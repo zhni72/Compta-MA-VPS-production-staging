@@ -13,10 +13,19 @@ from __future__ import annotations
 
 from functools import lru_cache
 from pathlib import Path
+from typing import Literal
 
+from pydantic import model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 BASE_DIR = Path(__file__).resolve().parents[2]
+
+# Valeur d'exemple de `SECRET_KEY` (documentation / developpement). Elle est
+# explicitement INTERDITE en production (cf. PG6E1) : un secret reel doit etre
+# genere hors du depot.
+PLACEHOLDER_SECRET_KEY = "compta-ma-secret-a-remplacer-en-production-32"
+# Longueur minimale exigee pour `SECRET_KEY` en production (signature HS256).
+MIN_SECRET_KEY_LENGTH = 32
 
 
 class Settings(BaseSettings):
@@ -26,14 +35,28 @@ class Settings(BaseSettings):
         extra="ignore",
     )
 
+    # --- Environnement d'execution ---
+    # Pilote les controles de securite : en `production`, certaines valeurs par
+    # defaut (DEBUG, SQLite, SECRET_KEY d'exemple) sont refusees au demarrage.
+    environment: Literal["development", "test", "staging", "production"] = (
+        "development"
+    )
+
     app_name: str = "Compta MA"
     debug: bool = True
 
     # --- Base de donnees ---
     database_url: str = f"sqlite:///{(BASE_DIR / 'compta_ma.db').as_posix()}"
 
+    # --- Migrations (Alembic) ---
+    # Facultatif : si absente, Alembic reutilise `database_url` (comportement
+    # historique, y compris SQLite). En production, elle peut cibler un role
+    # dedie aux migrations (compta_ma_migrator) sans exposer ces identifiants a
+    # l'application runtime. Elle n'est JAMAIS requise pour demarrer l'app.
+    migration_database_url: str | None = None
+
     # --- Securite (phase 2) ---
-    secret_key: str = "compta-ma-secret-a-remplacer-en-production-32"
+    secret_key: str = PLACEHOLDER_SECRET_KEY
     algorithm: str = "HS256"
     access_token_expire_minutes: int = 480
 
@@ -128,6 +151,42 @@ class Settings(BaseSettings):
     @property
     def is_sqlite(self) -> bool:
         return self.database_url.startswith("sqlite")
+
+    @property
+    def alembic_database_url(self) -> str:
+        """URL utilisee par Alembic : `MIGRATION_DATABASE_URL` sinon `DATABASE_URL`."""
+        return self.migration_database_url or self.database_url
+
+    @model_validator(mode="after")
+    def _valider_configuration_production(self) -> Settings:
+        """Refuse une configuration dangereuse lorsque `environment == 'production'`.
+
+        Les valeurs par defaut de developpement ne sont jamais rejetees : ce
+        controle ne s'active qu'en production.
+        """
+        if self.environment != "production":
+            return self
+
+        problemes: list[str] = []
+        if self.debug:
+            problemes.append("DEBUG doit etre desactive (false) en production.")
+        if self.is_sqlite:
+            problemes.append("DATABASE_URL ne doit pas cibler SQLite en production.")
+        if self.secret_key == PLACEHOLDER_SECRET_KEY:
+            problemes.append(
+                "SECRET_KEY utilise encore la valeur d'exemple : generez un "
+                "secret reel hors du depot."
+            )
+        if len(self.secret_key) < MIN_SECRET_KEY_LENGTH:
+            problemes.append(
+                f"SECRET_KEY doit comporter au moins {MIN_SECRET_KEY_LENGTH} "
+                "caracteres."
+            )
+        if problemes:
+            raise ValueError(
+                "Configuration de production invalide : " + " ".join(problemes)
+            )
+        return self
 
 
 @lru_cache

@@ -13,6 +13,7 @@ import csv
 from datetime import date
 
 from sqlalchemy import select
+from sqlalchemy.engine import make_url
 from sqlalchemy.orm import Session
 
 from app.core.config import settings
@@ -245,7 +246,12 @@ def main() -> None:
             ice=args.ice,
         )
     print("Amorcage termine :", result)
-    print(f"Base utilisee : {settings.database_url}")
+    # URL affichee sans mot de passe : un DATABASE_URL PostgreSQL ne doit jamais
+    # etre journalise en clair (cf. PG6E1). SQLite reste lisible tel quel.
+    base_affichee = make_url(settings.database_url).render_as_string(
+        hide_password=True
+    )
+    print(f"Base utilisee : {base_affichee}")
 
 
 if __name__ == "__main__":
