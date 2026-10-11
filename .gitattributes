@@ -1,0 +1,10 @@
+# Compta MA - attributs Git (PG6E2)
+#
+# Les scripts shell embarques dans les images Linux (initialisation PostgreSQL,
+# etc.) doivent etre stockes avec des fins de ligne LF : un CRLF rend le script
+# inexecutable dans un conteneur (interpreteur introuvable / `\r` dans les
+# commandes, y compris dans les delimiteurs de heredoc).
+#
+# Portee volontairement limitee aux scripts shell : aucune reecriture globale
+# des fins de ligne du projet.
+*.sh text eol=lf

@@ -5,6 +5,7 @@
 
 # --- Python / venv local ---
 .venv/
+.venv-*/
 venv/
 __pycache__/
 *.py[cod]
@@ -14,14 +15,15 @@ __pycache__/
 .ruff_cache/
 
 # --- Secrets / config locale ---
+# `.env` et ses variantes ne doivent JAMAIS entrer dans l'image ; seul
+# `.env.example` (documentation, sans valeur reelle) est conserve.
 .env
 .env.*
 !.env.example
 
 # --- Donnees locales (bases, sauvegardes, pieces, exports) ---
 *.db
-*.sqlite
-*.sqlite3
+*.sqlite*
 *.bak*
 media/
 exports/
@@ -30,6 +32,20 @@ backups/
 # --- Fichiers temporaires / artefacts locaux ---
 *.tmp
 *.log
+logs/
+.coverage
+htmlcov/
+coverage.xml
+
+# --- Rapports et jeux de tests locaux (non requis par l'application) ---
+recette_j9/
+/pg5*.xml
+
+# --- Fichiers de construction / deploiement (hors runtime) ---
+Dockerfile
+docker-compose*.yml
+.dockerignore
+.gitattributes
 
 # --- VCS / IDE / documentation hors runtime ---
 .git/

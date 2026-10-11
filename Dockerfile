@@ -7,15 +7,26 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 
 WORKDIR /app
 
-# Les dependances sont copiees en premier pour profiter du cache Docker
-COPY requirements.txt ./
-RUN pip install --no-cache-dir -r requirements.txt
+# Les dependances sont copiees en premier pour profiter du cache Docker.
+# PG6E2 : l'image de production installe le VERROU de production valide
+# (requirements-prod.lock.txt : versions figees, reproductibles) et non le
+# fichier de developpement. Aucune dependance nouvelle n'est introduite.
+COPY requirements-prod.lock.txt ./
+RUN pip install --no-cache-dir -r requirements-prod.lock.txt
 
 COPY . .
 
 # Utilisateur non privilegie (bonne pratique en production)
 RUN useradd --create-home --shell /bin/bash compta \
     && chown -R compta:compta /app
+
+# PG6E2 : repertoire des pieces justificatives, cree AVANT le montage du volume
+# `media` de docker-compose. Docker initialise un volume nomme a partir du
+# repertoire present dans l'image : ce dernier doit donc appartenir a
+# l'utilisateur non privilegie pour que l'application (USER compta) puisse y
+# ecrire ses PDF et les pieces du greffe.
+RUN install -d -o compta -g compta -m 0750 /app/media
+
 USER compta
 
 EXPOSE 8000

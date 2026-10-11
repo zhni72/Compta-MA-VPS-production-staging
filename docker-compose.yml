@@ -1,38 +1,122 @@
-# Compta MA - deploiement phase 3 : application + PostgreSQL
-# Usage : cp .env.example .env ; docker compose up -d --build
-#         docker compose exec app python -m alembic upgrade head
+# ============================================================
+# Compta MA - reference de deploiement Docker PRODUCTION (PG6E2)
+# ============================================================
+# Chaine de services : db (PostgreSQL) -> migrate (one-shot) -> app (web).
+#
+# Variables OBLIGATOIRES (aucun mot de passe par defaut, aucun repli) :
+#   POSTGRES_PASSWORD           superutilisateur bootstrap de l'instance
+#   COMPTA_MA_APP_PASSWORD      role applicatif    compta_ma_app
+#   COMPTA_MA_MIGRATOR_PASSWORD role de migration  compta_ma_migrator
+#   SECRET_KEY                  signature JWT (>= 32 caracteres)
+# La syntaxe ${VAR:?message} fait ECHOUER `docker compose up` immediatement si
+# une de ces variables est absente : jamais de secret de demonstration.
+#
+# Usage :
+#   docker compose up -d --build   # db -> migrate -> app
+#   docker compose logs migrate    # resultat des migrations
+#   docker compose down            # les donnees restent dans les volumes
+#
+# Isolation des identifiants : le service `app` ne recoit QUE le role
+# applicatif compta_ma_app (DATABASE_URL) ; MIGRATION_DATABASE_URL et le mot de
+# passe du role de migration ne sont transmis qu'au service `migrate`.
 
 services:
+  # ----------------------------------------------------------------
+  # A. Base de donnees PostgreSQL 18
+  # ----------------------------------------------------------------
   db:
-    image: postgres:16-alpine
+    # PostgreSQL 18 (version majeure). En 18, PGDATA est
+    # /var/lib/postgresql/18/docker et le volume officiel a ete deplace de
+    # /var/lib/postgresql/data vers /var/lib/postgresql : le montage ci-dessous
+    # suit cette convention (monter /var/lib/postgresql/data empeche le
+    # demarrage sur cette version majeure).
+    image: postgres:18-alpine
     restart: unless-stopped
+    # Arret propre de PostgreSQL (point de controle) avant tout SIGKILL.
+    stop_grace_period: 1m
     environment:
+      # Non secrets : valeurs de repli raisonnables.
       POSTGRES_DB: ${POSTGRES_DB:-compta_ma}
-      POSTGRES_USER: ${POSTGRES_USER:-compta}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-compta}
+      POSTGRES_USER: ${POSTGRES_USER:-compta_ma_bootstrap}
+      # Secrets : tous obligatoires.
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}
+      # Mots de passe consommes UNIQUEMENT par le script d'initialisation des
+      # roles (docker/postgres/10-init-compta-roles.sh) lors de la premiere
+      # creation du cluster : ils ne sont transmis a aucun autre service.
+      COMPTA_MA_APP_PASSWORD: ${COMPTA_MA_APP_PASSWORD:?COMPTA_MA_APP_PASSWORD is required}
+      COMPTA_MA_MIGRATOR_PASSWORD: ${COMPTA_MA_MIGRATOR_PASSWORD:?COMPTA_MA_MIGRATOR_PASSWORD is required}
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      # Donnees persistantes du cluster (chemin PG 18).
+      - postgres_data:/var/lib/postgresql
+      # Initialisation versionnee des roles : executee par l'entrypoint
+      # officiel au premier demarrage sur un PGDATA vide, puis ignoree.
+      - ./docker/postgres:/docker-entrypoint-initdb.d:ro
+    # Aucun port publie : la base n'est joignable que par le reseau interne.
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-compta} -d ${POSTGRES_DB:-compta_ma}"]
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
       interval: 10s
       timeout: 5s
       retries: 5
+      start_period: 30s
 
-  app:
+  # ----------------------------------------------------------------
+  # B. Migrations Alembic (one-shot, role compta_ma_migrator)
+  # ----------------------------------------------------------------
+  migrate:
     build: .
-    restart: unless-stopped
+    # Meme image que `app` (construite une seule fois).
+    image: compta_ma-app:local
+    # Service one-shot : il s'arrete apres les migrations (code 0 attendu).
+    restart: "no"
     depends_on:
       db:
         condition: service_healthy
     environment:
-      # En phase 3 la base est PostgreSQL : meme code que la phase 1 (SQLite).
-      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-compta}:${POSTGRES_PASSWORD:-compta}@db:5432/${POSTGRES_DB:-compta_ma}
-      SECRET_KEY: ${SECRET_KEY:-compta-ma-secret-a-remplacer-en-production-32}
-      DEBUG: ${DEBUG:-false}
+      # La validation PG6E1 en production exige une DATABASE_URL non SQLite et
+      # un SECRET_KEY valide : ce processus s'aligne sur la production.
+      ENVIRONMENT: production
+      DEBUG: "false"
+      SECRET_KEY: ${SECRET_KEY:?SECRET_KEY is required}
+      # Role DEDIE aux migrations (jamais le superutilisateur bootstrap) :
+      # c'est l'URL reellement utilisee par Alembic.
+      MIGRATION_DATABASE_URL: "postgresql+psycopg://compta_ma_migrator:${COMPTA_MA_MIGRATOR_PASSWORD:?COMPTA_MA_MIGRATOR_PASSWORD is required}@db:5432/${POSTGRES_DB:-compta_ma}"
+      # Alembic lit MIGRATION_DATABASE_URL en priorite ; DATABASE_URL est
+      # fournie pour satisfaire la validation de Settings dans ce processus.
+      DATABASE_URL: "postgresql+psycopg://compta_ma_migrator:${COMPTA_MA_MIGRATOR_PASSWORD:?COMPTA_MA_MIGRATOR_PASSWORD is required}@db:5432/${POSTGRES_DB:-compta_ma}"
+    # Invocation Alembic validee : `python -m alembic upgrade head`.
+    command: ["python", "-m", "alembic", "upgrade", "head"]
+    # Aucun port publie.
+
+  # ----------------------------------------------------------------
+  # C. Application web (role compta_ma_app)
+  # ----------------------------------------------------------------
+  app:
+    build: .
+    image: compta_ma-app:local
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+      migrate:
+        # L'application ne demarre qu'apres le succes des migrations.
+        condition: service_completed_successfully
+    environment:
+      ENVIRONMENT: production
+      DEBUG: "false"
+      # URL du role APPLICATIF uniquement (compta_ma_app) : aucun droit de
+      # migration, et le mot de passe du role de migration n'existe pas dans ce
+      # conteneur (cf. isolation des identifiants en tete de fichier).
+      DATABASE_URL: "postgresql+psycopg://compta_ma_app:${COMPTA_MA_APP_PASSWORD:?COMPTA_MA_APP_PASSWORD is required}@db:5432/${POSTGRES_DB:-compta_ma}"
+      SECRET_KEY: ${SECRET_KEY:?SECRET_KEY is required}
       DEFAULT_VAT_RATE: ${DEFAULT_VAT_RATE:-20.00}
     ports:
-      - "8000:8000"
+      # Port applicatif lie a localhost : un reverse proxy (nginx, traefik,
+      # caddy) expose ensuite HTTPS. La publication n'est jamais ouverte sur
+      # l'exterieur du serveur.
+      - "127.0.0.1:8000:8000"
     volumes:
+      # Pieces justificatives et PDF (repertoire cree dans l'image au nom de
+      # l'utilisateur non privilegie).
       - media:/app/media
 
 volumes:
