@@ -1,0 +1,1 @@
+"""Interface graphique (Jinja2) : gabarits, feuille de style et routes HTML."""

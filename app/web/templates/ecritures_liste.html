@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1>Saisie des écritures</h1>
+    <div class="breadcrumb">
+      <a href="/">Accueil</a> &middot; Comptabilité &middot; journal
+      {{ journal_code or 'tous' }} &middot; exercice {{ exercice }}
+    </div>
+  </div>
+  <div class="actions">
+    <a class="btn btn-primary" href="/ecritures/nouvelle">+ Nouvelle écriture</a>
+    <a class="btn" href="/etats/journal?year={{ exercice }}">Journal comptable</a>
+  </div>
+</div>
+
+<div class="card">
+  <form class="filters" method="get" action="/ecritures">
+    <div class="field">
+      <label for="journal_code">Journal</label>
+      <select id="journal_code" name="journal_code">
+        <option value="">Tous les journaux</option>
+        {% for j in journaux %}
+        <option value="{{ j.code }}" {{ 'selected' if journal_code == j.code }}>
+          {{ j.code }} — {{ j.label }}
+        </option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="field">
+      <label for="date_from">Du</label>
+      <input type="date" id="date_from" name="date_from" value="{{ date_from }}">
+    </div>
+    <div class="field">
+      <label for="date_to">Au</label>
+      <input type="date" id="date_to" name="date_to" value="{{ date_to }}">
+    </div>
+    <button type="submit" class="btn">Filtrer</button>
+    <a class="btn" href="/ecritures">Réinitialiser</a>
+  </form>
+
+  <div class="body tight table-wrap">
+    <table class="data">
+      <thead>
+        <tr>
+          <th>Numéro</th><th>Date</th><th>Journal</th><th>Libellé</th>
+          <th class="num">Débit</th><th class="num">Crédit</th><th>État</th><th>Origine</th><th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for e in ecritures %}
+        <tr>
+          <td class="code">{{ e.entry_number or '—' }}</td>
+          <td>{{ e.entry_date | date_fr }}</td>
+          <td>{{ journaux_map.get(e.journal_id, '?') }}</td>
+          <td>
+            {{ e.label }}
+            {% if e.lines and e.status == 'draft' %}
+            <div class="secondary" style="font-size:12px; color:var(--text-muted)">
+              {% for l in e.lines %}{{ l.account_number }}&nbsp;{{ l.debit | amount }}/{{ l.credit | amount }}{% if not loop.last %} · {% endif %}{% endfor %}
+            </div>
+            {% endif %}
+          </td>
+          <td class="num">{{ e.total_debit | amount }}</td>
+          <td class="num">{{ e.total_credit | amount }}</td>
+          <td><span class="badge {{ STATUS_BADGES.get(e.status) }}">{{ STATUS_LABELS.get(e.status) }}</span></td>
+          <td class="secondary" style="font-size:12px">
+            {{ {'manual': 'Saisie', 'invoice': 'Facture', 'payment': 'Règlement', 'reversal': 'Contre-écriture'}.get(e.source, e.source) }}
+          </td>
+          <td class="center" style="white-space:nowrap">
+            {% if e.status == 'draft' %}
+            <form method="post" action="/ecritures/{{ e.id }}/valider" style="display:inline">
+              <button class="btn btn-small btn-success" type="submit">Valider</button>
+            </form>
+            {% else %}
+            <form method="post" action="/ecritures/{{ e.id }}/extourner" style="display:inline"
+                  onsubmit="return confirm('Générer une contre-écriture pour cette écriture ?');">
+              <input type="hidden" name="reason" value="Correction">
+              <button class="btn btn-small" type="submit">Extourner</button>
+            </form>
+            {% endif %}
+          </td>
+        </tr>
+        {% else %}
+        <tr>
+          <td colspan="9" class="empty">
+            Aucune écriture sur la période. Créez une écriture ou saisissez une facture.
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,137 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1>Fiche de la société</h1>
+    <div class="breadcrumb">
+      <a href="/">Accueil</a> &middot; Paramètres &middot; {{ societes | length }} dossier(s) comptable(s)
+    </div>
+  </div>
+  <div class="actions">
+    <a class="btn" href="/parametres/exercices">Exercices</a>
+    <a class="btn" href="/parametres/utilisateurs">Utilisateurs</a>
+  </div>
+</div>
+
+<div class="grid cols-3">
+  <div class="kpi">
+    <div class="label">Comptes au plan comptable</div>
+    <div class="value">{{ total_comptes_plan }}</div>
+    <div class="hint">PCGE / CGNC (4 chiffres et plus)</div>
+  </div>
+  <div class="kpi">
+    <div class="label">Exercices enregistrés</div>
+    <div class="value">{{ exercices | length }}</div>
+    <div class="hint">Année civile (obligation marocaine)</div>
+  </div>
+  <div class="kpi">
+    <div class="label">Régime de TVA</div>
+    <div class="value" style="font-size:18px">{{ company.vat_regime if company else '—' }}</div>
+    <div class="hint">Mensuel si CA ≥ 1 000 000 DH</div>
+  </div>
+</div>
+
+<form method="post" action="/parametres/societe">
+  <div class="card">
+    <header><span>Identification légale (mentions obligatoires des factures)</span></header>
+    <div class="body">
+      <div class="form-grid cols-3">
+        <div style="grid-column: span 2">
+          <label for="name" class="required">Raison sociale</label>
+          <input type="text" id="name" name="name" required maxlength="180"
+                 value="{{ company.name if company else '' }}" placeholder="ex. ATLAS SERVICES SARL">
+        </div>
+        <div>
+          <label for="legal_form">Forme juridique</label>
+          <input type="text" id="legal_form" name="legal_form" maxlength="40"
+                 value="{{ company.legal_form or '' if company else '' }}" placeholder="SARL, SAS, SA">
+        </div>
+        <div>
+          <label for="ice">ICE (15 chiffres)</label>
+          <input type="text" id="ice" name="ice" maxlength="15"
+                 value="{{ company.ice or '' if company else '' }}" placeholder="001234567000012">
+        </div>
+        <div>
+          <label for="fiscal_id">Identifiant fiscal (IF)</label>
+          <input type="text" id="fiscal_id" name="fiscal_id" maxlength="8" placeholder="1084612"
+                 value="{{ company.fiscal_id or '' if company else '' }}">
+          <div class="field-help">7 ou 8 chiffres, saisi tel quel (aucune transformation) ; sert au dépôt EDI.</div>
+        </div>
+        <div>
+          <label for="rc">Registre de commerce (RC)</label>
+          <input type="text" id="rc" name="rc" maxlength="30"
+                 value="{{ company.rc or '' if company else '' }}">
+        </div>
+        <div>
+          <label for="patente">N° de patente (taxe professionnelle)</label>
+          <input type="text" id="patente" name="patente" maxlength="30"
+                 value="{{ company.patente or '' if company else '' }}">
+        </div>
+        <div>
+          <label for="cnss_number">N° d'affiliation CNSS</label>
+          <input type="text" id="cnss_number" name="cnss_number" maxlength="20"
+                 value="{{ company.cnss_number or '' if company else '' }}">
+        </div>
+        <div>
+          <label for="vat_regime">Régime de déclaration TVA</label>
+          <select id="vat_regime" name="vat_regime">
+            <option value="trimestriel"
+              {{ 'selected' if company and company.vat_regime == 'trimestriel' }}>
+              Trimestriel (CA inférieur à 1 000 000 DH)
+            </option>
+            <option value="mensuel"
+              {{ 'selected' if company and company.vat_regime == 'mensuel' }}>
+              Mensuel (CA supérieur ou égal à 1 000 000 DH)
+            </option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-grid cols-2" style="margin-top:12px">
+        <div>
+          <label for="address">Adresse</label>
+          <input type="text" id="address" name="address" maxlength="255"
+                 value="{{ company.address or '' if company else '' }}">
+        </div>
+        <div>
+          <label for="city">Ville</label>
+          <input type="text" id="city" name="city" maxlength="80"
+                 value="{{ company.city or '' if company else '' }}">
+        </div>
+        <div>
+          <label for="phone">Téléphone</label>
+          <input type="text" id="phone" name="phone" maxlength="30"
+                 value="{{ company.phone or '' if company else '' }}">
+        </div>
+        <div>
+          <label for="email">E-mail</label>
+          <input type="email" id="email" name="email" maxlength="120"
+                 value="{{ company.email or '' if company else '' }}">
+        </div>
+      </div>
+
+      <div class="form-grid cols-2" style="margin-top:12px">
+        <div>
+          <label for="year">Ouvrir un exercice comptable</label>
+          <input type="number" id="year" name="year" min="2000" max="2100"
+                 value="{{ annee_courante }}">
+          <div class="field-help">Les sociétés marocaines clôturent au 31 décembre.</div>
+        </div>
+        <div>
+          <label>Contrôle applicable aux factures de vente</label>
+          <label style="font-weight:400">
+            <input type="checkbox" name="require_ice" value="1" style="width:auto; margin-right:6px"
+                   {{ 'checked' if not company or company.require_ice }}>
+            Refuser la validation d'une facture sans ICE (professionnels)
+          </label>
+        </div>
+      </div>
+    </div>
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary">Enregistrer la fiche société</button>
+      <a class="btn" href="/">Tableau de bord</a>
+    </div>
+  </div>
+</form>
+{% endblock %}

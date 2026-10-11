@@ -1,0 +1,258 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1>Relevé des déductions TVA — export EDI</h1>
+    <div class="breadcrumb">
+      <a href="/">Accueil</a> &middot; <a href="/tva">Déclaration de TVA</a> &middot;
+      {{ libelle }} &middot; fichier <strong>{{ nom_fichier }}</strong>
+    </div>
+  </div>
+  <div class="actions">
+    <a class="btn btn-primary" href="/tva/edi/xml?year={{ exercice }}&month={{ month }}&quarter={{ quarter }}&include_zero={{ include_zero }}&tx_unit={{ tx_unit }}&prorata={{ prorata }}&base_periode={{ base_periode }}&taux_prorata={{ taux_prorata }}">
+      ⬇ Télécharger le XML
+    </a>
+    <a class="btn" href="/tva/edi/bordereau/pdf?year={{ exercice }}&month={{ month }}&quarter={{ quarter }}">⬇ Bordereau PDF</a>
+    <a class="btn" href="/tva?year={{ exercice }}&month={{ month }}&quarter={{ quarter }}">Déclaration</a>
+  </div>
+</div>
+
+<div class="grid cols-4">
+  <div class="kpi">
+    <div class="label">Lignes du relevé</div>
+    <div class="value">{{ totaux.nb_lignes }}</div>
+    <div class="hint">{{ exclues | length }} ligne(s) écartée(s) (TVA nulle)</div>
+  </div>
+  <div class="kpi">
+    <div class="label">Base HT déductible</div>
+    <div class="value">{{ totaux.mht | money }}</div>
+    <div class="hint">Total des factures d'achat retenues</div>
+  </div>
+  <div class="kpi negative">
+    <div class="label">TVA déductible</div>
+    <div class="value">{{ totaux.tva | money }}</div>
+    <div class="hint">Somme des balises &lt;tva&gt;</div>
+  </div>
+  <div class="kpi">
+    <div class="label">Régime / période</div>
+    <div class="value" style="font-size:17px">
+      {{ 'Mensuel' if regime == 1 else 'Trimestriel' }} — {{ periode }}
+    </div>
+    <div class="hint">
+      Balises &lt;regime&gt; / &lt;periode&gt; · base {{ 'date de paiement' if base_periode == 'paiement' else 'date de facture' }}
+      · prorata {{ (prorata_valeur * 100) | amount }} %
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <form class="filters" method="get" action="/tva/edi">
+    <div class="field">
+      <label for="year">Exercice</label>
+      <input type="number" id="year" name="year" value="{{ exercice }}" min="2000" max="2100" style="min-width:110px">
+    </div>
+    <div class="field">
+      <label for="month">Mois (régime mensuel)</label>
+      <select id="month" name="month">
+        <option value="">—</option>
+        {% for m in range(1, 13) %}
+        <option value="{{ m }}" {{ 'selected' if month == m | string }}>{{ '%02d' % m }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="field">
+      <label for="quarter">Trimestre (régime trimestriel)</label>
+      <select id="quarter" name="quarter">
+        <option value="">—</option>
+        {% for t in range(1, 5) %}
+        <option value="{{ t }}" {{ 'selected' if quarter == t | string }}>T{{ t }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="field">
+      <label for="tx_unit">Unité de &lt;tx&gt;</label>
+      <select id="tx_unit" name="tx_unit">
+        <option value="percent" {{ 'selected' if tx_unit == 'percent' }}>20 (pourcentage)</option>
+        <option value="ratio" {{ 'selected' if tx_unit == 'ratio' }}>0.20 (ratio)</option>
+      </select>
+    </div>
+    <div class="field">
+      <label for="include_zero">Lignes à TVA nulle</label>
+      <select id="include_zero" name="include_zero">
+        <option value="" {{ 'selected' if include_zero != '1' }}>Exclues du relevé</option>
+        <option value="1" {{ 'selected' if include_zero == '1' }}>Inclues (tva = 0.00)</option>
+      </select>
+    </div>
+    <div class="field">
+      <label for="prorata">Balise &lt;prorata&gt;</label>
+      <select id="prorata" name="prorata">
+        <option value="" {{ 'selected' if prorata != '1' }}>Omise (conforme au XSD DGI)</option>
+        <option value="1" {{ 'selected' if prorata == '1' }}>Ajoutée (en pourcentage, ex. 90)</option>
+      </select>
+    </div>
+    <div class="field">
+      <label for="base_periode">Période rattachée à</label>
+      <select id="base_periode" name="base_periode">
+        <option value="paiement" {{ 'selected' if base_periode == 'paiement' }}>Date de paiement (encaissement)</option>
+        <option value="facture" {{ 'selected' if base_periode == 'facture' }}>Date de facture</option>
+      </select>
+    </div>
+    <div class="field">
+      <label for="taux_prorata">Prorata de déduction (%)</label>
+      <input type="number" id="taux_prorata" name="taux_prorata" value="{{ taux_prorata }}"
+             min="0" max="100" step="0.01" style="min-width:100px">
+      <div class="field-help">100 = déduction intégrale (CGI art. 106).</div>
+    </div>
+    <button type="submit" class="btn btn-primary">Préparer le relevé</button>
+  </form>
+</div>
+
+{% if anomalies_bloquantes %}
+<div class="card">
+  <header><span>⛔ Anomalies bloquantes ({{ anomalies_bloquantes | length }}) — export refusé sans correction</span></header>
+  <div class="body tight table-wrap">
+    <table class="data">
+      <thead><tr><th>Référence</th><th>Motif</th><th class="center">Gravité</th></tr></thead>
+      <tbody>
+        {% for a in anomalies %}
+        <tr>
+          <td class="code">{{ a.reference }}</td>
+          <td>{{ a.motif }}</td>
+          <td class="center">
+            <span class="badge {{ 'badge-red' if a.bloquant else 'badge-orange' }}">
+              {{ 'Bloquante' if a.bloquant else 'À vérifier' }}
+            </span>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% elif anomalies %}
+<div class="card">
+  <header><span>⚠ Anomalies non bloquantes ({{ anomalies | length }})</span></header>
+  <div class="body tight table-wrap">
+    <table class="data">
+      <thead><tr><th>Référence</th><th>Motif</th></tr></thead>
+      <tbody>
+        {% for a in anomalies %}
+        <tr><td class="code">{{ a.reference }}</td><td>{{ a.motif }}</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endif %}
+
+<div class="card">
+  <header><span>Lignes du fichier XML (balises &lt;rd&gt;)</span></header>
+  <div class="body tight table-wrap">
+    <table class="data">
+      <thead>
+        <tr>
+          <th class="num">ord</th><th>num</th><th>des</th><th>dfac</th>
+          <th>if (refF)</th><th>ice (refF)</th><th class="num">tx</th>
+          <th>mp</th><th>dpai</th>
+          <th class="num">mht</th><th class="num">tva</th><th class="num">ttc</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for ligne in lignes %}
+        <tr>
+          <td class="num">{{ ligne.ordre }}</td>
+          <td class="code">{{ ligne.num }}</td>
+          <td>{{ ligne.designation }}</td>
+          <td>{{ ligne.date_facture | date_fr }}</td>
+          <td class="code">{{ ligne.if_fournisseur or '—' }}</td>
+          <td class="code">{{ ligne.ice_fournisseur or '—' }}</td>
+          <td class="num">{{ ligne.taux | amount }}</td>
+          <td class="center">{{ ligne.mode_id }}</td>
+          <td>{{ ligne.date_paiement | date_fr if ligne.date_paiement else '—' }}</td>
+          <td class="num">{{ ligne.mht | amount }}</td>
+          <td class="num">{{ ligne.tva | amount }}</td>
+          <td class="num">{{ ligne.ttc | amount }}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="12" class="empty">Aucune facture d'achat validée sur la période.</td></tr>
+        {% endfor %}
+      </tbody>
+      <tfoot>
+        <tr>
+          <td colspan="9">Totaux</td>
+          <td class="num">{{ totaux.mht | amount }}</td>
+          <td class="num">{{ totaux.tva | amount }}</td>
+          <td class="num">{{ totaux.ttc | amount }}</td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+</div>
+
+<div class="grid cols-2">
+  <div class="card">
+    <header><span>Ventilation par taux (contrôle)</span></header>
+    <div class="body tight table-wrap">
+      <table class="data">
+        <thead><tr><th class="num">Taux</th><th class="num">Lignes</th><th class="num">Base HT</th><th class="num">TVA</th></tr></thead>
+        <tbody>
+          {% for taux, valeurs in totaux.par_taux.items() %}
+          <tr>
+            <td class="num">{{ taux | amount }} %</td>
+            <td class="num">{{ valeurs.nb }}</td>
+            <td class="num">{{ valeurs.base | amount }}</td>
+            <td class="num">{{ valeurs.tva | amount }}</td>
+          </tr>
+          {% else %}
+          <tr><td colspan="4" class="empty">—</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <header><span>Lignes écartées du relevé</span></header>
+    <div class="body tight table-wrap">
+      <table class="data">
+        <thead><tr><th>Référence</th><th>Motif</th><th class="num">Base HT</th></tr></thead>
+        <tbody>
+          {% for e in exclues %}
+          <tr>
+            <td class="code">{{ e.reference }}</td>
+            <td>{{ e.motif }}</td>
+            <td class="num">{{ e.mht | amount }}</td>
+          </tr>
+          {% else %}
+          <tr><td colspan="3" class="empty">Aucune ligne écartée.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <header><span>Rappel des règles de dépôt (modèle DGI « ADC082F-15I », art. 112 du CGI)</span></header>
+  <div class="body">
+    <ul style="margin:0; padding-left:18px; font-size:13.5px; line-height:1.9">
+      <li>Fichier <strong>XML</strong> (jamais une archive ZIP), <strong>&lt; 1 Mo</strong>, validé contre le schéma XSD DGI.</li>
+      <li>Ordre des balises <strong>imposé</strong> par le XSD : <code>identifiantFiscal, annee, periode, regime,
+          releveDeductions → rd (ord, num, des, mht, tva, ttc, refF(if, nom, ice), tx, mp(id), dpai, dfac)</code>.</li>
+      <li><strong>&lt;tx&gt;</strong> exprimé en <strong>pourcentage</strong> (<code>&lt;tx&gt;20&lt;/tx&gt;</code>) — unité confirmée par l'exemple DGI accepté.</li>
+      <li><strong>&lt;prorata&gt; n'est pas déclarée dans le XSD</strong> : la balise est omise par défaut ; si votre plateforme l'exige,
+          elle est écrite en <strong>pourcentage</strong> (exemple officiel DGI : <code>&lt;prorata&gt;70&lt;/prorata&gt;</code>).</li>
+      <li><strong>IF sur 7 ou 8 chiffres, utilisé tel quel</strong> (aucun zéro ajouté) : <code>&lt;if&gt;1084612&lt;/if&gt;</code>,
+          <code>&lt;identifiantFiscal&gt;1234567&lt;/identifiantFiscal&gt;</code>.</li>
+      <li>Dates <strong>AAAA-MM-JJ</strong>, décimaux avec le point (<code>118.00</code>) ; <code>&lt;ord&gt;</code> limité à <strong>127</strong> lignes par fichier.</li>
+      <li>Période rattachée en priorité à la <strong>date de paiement</strong> (le modèle DGI « REGIME(Encais-1) » attache la déduction au règlement : le relevé porte
+          &lt;dpai&gt; et &lt;dfac&gt;) ; la base « date de facture » reste sélectionnable pour les contrôles.</li>
+      <li>Le <strong>prorata de déduction</strong> (CGI art. 106) réduit la balise &lt;tva&gt; : 100 % par défaut ; si l'entreprise a des activités exonérées,
+          saisissez le prorata de l'exercice — une régularisation reste due en cas d'immobilisation ou de changement d'activité.</li>
+      <li>TVA déductible ventilée selon le CGNC : <strong>34551</strong> sur immobilisations, <strong>34552</strong> sur charges.</li>
+      <li>Après acceptation, les données arrivent dans la déclaration Simpl-TVA à l'état <strong>brouillon</strong> : il reste à la valider et à la déposer.</li>
+    </ul>
+  </div>
+</div>
+{% endblock %}

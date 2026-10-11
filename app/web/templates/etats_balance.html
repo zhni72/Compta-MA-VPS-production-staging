@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1>Balance générale</h1>
+    <div class="breadcrumb">
+      <a href="/">Accueil</a> &middot; États comptables &middot; {{ libelle }}
+      &middot; du {{ debut | date_fr }} au {{ fin | date_fr }}
+    </div>
+  </div>
+  <div class="actions">
+    <button class="btn" type="button" onclick="window.print()">Imprimer</button>
+    <a class="btn" href="/etats/grand-livre?year={{ exercice }}">Grand livre</a>
+    <a class="btn" href="/etats/cpc?year={{ exercice }}">CPC</a>
+  </div>
+</div>
+
+<div class="grid cols-3">
+  <div class="kpi">
+    <div class="label">Total débit</div>
+    <div class="value">{{ balance.total_debit | money }}</div>
+    <div class="hint">{{ balance.lines | length }} compte(s) mouvementé(s)</div>
+  </div>
+  <div class="kpi">
+    <div class="label">Total crédit</div>
+    <div class="value">{{ balance.total_credit | money }}</div>
+    <div class="hint">Contrôle de partie double</div>
+  </div>
+  <div class="kpi {{ 'positive' if balance.equilibre else 'negative' }}">
+    <div class="label">Équilibre de la balance</div>
+    <div class="value" style="font-size:18px">
+      {{ 'Équilibrée' if balance.equilibre else 'Déséquilibrée' }}
+    </div>
+    <div class="hint">débit = crédit sur les écritures validées</div>
+  </div>
+</div>
+
+<div class="card">
+  <form class="filters" method="get" action="/etats/balance">
+    <div class="field">
+      <label for="year">Exercice</label>
+      <input type="number" id="year" name="year" value="{{ exercice }}" min="2000" max="2100" style="min-width:110px">
+    </div>
+    <div class="field">
+      <label for="month">Mois (régime mensuel)</label>
+      <select id="month" name="month">
+        <option value="">—</option>
+        {% for m in range(1, 13) %}
+        <option value="{{ m }}" {{ 'selected' if month == m | string }}>{{ '%02d' % m }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="field">
+      <label for="quarter">Trimestre</label>
+      <select id="quarter" name="quarter">
+        <option value="">—</option>
+        {% for t in range(1, 5) %}
+        <option value="{{ t }}" {{ 'selected' if quarter == t | string }}>T{{ t }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="field">
+      <label for="prefix">Comptes commençant par</label>
+      <input type="search" id="prefix" name="prefix" value="{{ prefix }}" placeholder="ex. 342">
+    </div>
+    <button type="submit" class="btn btn-primary">Actualiser</button>
+    <a class="btn" href="/etats/balance?year={{ exercice }}">Exercice complet</a>
+  </form>
+
+  <div class="body tight table-wrap">
+    <table class="data">
+      <thead>
+        <tr>
+          <th>Compte</th><th>Intitulé</th><th class="num">Mouvement débit</th>
+          <th class="num">Mouvement crédit</th><th class="num">Solde débiteur</th>
+          <th class="num">Solde créditeur</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for l in balance.lines %}
+        <tr>
+          <td class="code">
+            <a href="/etats/grand-livre?account_number={{ l.account_number }}&year={{ exercice }}">{{ l.account_number }}</a>
+          </td>
+          <td>{{ l.label }}</td>
+          <td class="num">{{ l.debit | amount }}</td>
+          <td class="num">{{ l.credit | amount }}</td>
+          <td class="num">{{ l.solde | amount if l.solde > 0 else '' }}</td>
+          <td class="num">{{ (-l.solde) | amount if l.solde < 0 else '' }}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="6" class="empty">Aucun mouvement sur la période sélectionnée.</td></tr>
+        {% endfor %}
+      </tbody>
+      <tfoot>
+        <tr>
+          <td colspan="2">Totaux généraux</td>
+          <td class="num">{{ balance.total_debit | amount }}</td>
+          <td class="num">{{ balance.total_credit | amount }}</td>
+          <td colspan="2" class="num">{{ 'Balance équilibrée' if balance.equilibre else 'Écart à corriger' }}</td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+</div>
+
+<div class="card">
+  <header><span>Récapitulatif par classe du CGNC</span></header>
+  <div class="body tight table-wrap">
+    <table class="data">
+      <thead>
+        <tr><th class="center">Classe</th><th>Intitulé</th><th class="num">Débit</th><th class="num">Crédit</th><th class="num">Solde</th></tr>
+      </thead>
+      <tbody>
+        {% for c in par_classe %}
+        <tr>
+          <td class="center">{{ c.classe }}</td>
+          <td>{{ c.libelle }}</td>
+          <td class="num">{{ c.debit | amount }}</td>
+          <td class="num">{{ c.credit | amount }}</td>
+          <td class="num">{{ c.solde | amount }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

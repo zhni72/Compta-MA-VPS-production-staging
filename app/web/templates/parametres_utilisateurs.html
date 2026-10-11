@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1>Utilisateurs &amp; rôles</h1>
+    <div class="breadcrumb">
+      <a href="/">Accueil</a> &middot; Paramètres &middot; {{ utilisateurs | length }} utilisateur(s)
+    </div>
+  </div>
+  <div class="actions">
+    <a class="btn" href="/parametres/exercices">Exercices</a>
+    <a class="btn" href="/parametres/societe">Fiche société</a>
+  </div>
+</div>
+
+<div class="card">
+  <header><span>Comptes existants</span></header>
+  <div class="body tight table-wrap">
+    <table class="data">
+      <thead>
+        <tr><th>ID</th><th>Nom</th><th>E-mail</th><th>Rôles</th><th class="center">Actif</th><th class="center">Super-admin</th></tr>
+      </thead>
+      <tbody>
+        {% for u in utilisateurs %}
+        <tr>
+          <td>{{ u.id }}</td>
+          <td>{{ u.full_name }}</td>
+          <td class="code">{{ u.email }}</td>
+          <td>
+            {% for code in u.role_codes | sort %}
+            <span class="badge badge-blue">{{ ROLE_LABELS_WEB.get(code, code) }}</span>
+            {% endfor %}
+          </td>
+          <td class="center">{{ 'Oui' if u.is_active else 'Non' }}</td>
+          <td class="center">{{ 'Oui' if u.is_superadmin else '—' }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="grid cols-2">
+  <div class="card">
+    <header><span>Créer un utilisateur</span></header>
+    <form method="post" action="/parametres/utilisateurs">
+      <div class="body">
+        <div class="form-grid cols-2">
+          <div>
+            <label for="full_name">Nom complet</label>
+            <input type="text" id="full_name" name="full_name" maxlength="150"
+                   placeholder="ex. Salma Bennani">
+          </div>
+          <div>
+            <label for="email" class="required">Adresse e-mail (identifiant)</label>
+            <input type="email" id="email" name="email" required maxlength="150">
+          </div>
+        </div>
+        <div style="margin-top:12px">
+          <label for="password" class="required">Mot de passe (8 caractères minimum)</label>
+          <input type="password" id="password" name="password" required minlength="8"
+                 autocomplete="new-password">
+          <div class="field-help">Hachage Argon2id : aucun mot de passe n'est stocké en clair.</div>
+        </div>
+        <div style="margin-top:12px">
+          <label>Rôles (RBAC)</label>
+          {% for r in roles %}
+          <label style="font-weight:400; display:block">
+            <input type="checkbox" name="roles" value="{{ r.code }}"
+                   style="width:auto; margin-right:6px"
+                   {{ 'checked' if r.code == 'COMPTABLE' }}>
+            <strong>{{ ROLE_LABELS_WEB.get(r.code, r.name) }}</strong>
+            <span class="field-help" style="display:inline">
+              {% if r.code == 'ADMIN' %}— gestion complète, sociétés et utilisateurs
+              {% elif r.code == 'EXPERT_COMPTABLE' %}— validation, clôture, états
+              {% elif r.code == 'COMPTABLE' %}— saisie, factures, règlements
+              {% elif r.code == 'CAISSIER' %}— règlements de trésorerie
+              {% elif r.code == 'COMMERCIAL' %}— factures clients
+              {% else %}— consultation et exports{% endif %}
+            </span>
+          </label>
+          {% endfor %}
+        </div>
+      </div>
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary">Créer l'utilisateur</button>
+      </div>
+    </form>
+  </div>
+
+  <div class="card">
+    <header><span>Matrice des droits</span></header>
+    <div class="body tight table-wrap">
+      <table class="data">
+        <thead><tr><th>Opération</th><th>Rôles autorisés</th></tr></thead>
+        <tbody>
+          <tr><td>Consulter les écrans et les états</td><td>Tous les rôles</td></tr>
+          <tr><td>Créer un tiers</td><td>Admin, Expert-comptable, Comptable, Commercial</td></tr>
+          <tr><td>Créer une facture</td><td>Admin, Expert-comptable, Comptable, Commercial</td></tr>
+          <tr><td>Valider / annuler une facture</td><td>Admin, Expert-comptable, Comptable</td></tr>
+          <tr><td>Enregistrer un règlement</td><td>Admin, Expert-comptable, Comptable, Caissier</td></tr>
+          <tr><td>Saisir et valider une écriture</td><td>Admin, Expert-comptable, Comptable</td></tr>
+          <tr><td>Clôturer / verrouiller un exercice</td><td>Admin, Expert-comptable</td></tr>
+          <tr><td>Gérer la société et les utilisateurs</td><td>Administrateur</td></tr>
+        </tbody>
+      </table>
+      <div class="body">
+        <p class="field-help" style="margin:0">
+          Chaque opération sensible est enregistrée dans la piste d'audit
+          (utilisateur, action, date, entité concernée).
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

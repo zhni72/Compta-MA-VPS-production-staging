@@ -1,0 +1,42 @@
+# ============================================================
+# Compta MA - dependances Python
+# Phase 1 (mono-utilisateur) : SQLite, aucune installation serveur requise
+# Phase 2 (multi-utilisateurs) : PostgreSQL (psycopg)
+# ============================================================
+#
+# Versions FIGEES (P0 portabilite / reproductibilite) : ce sont les versions
+# reellement installees dans .venv et validees par la suite de reference
+# (448 tests PASS). Aucune montee de version sans campagne de tests complete.
+
+# --- Coeur applicatif ---
+fastapi==0.141.1
+uvicorn[standard]==0.53.0
+jinja2==3.1.6
+sqlalchemy==2.0.54
+alembic==1.20.0
+pydantic==2.13.5
+pydantic-settings==2.15.0
+pyjwt==2.14.0
+argon2-cffi==25.1.0
+python-multipart==0.0.32
+
+# --- Base de donnees PostgreSQL (Phase 2) ---
+psycopg[binary]==3.3.6
+
+# --- Outils developpement ---
+# pypdf : convertisseur du plan comptable PDF -> CSV (tools/plan_pdf_to_csv.py)
+pypdf==6.19.0
+# reportlab : rendu PDF des etats, pieces et bordereaux (app/services/pdf.py).
+# Moteur retenu au POC du jalon J0 : pur Python, aucune dependance systeme.
+# (WeasyPrint ecarte : runtime GTK requis -> echec d'import sur poste Windows.
+# Il n'est present dans .venv que pour le diagnostic tools/poc_pdf.py et
+# n'est PAS une dependance du serveur.)
+reportlab==5.0.1
+# lxml : validation des fichiers EDI contre les XSD de la DGI (TVA RD, liasse,
+# DTS, CbCR) - la bibliotheque standard ne sait pas valider un XSD.
+lxml==6.1.3
+
+# --- Tests ---
+pytest==9.1.1
+httpx==0.28.1
+

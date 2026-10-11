@@ -1,0 +1,364 @@
+Base : compta_ma.db | societe : SOCIETE RECETTE MAROC SARL AU (ICE 001234567000099, IF 1234567, TVA mensuel)
+Exercices : [(2025, 'closed'), (2026, 'open')]
+
+====================================================================================================
+A. ECRITURES DE PAIE 2026 (a neutraliser : seed PAIE26-xx + ecriture du module)
+====================================================================================================
+24 ecriture(s) de paie en 2026 :
+
+  2026-01-31 | EC202600096 | journal OD | ref=PAIE 2026-01 | source=payroll | validated | Paie 2026-01 - 3 bulletin(s)
+      61711    D    26,000.00 C         0.00  Salaire de base
+      61741    D     2,415.60 C         0.00  Cotations patronales CNSS/AMO
+      61744    D     1,664.00 C         0.00  Prestations familiales (patronales)
+      61768    D       416.00 C         0.00  Taxe de formation professionnelle
+      4432     D         0.00 C    22,439.74  Rémunérations dues au personnel
+      4441     D         0.00 C     5,755.20  CNSS / AMO (parts salariale et patronale)
+      4452     D         0.00 C     2,300.66  Impôt sur le revenu retenu à la source
+      -> equilibre : OUI (30,495.60)
+
+  2026-01-31 | EC202600097 | journal BQ | ref=PAIE 2026-01 | source=payroll | validated | Règlement des salaires 2026-01
+      4432     D    22,439.74 C         0.00  Règlement salaires 2026-01
+      5141     D         0.00 C    22,439.74  Règlement salaires 2026-01
+      -> equilibre : OUI (22,439.74)
+
+  2026-02-28 | EC202600098 | journal OD | ref=PAIE 2026-02 | source=payroll | validated | Paie 2026-02 - 3 bulletin(s)
+      61711    D    26,000.00 C         0.00  Salaire de base
+      61741    D     2,415.60 C         0.00  Cotations patronales CNSS/AMO
+      61744    D     1,664.00 C         0.00  Prestations familiales (patronales)
+      61768    D       416.00 C         0.00  Taxe de formation professionnelle
+      4432     D         0.00 C    22,439.74  Rémunérations dues au personnel
+      4441     D         0.00 C     5,755.20  CNSS / AMO (parts salariale et patronale)
+      4452     D         0.00 C     2,300.66  Impôt sur le revenu retenu à la source
+      -> equilibre : OUI (30,495.60)
+
+  2026-02-28 | EC202600099 | journal BQ | ref=PAIE 2026-02 | source=payroll | validated | Règlement des salaires 2026-02
+      4432     D    22,439.74 C         0.00  Règlement salaires 2026-02
+      5141     D         0.00 C    22,439.74  Règlement salaires 2026-02
+      -> equilibre : OUI (22,439.74)
+
+  2026-03-31 | EC202600100 | journal OD | ref=PAIE 2026-03 | source=payroll | validated | Paie 2026-03 - 3 bulletin(s)
+      61711    D    26,000.00 C         0.00  Salaire de base
+      61741    D     2,415.60 C         0.00  Cotations patronales CNSS/AMO
+      61744    D     1,664.00 C         0.00  Prestations familiales (patronales)
+      61768    D       416.00 C         0.00  Taxe de formation professionnelle
+      4432     D         0.00 C    22,439.74  Rémunérations dues au personnel
+      4441     D         0.00 C     5,755.20  CNSS / AMO (parts salariale et patronale)
+      4452     D         0.00 C     2,300.66  Impôt sur le revenu retenu à la source
+      -> equilibre : OUI (30,495.60)
+
+  2026-03-31 | EC202600101 | journal BQ | ref=PAIE 2026-03 | source=payroll | validated | Règlement des salaires 2026-03
+      4432     D    22,439.74 C         0.00  Règlement salaires 2026-03
+      5141     D         0.00 C    22,439.74  Règlement salaires 2026-03
+      -> equilibre : OUI (22,439.74)
+
+  2026-04-30 | EC202600102 | journal OD | ref=PAIE 2026-04 | source=payroll | validated | Paie 2026-04 - 3 bulletin(s)
+      61711    D    26,000.00 C         0.00  Salaire de base
+      61741    D     2,415.60 C         0.00  Cotations patronales CNSS/AMO
+      61744    D     1,664.00 C         0.00  Prestations familiales (patronales)
+      61768    D       416.00 C         0.00  Taxe de formation professionnelle
+      4432     D         0.00 C    22,439.74  Rémunérations dues au personnel
+      4441     D         0.00 C     5,755.20  CNSS / AMO (parts salariale et patronale)
+      4452     D         0.00 C     2,300.66  Impôt sur le revenu retenu à la source
+      -> equilibre : OUI (30,495.60)
+
+  2026-04-30 | EC202600103 | journal BQ | ref=PAIE 2026-04 | source=payroll | validated | Règlement des salaires 2026-04
+      4432     D    22,439.74 C         0.00  Règlement salaires 2026-04
+      5141     D         0.00 C    22,439.74  Règlement salaires 2026-04
+      -> equilibre : OUI (22,439.74)
+
+  2026-05-31 | EC202600104 | journal OD | ref=PAIE 2026-05 | source=payroll | validated | Paie 2026-05 - 3 bulletin(s)
+      61711    D    26,000.00 C         0.00  Salaire de base
+      61741    D     2,415.60 C         0.00  Cotations patronales CNSS/AMO
+      61744    D     1,664.00 C         0.00  Prestations familiales (patronales)
+      61768    D       416.00 C         0.00  Taxe de formation professionnelle
+      4432     D         0.00 C    22,439.74  Rémunérations dues au personnel
+      4441     D         0.00 C     5,755.20  CNSS / AMO (parts salariale et patronale)
+      4452     D         0.00 C     2,300.66  Impôt sur le revenu retenu à la source
+      -> equilibre : OUI (30,495.60)
+
+  2026-05-31 | EC202600105 | journal BQ | ref=PAIE 2026-05 | source=payroll | validated | Règlement des salaires 2026-05
+      4432     D    22,439.74 C         0.00  Règlement salaires 2026-05
+      5141     D         0.00 C    22,439.74  Règlement salaires 2026-05
+      -> equilibre : OUI (22,439.74)
+
+  2026-06-30 | EC202600106 | journal OD | ref=PAIE 2026-06 | source=payroll | validated | Paie 2026-06 - 3 bulletin(s)
+      61711    D    26,000.00 C         0.00  Salaire de base
+      61741    D     2,415.60 C         0.00  Cotations patronales CNSS/AMO
+      61744    D     1,664.00 C         0.00  Prestations familiales (patronales)
+      61768    D       416.00 C         0.00  Taxe de formation professionnelle
+      4432     D         0.00 C    22,439.74  Rémunérations dues au personnel
+      4441     D         0.00 C     5,755.20  CNSS / AMO (parts salariale et patronale)
+      4452     D         0.00 C     2,300.66  Impôt sur le revenu retenu à la source
+      -> equilibre : OUI (30,495.60)
+
+  2026-06-30 | EC202600107 | journal BQ | ref=PAIE 2026-06 | source=payroll | validated | Règlement des salaires 2026-06
+      4432     D    22,439.74 C         0.00  Règlement salaires 2026-06
+      5141     D         0.00 C    22,439.74  Règlement salaires 2026-06
+      -> equilibre : OUI (22,439.74)
+
+  2026-07-31 | EC202600108 | journal OD | ref=PAIE 2026-07 | source=payroll | validated | Paie 2026-07 - 3 bulletin(s)
+      61711    D    26,000.00 C         0.00  Salaire de base
+      61741    D     2,415.60 C         0.00  Cotations patronales CNSS/AMO
+      61744    D     1,664.00 C         0.00  Prestations familiales (patronales)
+      61768    D       416.00 C         0.00  Taxe de formation professionnelle
+      4432     D         0.00 C    22,439.74  Rémunérations dues au personnel
+      4441     D         0.00 C     5,755.20  CNSS / AMO (parts salariale et patronale)
+      4452     D         0.00 C     2,300.66  Impôt sur le revenu retenu à la source
+      -> equilibre : OUI (30,495.60)
+
+  2026-07-31 | EC202600109 | journal BQ | ref=PAIE 2026-07 | source=payroll | validated | Règlement des salaires 2026-07
+      4432     D    22,439.74 C         0.00  Règlement salaires 2026-07
+      5141     D         0.00 C    22,439.74  Règlement salaires 2026-07
+      -> equilibre : OUI (22,439.74)
+
+  2026-08-31 | EC202600110 | journal OD | ref=PAIE 2026-08 | source=payroll | validated | Paie 2026-08 - 3 bulletin(s)
+      61711    D    26,000.00 C         0.00  Salaire de base
+      61741    D     2,415.60 C         0.00  Cotations patronales CNSS/AMO
+      61744    D     1,664.00 C         0.00  Prestations familiales (patronales)
+      61768    D       416.00 C         0.00  Taxe de formation professionnelle
+      4432     D         0.00 C    22,439.74  Rémunérations dues au personnel
+      4441     D         0.00 C     5,755.20  CNSS / AMO (parts salariale et patronale)
+      4452     D         0.00 C     2,300.66  Impôt sur le revenu retenu à la source
+      -> equilibre : OUI (30,495.60)
+
+  2026-08-31 | EC202600111 | journal BQ | ref=PAIE 2026-08 | source=payroll | validated | Règlement des salaires 2026-08
+      4432     D    22,439.74 C         0.00  Règlement salaires 2026-08
+      5141     D         0.00 C    22,439.74  Règlement salaires 2026-08
+      -> equilibre : OUI (22,439.74)
+
+  2026-09-30 | EC202600112 | journal OD | ref=PAIE 2026-09 | source=payroll | validated | Paie 2026-09 - 3 bulletin(s)
+      61711    D    26,000.00 C         0.00  Salaire de base
+      61741    D     2,415.60 C         0.00  Cotations patronales CNSS/AMO
+      61744    D     1,664.00 C         0.00  Prestations familiales (patronales)
+      61768    D       416.00 C         0.00  Taxe de formation professionnelle
+      4432     D         0.00 C    22,439.74  Rémunérations dues au personnel
+      4441     D         0.00 C     5,755.20  CNSS / AMO (parts salariale et patronale)
+      4452     D         0.00 C     2,300.66  Impôt sur le revenu retenu à la source
+      -> equilibre : OUI (30,495.60)
+
+  2026-09-30 | EC202600113 | journal BQ | ref=PAIE 2026-09 | source=payroll | validated | Règlement des salaires 2026-09
+      4432     D    22,439.74 C         0.00  Règlement salaires 2026-09
+      5141     D         0.00 C    22,439.74  Règlement salaires 2026-09
+      -> equilibre : OUI (22,439.74)
+
+  2026-10-31 | EC202600114 | journal OD | ref=PAIE 2026-10 | source=payroll | validated | Paie 2026-10 - 3 bulletin(s)
+      61711    D    26,000.00 C         0.00  Salaire de base
+      61741    D     2,415.60 C         0.00  Cotations patronales CNSS/AMO
+      61744    D     1,664.00 C         0.00  Prestations familiales (patronales)
+      61768    D       416.00 C         0.00  Taxe de formation professionnelle
+      4432     D         0.00 C    22,439.74  Rémunérations dues au personnel
+      4441     D         0.00 C     5,755.20  CNSS / AMO (parts salariale et patronale)
+      4452     D         0.00 C     2,300.66  Impôt sur le revenu retenu à la source
+      -> equilibre : OUI (30,495.60)
+
+  2026-10-31 | EC202600115 | journal BQ | ref=PAIE 2026-10 | source=payroll | validated | Règlement des salaires 2026-10
+      4432     D    22,439.74 C         0.00  Règlement salaires 2026-10
+      5141     D         0.00 C    22,439.74  Règlement salaires 2026-10
+      -> equilibre : OUI (22,439.74)
+
+  2026-11-30 | EC202600116 | journal OD | ref=PAIE 2026-11 | source=payroll | validated | Paie 2026-11 - 3 bulletin(s)
+      61711    D    26,000.00 C         0.00  Salaire de base
+      61741    D     2,415.60 C         0.00  Cotations patronales CNSS/AMO
+      61744    D     1,664.00 C         0.00  Prestations familiales (patronales)
+      61768    D       416.00 C         0.00  Taxe de formation professionnelle
+      4432     D         0.00 C    22,439.74  Rémunérations dues au personnel
+      4441     D         0.00 C     5,755.20  CNSS / AMO (parts salariale et patronale)
+      4452     D         0.00 C     2,300.66  Impôt sur le revenu retenu à la source
+      -> equilibre : OUI (30,495.60)
+
+  2026-11-30 | EC202600117 | journal BQ | ref=PAIE 2026-11 | source=payroll | validated | Règlement des salaires 2026-11
+      4432     D    22,439.74 C         0.00  Règlement salaires 2026-11
+      5141     D         0.00 C    22,439.74  Règlement salaires 2026-11
+      -> equilibre : OUI (22,439.74)
+
+  2026-12-31 | EC202600118 | journal OD | ref=PAIE 2026-12 | source=payroll | validated | Paie 2026-12 - 3 bulletin(s)
+      61711    D    26,000.00 C         0.00  Salaire de base
+      61741    D     2,415.60 C         0.00  Cotations patronales CNSS/AMO
+      61744    D     1,664.00 C         0.00  Prestations familiales (patronales)
+      61768    D       416.00 C         0.00  Taxe de formation professionnelle
+      4432     D         0.00 C    22,439.74  Rémunérations dues au personnel
+      4441     D         0.00 C     5,755.20  CNSS / AMO (parts salariale et patronale)
+      4452     D         0.00 C     2,300.66  Impôt sur le revenu retenu à la source
+      -> equilibre : OUI (30,495.60)
+
+  2026-12-31 | EC202600119 | journal BQ | ref=PAIE 2026-12 | source=payroll | validated | Règlement des salaires 2026-12
+      4432     D    22,439.74 C         0.00  Règlement salaires 2026-12
+      5141     D         0.00 C    22,439.74  Règlement salaires 2026-12
+      -> equilibre : OUI (22,439.74)
+
+  Total debit des ecritures listees en 2026 : 635,224.08 DH
+
+Totaux par compte (ecritures de l'exercice 2026) :
+  4432     Rémunérations dues au personnel        debit   269,276.88 credit   269,276.88 solde         0.00
+  4441     Caisse Nationale de la Sécurité Social debit         0.00 credit    69,062.40 solde   -69,062.40
+  4452     Etat Impôts, taxes et assimilés        debit         0.00 credit    27,607.92 solde   -27,607.92
+  5141     Banques (solde débiteur)               debit   764,000.00 credit   540,996.88 solde   223,003.12
+  61711    Appointements et salaires              debit   312,000.00 credit         0.00 solde   312,000.00
+  61741    Cotisations de sécurité sociale        debit    28,987.20 credit         0.00 solde    28,987.20
+  61744    Prestations familiales                 debit    19,968.00 credit         0.00 solde    19,968.00
+  61768    Autres charges sociales diverses       debit     4,992.00 credit         0.00 solde     4,992.00
+
+====================================================================================================
+B. ECRITURES DE PAIE 2025 (exercice CLOS - hors perimetre)
+====================================================================================================
+12 ecriture(s) de paie en 2025 :
+
+  2025-01-28 | EC202500008 | journal BQ | ref=PAIE25-01 | source=import_jeu_j9 | validated | Paie et charges 01/2025
+      6171     D    10,000.00 C         0.00  Paie et charges 01/2025
+      6174     D     2,000.00 C         0.00  Paie et charges 01/2025
+      5141     D         0.00 C    12,000.00  Paie et charges 01/2025
+      -> equilibre : OUI (12,000.00)
+
+  2025-02-28 | EC202500015 | journal BQ | ref=PAIE25-02 | source=import_jeu_j9 | validated | Paie et charges 02/2025
+      6171     D    10,000.00 C         0.00  Paie et charges 02/2025
+      6174     D     2,000.00 C         0.00  Paie et charges 02/2025
+      5141     D         0.00 C    12,000.00  Paie et charges 02/2025
+      -> equilibre : OUI (12,000.00)
+
+  2025-03-28 | EC202500022 | journal BQ | ref=PAIE25-03 | source=import_jeu_j9 | validated | Paie et charges 03/2025
+      6171     D    10,000.00 C         0.00  Paie et charges 03/2025
+      6174     D     2,000.00 C         0.00  Paie et charges 03/2025
+      5141     D         0.00 C    12,000.00  Paie et charges 03/2025
+      -> equilibre : OUI (12,000.00)
+
+  2025-04-28 | EC202500029 | journal BQ | ref=PAIE25-04 | source=import_jeu_j9 | validated | Paie et charges 04/2025
+      6171     D    10,000.00 C         0.00  Paie et charges 04/2025
+      6174     D     2,000.00 C         0.00  Paie et charges 04/2025
+      5141     D         0.00 C    12,000.00  Paie et charges 04/2025
+      -> equilibre : OUI (12,000.00)
+
+  2025-05-28 | EC202500036 | journal BQ | ref=PAIE25-05 | source=import_jeu_j9 | validated | Paie et charges 05/2025
+      6171     D    10,000.00 C         0.00  Paie et charges 05/2025
+      6174     D     2,000.00 C         0.00  Paie et charges 05/2025
+      5141     D         0.00 C    12,000.00  Paie et charges 05/2025
+      -> equilibre : OUI (12,000.00)
+
+  2025-06-28 | EC202500043 | journal BQ | ref=PAIE25-06 | source=import_jeu_j9 | validated | Paie et charges 06/2025
+      6171     D    10,000.00 C         0.00  Paie et charges 06/2025
+      6174     D     2,000.00 C         0.00  Paie et charges 06/2025
+      5141     D         0.00 C    12,000.00  Paie et charges 06/2025
+      -> equilibre : OUI (12,000.00)
+
+  2025-07-28 | EC202500050 | journal BQ | ref=PAIE25-07 | source=import_jeu_j9 | validated | Paie et charges 07/2025
+      6171     D    10,000.00 C         0.00  Paie et charges 07/2025
+      6174     D     2,000.00 C         0.00  Paie et charges 07/2025
+      5141     D         0.00 C    12,000.00  Paie et charges 07/2025
+      -> equilibre : OUI (12,000.00)
+
+  2025-08-28 | EC202500057 | journal BQ | ref=PAIE25-08 | source=import_jeu_j9 | validated | Paie et charges 08/2025
+      6171     D    10,000.00 C         0.00  Paie et charges 08/2025
+      6174     D     2,000.00 C         0.00  Paie et charges 08/2025
+      5141     D         0.00 C    12,000.00  Paie et charges 08/2025
+      -> equilibre : OUI (12,000.00)
+
+  2025-09-28 | EC202500064 | journal BQ | ref=PAIE25-09 | source=import_jeu_j9 | validated | Paie et charges 09/2025
+      6171     D    10,000.00 C         0.00  Paie et charges 09/2025
+      6174     D     2,000.00 C         0.00  Paie et charges 09/2025
+      5141     D         0.00 C    12,000.00  Paie et charges 09/2025
+      -> equilibre : OUI (12,000.00)
+
+  2025-10-28 | EC202500071 | journal BQ | ref=PAIE25-10 | source=import_jeu_j9 | validated | Paie et charges 10/2025
+      6171     D    10,000.00 C         0.00  Paie et charges 10/2025
+      6174     D     2,000.00 C         0.00  Paie et charges 10/2025
+      5141     D         0.00 C    12,000.00  Paie et charges 10/2025
+      -> equilibre : OUI (12,000.00)
+
+  2025-11-28 | EC202500078 | journal BQ | ref=PAIE25-11 | source=import_jeu_j9 | validated | Paie et charges 11/2025
+      6171     D    10,000.00 C         0.00  Paie et charges 11/2025
+      6174     D     2,000.00 C         0.00  Paie et charges 11/2025
+      5141     D         0.00 C    12,000.00  Paie et charges 11/2025
+      -> equilibre : OUI (12,000.00)
+
+  2025-12-28 | EC202500085 | journal BQ | ref=PAIE25-12 | source=import_jeu_j9 | validated | Paie et charges 12/2025
+      6171     D    10,000.00 C         0.00  Paie et charges 12/2025
+      6174     D     2,000.00 C         0.00  Paie et charges 12/2025
+      5141     D         0.00 C    12,000.00  Paie et charges 12/2025
+      -> equilibre : OUI (12,000.00)
+
+  Total debit des ecritures listees en 2025 : 144,000.00 DH
+
+====================================================================================================
+C. CYCLES, BULLETINS, SALARIES ET DECLARATIONS
+====================================================================================================
+
+Cycles de paie (payroll_runs) :
+  2026-01 statut=paye      paie du 2026-01-31 brut  26,000.00 IR  2,300.66 net  22,439.74 employeur  30,495.60 | ecriture=185 paiement=186
+  2026-02 statut=paye      paie du 2026-02-28 brut  26,000.00 IR  2,300.66 net  22,439.74 employeur  30,495.60 | ecriture=187 paiement=188
+  2026-03 statut=paye      paie du 2026-03-31 brut  26,000.00 IR  2,300.66 net  22,439.74 employeur  30,495.60 | ecriture=189 paiement=190
+  2026-04 statut=paye      paie du 2026-04-30 brut  26,000.00 IR  2,300.66 net  22,439.74 employeur  30,495.60 | ecriture=191 paiement=192
+  2026-05 statut=paye      paie du 2026-05-31 brut  26,000.00 IR  2,300.66 net  22,439.74 employeur  30,495.60 | ecriture=193 paiement=194
+  2026-06 statut=paye      paie du 2026-06-30 brut  26,000.00 IR  2,300.66 net  22,439.74 employeur  30,495.60 | ecriture=195 paiement=196
+  2026-07 statut=paye      paie du 2026-07-31 brut  26,000.00 IR  2,300.66 net  22,439.74 employeur  30,495.60 | ecriture=197 paiement=198
+  2026-08 statut=paye      paie du 2026-08-31 brut  26,000.00 IR  2,300.66 net  22,439.74 employeur  30,495.60 | ecriture=199 paiement=200
+  2026-09 statut=paye      paie du 2026-09-30 brut  26,000.00 IR  2,300.66 net  22,439.74 employeur  30,495.60 | ecriture=201 paiement=202
+  2026-10 statut=paye      paie du 2026-10-31 brut  26,000.00 IR  2,300.66 net  22,439.74 employeur  30,495.60 | ecriture=203 paiement=204
+  2026-11 statut=paye      paie du 2026-11-30 brut  26,000.00 IR  2,300.66 net  22,439.74 employeur  30,495.60 | ecriture=205 paiement=206
+  2026-12 statut=paye      paie du 2026-12-31 brut  26,000.00 IR  2,300.66 net  22,439.74 employeur  30,495.60 | ecriture=207 paiement=208
+
+Bulletins (payslips) :
+  2026-01 EMP001   EMP001 — Seuil exonéré   brut  3,000.00 IR     0.00 net  2,797.80 cout  3,632.70 entry=185
+  2026-01 EMP002   EMP002 — Tranche 30%     brut  7,000.00 IR     0.00 net  6,573.00 cout  8,386.50 entry=185
+  2026-01 EMP003   EMP003 — Tranche 37%     brut 16,000.00 IR 2,300.66 net 13,068.94 cout 18,476.40 entry=185
+  2026-02 EMP001   EMP001 — Seuil exonéré   brut  3,000.00 IR     0.00 net  2,797.80 cout  3,632.70 entry=187
+  2026-02 EMP002   EMP002 — Tranche 30%     brut  7,000.00 IR     0.00 net  6,573.00 cout  8,386.50 entry=187
+  2026-02 EMP003   EMP003 — Tranche 37%     brut 16,000.00 IR 2,300.66 net 13,068.94 cout 18,476.40 entry=187
+  2026-03 EMP001   EMP001 — Seuil exonéré   brut  3,000.00 IR     0.00 net  2,797.80 cout  3,632.70 entry=189
+  2026-03 EMP002   EMP002 — Tranche 30%     brut  7,000.00 IR     0.00 net  6,573.00 cout  8,386.50 entry=189
+  2026-03 EMP003   EMP003 — Tranche 37%     brut 16,000.00 IR 2,300.66 net 13,068.94 cout 18,476.40 entry=189
+  2026-04 EMP001   EMP001 — Seuil exonéré   brut  3,000.00 IR     0.00 net  2,797.80 cout  3,632.70 entry=191
+  2026-04 EMP002   EMP002 — Tranche 30%     brut  7,000.00 IR     0.00 net  6,573.00 cout  8,386.50 entry=191
+  2026-04 EMP003   EMP003 — Tranche 37%     brut 16,000.00 IR 2,300.66 net 13,068.94 cout 18,476.40 entry=191
+  2026-05 EMP001   EMP001 — Seuil exonéré   brut  3,000.00 IR     0.00 net  2,797.80 cout  3,632.70 entry=193
+  2026-05 EMP002   EMP002 — Tranche 30%     brut  7,000.00 IR     0.00 net  6,573.00 cout  8,386.50 entry=193
+  2026-05 EMP003   EMP003 — Tranche 37%     brut 16,000.00 IR 2,300.66 net 13,068.94 cout 18,476.40 entry=193
+  2026-06 EMP001   EMP001 — Seuil exonéré   brut  3,000.00 IR     0.00 net  2,797.80 cout  3,632.70 entry=195
+  2026-06 EMP002   EMP002 — Tranche 30%     brut  7,000.00 IR     0.00 net  6,573.00 cout  8,386.50 entry=195
+  2026-06 EMP003   EMP003 — Tranche 37%     brut 16,000.00 IR 2,300.66 net 13,068.94 cout 18,476.40 entry=195
+  2026-07 EMP001   EMP001 — Seuil exonéré   brut  3,000.00 IR     0.00 net  2,797.80 cout  3,632.70 entry=197
+  2026-07 EMP002   EMP002 — Tranche 30%     brut  7,000.00 IR     0.00 net  6,573.00 cout  8,386.50 entry=197
+  2026-07 EMP003   EMP003 — Tranche 37%     brut 16,000.00 IR 2,300.66 net 13,068.94 cout 18,476.40 entry=197
+  2026-08 EMP001   EMP001 — Seuil exonéré   brut  3,000.00 IR     0.00 net  2,797.80 cout  3,632.70 entry=199
+  2026-08 EMP002   EMP002 — Tranche 30%     brut  7,000.00 IR     0.00 net  6,573.00 cout  8,386.50 entry=199
+  2026-08 EMP003   EMP003 — Tranche 37%     brut 16,000.00 IR 2,300.66 net 13,068.94 cout 18,476.40 entry=199
+  2026-09 EMP001   EMP001 — Seuil exonéré   brut  3,000.00 IR     0.00 net  2,797.80 cout  3,632.70 entry=201
+  2026-09 EMP002   EMP002 — Tranche 30%     brut  7,000.00 IR     0.00 net  6,573.00 cout  8,386.50 entry=201
+  2026-09 EMP003   EMP003 — Tranche 37%     brut 16,000.00 IR 2,300.66 net 13,068.94 cout 18,476.40 entry=201
+  2026-10 EMP001   EMP001 — Seuil exonéré   brut  3,000.00 IR     0.00 net  2,797.80 cout  3,632.70 entry=203
+  2026-10 EMP002   EMP002 — Tranche 30%     brut  7,000.00 IR     0.00 net  6,573.00 cout  8,386.50 entry=203
+  2026-10 EMP003   EMP003 — Tranche 37%     brut 16,000.00 IR 2,300.66 net 13,068.94 cout 18,476.40 entry=203
+  2026-11 EMP001   EMP001 — Seuil exonéré   brut  3,000.00 IR     0.00 net  2,797.80 cout  3,632.70 entry=205
+  2026-11 EMP002   EMP002 — Tranche 30%     brut  7,000.00 IR     0.00 net  6,573.00 cout  8,386.50 entry=205
+  2026-11 EMP003   EMP003 — Tranche 37%     brut 16,000.00 IR 2,300.66 net 13,068.94 cout 18,476.40 entry=205
+  2026-12 EMP001   EMP001 — Seuil exonéré   brut  3,000.00 IR     0.00 net  2,797.80 cout  3,632.70 entry=207
+  2026-12 EMP002   EMP002 — Tranche 30%     brut  7,000.00 IR     0.00 net  6,573.00 cout  8,386.50 entry=207
+  2026-12 EMP003   EMP003 — Tranche 37%     brut 16,000.00 IR 2,300.66 net 13,068.94 cout 18,476.40 entry=207
+
+Salaries et contrats :
+  EMP001   EMP001 — Seuil exonéré   entree 2025-01-01 sortie - actif=1 base  3,000.00 transport    0.00 logement    0.00 autres    0.00 (contrat du 2025-01-01)
+  EMP001   EMP001 — Seuil exonéré   entree 2025-01-01 sortie - actif=1 base  3,000.00 transport    0.00 logement    0.00 autres    0.00 (contrat du 2026-01-01)
+  EMP002   EMP002 — Tranche 30%     entree 2025-01-01 sortie - actif=1 base  7,000.00 transport    0.00 logement    0.00 autres    0.00 (contrat du 2025-01-01)
+  EMP002   EMP002 — Tranche 30%     entree 2025-01-01 sortie - actif=1 base  7,000.00 transport    0.00 logement    0.00 autres    0.00 (contrat du 2026-01-01)
+  EMP003   EMP003 — Tranche 37%     entree 2025-01-01 sortie - actif=1 base 16,000.00 transport    0.00 logement    0.00 autres    0.00 (contrat du 2025-01-01)
+  EMP003   EMP003 — Tranche 37%     entree 2025-01-01 sortie - actif=1 base 16,000.00 transport    0.00 logement    0.00 autres    0.00 (contrat du 2026-01-01)
+
+Declarations fiscales (registre) :
+  #2 TVA 2026 regime=4 mode=simulation statut=brouillon montant=69,120.00 lignes=2 exercice=1 fichier=None
+  #3 DTS 2026 regime=EDI mode=EDI statut=brouillon montant=27,607.92 lignes=3 exercice=None fichier=DTS_1234567_2026.xml
+
+====================================================================================================
+D. SITUATION COMPTABLE AVANT REINITIALISATION
+====================================================================================================
+
+Situation comptable de reference (2026) :
+  Resultat comptable (CPC) : -113,307.20 DH (perte)
+  Total charges : 545,307.20 | total produits : 432,000.00
+  ESG : marge brute 329,000.00 | valeur ajoutee 287,600.00 | EBE -78,347.20 | resultat net -113,307.20 | coherent CPC True
+  Bilan : actif net 396,803.12 | passif avec resultat 369,803.12 | equilibre True
+  Fiscal : resultat avant impot -93,347.20 | resultat fiscal -93,347.20 | IS du 0.00 | acomptes 0.00 | solde a payer 0.00
+
+Situation comptable de reference (2025) :
+  Resultat comptable (CPC) : 73,600.00 DH (benefice)
+  Total charges : 286,400.00 | total produits : 360,000.00
+  ESG : marge brute 284,000.00 | valeur ajoutee 248,000.00 | EBE 104,000.00 | resultat net 73,600.00 | coherent CPC True
+  Bilan : actif net 387,520.00 | passif avec resultat 375,520.00 | equilibre True
+  Fiscal : resultat avant impot 92,000.00 | resultat fiscal 92,000.00 | IS du 18,400.00 | acomptes 0.00 | solde a payer 18,400.00

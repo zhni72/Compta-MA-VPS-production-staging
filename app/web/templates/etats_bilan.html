@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1>Bilan</h1>
+    <div class="breadcrumb">
+      <a href="/">Accueil</a> &middot; États comptables &middot; Bilan &middot; {{ libelle }}
+    </div>
+  </div>
+  <div class="actions">
+    <button class="btn" type="button" onclick="window.print()">Imprimer</button>
+    <a class="btn btn-primary" href="/etats/bilan/pdf?year={{ exercice }}">⬇ Bilan PDF</a>
+    <a class="btn" href="/etats/esg/pdf?year={{ exercice }}">⬇ ESG PDF</a>
+    <a class="btn" href="/etats/etic/pdf?year={{ exercice }}">⬇ ETIC PDF</a>
+    <a class="btn" href="/etats/cpc?year={{ exercice }}">CPC</a>
+  </div>
+</div>
+
+<div class="grid cols-3">
+  <div class="kpi">
+    <div class="label">Total de l'actif</div>
+    <div class="value">{{ bilan.total_actif | money }}</div>
+    <div class="hint">Classes 2, 3 et 5 (soldes débiteurs)</div>
+  </div>
+  <div class="kpi">
+    <div class="label">Total du passif (hors résultat)</div>
+    <div class="value">{{ bilan.total_passif | money }}</div>
+    <div class="hint">Classes 1 et 4 (soldes créditeurs)</div>
+  </div>
+  <div class="kpi {{ 'positive' if bilan.equilibre else 'negative' }}">
+    <div class="label">Contrôle d'équilibre</div>
+    <div class="value" style="font-size:18px">
+      {{ 'Bilan équilibré' if bilan.equilibre else 'Déséquilibré' }}
+    </div>
+    <div class="hint">Actif = Passif + résultat de l'exercice ({{ bilan.resultat_exercice | amount }})</div>
+  </div>
+</div>
+
+<div class="card">
+  <form class="filters" method="get" action="/etats/bilan">
+    <div class="field">
+      <label for="year">Exercice</label>
+      <input type="number" id="year" name="year" value="{{ exercice }}" min="2000" max="2100" style="min-width:110px">
+    </div>
+    <div class="field">
+      <label for="month">Mois</label>
+      <select id="month" name="month">
+        <option value="">—</option>
+        {% for m in range(1, 13) %}
+        <option value="{{ m }}" {{ 'selected' if month == m | string }}>{{ '%02d' % m }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="field">
+      <label for="quarter">Trimestre</label>
+      <select id="quarter" name="quarter">
+        <option value="">—</option>
+        {% for t in range(1, 5) %}
+        <option value="{{ t }}" {{ 'selected' if quarter == t | string }}>T{{ t }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <button type="submit" class="btn btn-primary">Actualiser</button>
+  </form>
+
+  <div class="body tight table-wrap">
+    <table class="data">
+      <thead>
+        <tr>
+          <th>Compte</th><th>ACTIF</th><th class="num">Montant</th>
+          <th>Compte</th><th>PASSIF</th><th class="num">Montant</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% set nb = [bilan.actif | length, bilan.passif | length] | max %}
+        {% for i in range(nb) %}
+        <tr>
+          {% if i < bilan.actif | length %}
+          {% set a = bilan.actif[i] %}
+          <td class="code">{{ a.account_number }}</td>
+          <td>{{ a.label }}</td>
+          <td class="num">{{ a.montant | amount }}</td>
+          {% else %}<td></td><td></td><td></td>{% endif %}
+          {% if i < bilan.passif | length %}
+          {% set p = bilan.passif[i] %}
+          <td class="code">{{ p.account_number }}</td>
+          <td>{{ p.label }}</td>
+          <td class="num">{{ p.montant | amount }}</td>
+          {% else %}<td></td><td></td><td></td>{% endif %}
+        </tr>
+        {% endfor %}
+        <tr style="background:var(--grey-bg)">
+          <td colspan="2"><strong>Résultat net de l'exercice
+            ({{ 'bénéfice' if bilan.resultat_exercice >= 0 else 'perte' }})</strong></td>
+          <td class="num"></td>
+          <td colspan="2"></td>
+          <td class="num"><strong>{{ bilan.resultat_exercice | amount }}</strong></td>
+        </tr>
+      </tbody>
+      <tfoot>
+        <tr>
+          <td colspan="2">TOTAL ACTIF</td>
+          <td class="num">{{ bilan.total_actif | amount }}</td>
+          <td colspan="2">TOTAL PASSIF</td>
+          <td class="num">{{ bilan.total_passif_avec_resultat | amount }}</td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+</div>
+
+<div class="card">
+  <header><span>Classes du CGNC utilisées</span></header>
+  <div class="body">
+    <ul style="margin:0; padding-left:18px; font-size:13.5px; line-height:1.8">
+      {% for classe, libelle in cgnc.items() %}
+      <li>Classe {{ classe }} — {{ libelle }}</li>
+      {% endfor %}
+    </ul>
+    <p class="field-help" style="margin-top:10px">
+      Bilan simplifié : actif (classes 2, 3, 5) et passif (classes 1, 4) avec le résultat
+      porté au passif. Le bilan officiel du modèle normal du CGNC (actif immobilisé,
+      actif circulant, trésorerie, capitaux propres, dettes) doit être validé par
+      l'expert-comptable avant dépôt.
+    </p>
+  </div>
+</div>
+{% endblock %}

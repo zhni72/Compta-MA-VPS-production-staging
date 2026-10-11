@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1>Exercices comptables</h1>
+    <div class="breadcrumb">
+      <a href="/">Accueil</a> &middot; Paramètres &middot; {{ exercices | length }} exercice(s)
+    </div>
+  </div>
+  <div class="actions">
+    <a class="btn" href="/parametres/societe">Fiche société</a>
+    <a class="btn" href="/etats/balance">Balance</a>
+  </div>
+</div>
+
+<div class="card">
+  <header><span>Situation des exercices</span></header>
+  <div class="body tight table-wrap">
+    <table class="data">
+      <thead>
+        <tr>
+          <th>Exercice</th><th>Du</th><th>Au</th><th class="center">État</th>
+          <th class="center">Écritures</th><th class="center">Documents</th>
+          <th class="center">Clôturé le</th><th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for e in exercices %}
+        <tr>
+          <td><strong>{{ e.year }}</strong></td>
+          <td>{{ e.start_date | date_fr }}</td>
+          <td>{{ e.end_date | date_fr }}</td>
+          <td class="center">
+            <span class="badge {{ STATUS_BADGES.get(e.status) }}">{{ STATUS_LABELS.get(e.status) }}</span>
+          </td>
+          <td class="center">{{ stats.get(e.year, {}).get('ecritures', 0) }}</td>
+          <td class="center">{{ stats.get(e.year, {}).get('documents', 0) }}</td>
+          <td class="center">{{ e.closed_at | date_fr if e.closed_at else '—' }}</td>
+          <td style="white-space:nowrap">
+            {% if e.status == 'open' %}
+            <form method="post" action="/parametres/exercices/{{ e.year }}/closed" style="display:inline"
+                  onsubmit="return confirm('Clôturer l''exercice {{ e.year }} ? Le bilan doit être équilibré : les à-nouveaux de {{ e.year + 1 }} seront générés.');">
+              <button class="btn btn-small" type="submit">Clôturer</button>
+            </form>
+            <form method="post" action="/parametres/exercices/{{ e.year }}/locked" style="display:inline"
+                  onsubmit="return confirm('Verrouiller l''exercice {{ e.year }} ? Opération définitive (motif tracé).');">
+              <input type="text" name="motif" placeholder="Motif (obligatoire)" required
+                     minlength="10" style="width:170px">
+              <button class="btn btn-small btn-danger" type="submit">Verrouiller</button>
+            </form>
+            {% else %}
+            <form method="post" action="/parametres/exercices/{{ e.year }}/open" style="display:inline"
+                  onsubmit="return confirm('Réouvrir l''exercice {{ e.year }} ? Motif obligatoire, opération tracée ; les à-nouveaux de {{ e.year + 1 }} devront être régénérés.');">
+              <input type="text" name="motif" placeholder="Motif (obligatoire, ≥ 10 car.)" required
+                     minlength="10" style="width:190px">
+              <label style="font-size:12px; white-space:nowrap">
+                <input type="checkbox" name="regenerer_a_nouveaux" value="1" style="width:auto">
+                régénérer les à-nouveaux {{ e.year + 1 }}
+              </label>
+              <button class="btn btn-small btn-success" type="submit">Réouvrir</button>
+            </form>
+            {% endif %}
+            <a class="btn btn-small" href="/etats/balance?year={{ e.year }}">Balance</a>
+            <a class="btn btn-small" href="/etats/bordereau-greffe/pdf?year={{ e.year }}">⬇ Bordereau greffe PDF</a>
+            {% if e.status == 'open' %}
+            <form method="post" action="/parametres/exercices/{{ e.year }}/cloturer" style="display:inline"
+                  onsubmit="return confirm('Clôturer l''exercice {{ e.year }} et générer les écritures d''à-nouveaux de {{ e.year + 1 }} ?');">
+              <button type="submit" class="btn btn-small">Clôturer + à-nouveaux</button>
+            </form>
+            <form method="post" action="/parametres/exercices/{{ e.year }}/verrouiller" style="display:inline">
+              <input type="text" name="periode" placeholder="Mois (1-12)" style="width:90px">
+              <input type="text" name="motif" placeholder="Motif du verrou" style="width:140px">
+              <button type="submit" class="btn btn-small">Verrouiller</button>
+            </form>
+            {% endif %}
+          </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="8" class="empty">Aucun exercice : ouvrez le premier exercice ci-dessous.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="grid cols-2">
+  <div class="card">
+    <header><span>Ouvrir un nouvel exercice</span></header>
+    <form method="post" action="/parametres/exercices/nouveau">
+      <div class="body">
+        <label for="year" class="required">Année de l'exercice</label>
+        <input type="number" id="year" name="year" min="2000" max="2100"
+               value="{{ annee_courante }}" required>
+        <div class="field-help">
+          Exercice d'année civile : du 01/01 au 31/12, conformément à la réglementation
+          marocaine pour les sociétés.
+        </div>
+      </div>
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary">Ouvrir l'exercice</button>
+      </div>
+    </form>
+  </div>
+
+  <div class="card">
+    <header><span>Règles de gestion appliquées</span></header>
+    <div class="body">
+      <ul style="margin:0; padding-left:18px; font-size:13.5px; line-height:1.9">
+        <li><strong>Ouvert</strong> : saisie, modification et validation possibles.</li>
+        <li><strong>Clôturé</strong> : aucune nouvelle écriture n'est acceptée.</li>
+        <li><strong>Verrouillé</strong> : interdiction absolue, réouverture tracée.</li>
+        <li>Une écriture validée reste immuable : correction par contre-écriture.</li>
+        <li>Toute réouverture est enregistrée dans la piste d'audit (qui, quand, quoi).</li>
+      </ul>
+    </div>
+  </div>
+</div>
+{% endblock %}

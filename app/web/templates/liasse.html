@@ -1,0 +1,293 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1>IS &amp; liasse fiscale</h1>
+    <div class="breadcrumb">
+      <a href="/">Accueil</a> &middot; Liasse fiscale EDI Simpl-IS &middot; exercice {{ exercice }}
+      &middot; modèle <strong>{{ modele_choisi }}</strong>
+    </div>
+  </div>
+  <div class="actions">
+    <form method="get" action="/liasse" class="inline">
+      <input type="number" name="year" value="{{ exercice }}" min="2000" max="2100" style="width:90px">
+      <select name="modele" style="min-width:260px">
+        {% for nom, libelle in modeles %}
+        <option value="{{ nom }}" {{ 'selected' if nom == modele_choisi }}>{{ libelle }}</option>
+        {% endfor %}
+      </select>
+      <button type="submit" class="btn">Afficher</button>
+    </form>
+    {% if production %}
+    <a class="btn btn-primary" href="/etats/liasse.xml?year={{ exercice }}&modele={{ modele_choisi | urlencode }}">⬇ XML EDI (validé XSD)</a>
+    {% endif %}
+    <a class="btn" href="/etats/liasse-efi.csv?year={{ exercice }}&modele={{ modele_choisi | urlencode }}">⬇ EFI assisté (CSV)</a>
+  </div>
+</div>
+
+{% if erreur %}
+<div class="card">
+  <header><span>Attention</span></header>
+  <div class="body"><p style="margin:0">{{ erreur }}</p></div>
+</div>
+{% endif %}
+
+{% if dossier %}
+{% set calcul = dossier.fiscal.calcul %}
+{% set contrat = dossier.liasse.contrat %}
+<div class="grid cols-4">
+  <div class="kpi">
+    <div class="label">Résultat fiscal {{ exercice }}</div>
+    <div class="value">{{ calcul.resultat_fiscal | amount }} DH</div>
+    <div class="hint">
+      Comptable {{ calcul.resultat_comptable | amount }} DH &middot;
+      réintégrations {{ calcul.total_reintegrations | amount }} DH &middot;
+      déductions {{ calcul.total_deductions | amount }} DH
+    </div>
+  </div>
+  <div class="kpi">
+    <div class="label">Impôt dû (IS ou CM)</div>
+    <div class="value">{{ calcul.impot_du | amount }} DH</div>
+    <div class="hint">
+      IS {{ calcul.is_theorique | amount }} DH &middot;
+      cotisation minimale {{ calcul.cotisation_minimale | amount }} DH
+      (base CM hors TVA {{ calcul.base_cotisation_minimale | amount }} DH)
+    </div>
+  </div>
+  <div class="kpi">
+    <div class="label">Liasse alimentée</div>
+    <div class="value">{{ dossier.liasse.nb_cellules }} cellule(s)</div>
+    <div class="hint">
+      {{ dossier.liasse.nb_tableaux }} tableau(x) &middot;
+      {{ dossier.liasse.cellules_sans_valeur | length }} à compléter &middot;
+      schéma id {{ contrat.modele_id if contrat else '—' }}
+      ({{ contrat.tableaux | length if contrat else 0 }} tableaux,
+      {{ contrat.codes | length if contrat else 0 }} codes)
+    </div>
+  </div>
+  <div class="kpi {{ 'positive' if production and production.validation.valide else '' }}">
+    <div class="label">Validation du fichier XSD</div>
+    <div class="value" style="font-size:17px">
+      {% if production and production.validation.valide is true %}Conforme
+      {% elif production and production.validation.valide is false %}Refusé
+      {% else %}Non validé{% endif %}
+    </div>
+    <div class="hint">
+      {% if production %}
+      {{ production.nom_fichier }} &middot; {{ production.taille }} octets
+      {% else %}Fichier non produit (contrôle bloquant ou schéma absent){% endif %}
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <header><span>Contrôles avant dépôt ({{ dossier.controles | length }})</span></header>
+  <div class="body">
+    <ul style="margin:0; padding-left:18px; font-size:13px; line-height:1.8">
+      {% for controle in dossier.controles %}
+      <li>
+        <strong>{{ '⛔' if controle.niveau == 'bloquant' else ('⚠' if controle.niveau == 'avertissement' else 'ℹ') }}</strong>
+        <code>{{ controle.code }}</code> — {{ controle.message }}
+      </li>
+      {% endfor %}
+    </ul>
+  </div>
+</div>
+
+{% if production and not production.validation.valide %}
+<div class="card">
+  <header><span>Écarts au schéma XSD ({{ production.validation.erreurs | length }})</span></header>
+  <div class="body">
+    <p style="margin:0 0 8px 0">{{ production.validation.message }}</p>
+    <ul style="margin:0; padding-left:18px; font-size:13px">
+      {% for ecart in production.validation.erreurs %}
+      <li>ligne {{ ecart.ligne }} : {{ ecart.message }}</li>
+      {% endfor %}
+    </ul>
+  </div>
+</div>
+{% endif %}
+
+<div class="card">
+  <header><span>Cellules de la liasse ({{ dossier.liasse.nb_cellules }})</span></header>
+  <div class="body">
+    {% if dossier.liasse.nb_cellules %}
+    <table>
+      <thead>
+        <tr>
+          <th>Tableau</th><th>Code EDI</th><th>Libellé</th><th>Ligne</th>
+          <th>Valeur</th><th>Rubrique</th><th>Origine</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for tableau in dossier.liasse.tableaux %}
+        {% for cellule in tableau.cellules %}
+        <tr>
+          <td>{{ tableau.tableau_id }}{% if tableau.libelle %} — {{ tableau.libelle }}{% endif %}</td>
+          <td><code>{{ cellule.code_edi }}</code></td>
+          <td>{{ cellule.libelle or '' }}</td>
+          <td>{{ cellule.numero_ligne if cellule.numero_ligne is not none else '' }}</td>
+          <td class="num">{{ cellule.valeur }}</td>
+          <td><code>{{ cellule.rubrique }}</code></td>
+          <td style="font-size:12px">{{ cellule.source }}</td>
+        </tr>
+        {% endfor %}
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <p style="margin:0">
+      Aucune cellule : le référentiel de codification
+      (<code>referentiels/liasse/codification_liasse.csv</code>) ne décrit pas encore de
+      correspondance <code>codeEdi</code> ↔ rubrique pour ce modèle — l'annexe DGI
+      « Codification des cellules » n'est pas fournie (ambiguïté A22). Utilisez l'EFI
+      assisté ci-dessous.
+    </p>
+    {% endif %}
+  </div>
+</div>
+
+<div class="card">
+  <header><span>EFI assisté par tableau ({{ dossier.efi | length }} feuille(s))</span></header>
+  <div class="body">
+    {% for feuille in dossier.efi %}
+    <h3 style="margin:12px 0 6px 0; font-size:14px">
+      {{ feuille.onglet }}{% if feuille.libelle %} — {{ feuille.libelle }}{% endif %}
+      <span class="badge badge-grey">{{ feuille.nb_lignes }} ligne(s)</span>
+      {% if feuille.nb_a_completer %}<span class="badge badge-orange">{{ feuille.nb_a_completer }} à compléter</span>{% endif %}
+    </h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Code EDI</th><th>Libellé</th><th>Ligne</th><th>Valeur</th><th>État</th><th>Origine</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for ligne in feuille.lignes %}
+        <tr>
+          <td><code>{{ ligne.code_edi }}</code></td>
+          <td>{{ ligne.libelle or '' }}</td>
+          <td>{{ ligne.numero_ligne if ligne.numero_ligne is not none else '' }}</td>
+          <td class="num">{{ ligne.valeur if ligne.valeur is not none else '—' }}</td>
+          <td>{{ 'saisie à reporter' if ligne.etat == 'a_completer' else 'valeur produite' }}</td>
+          <td style="font-size:12px">{{ ligne.source or '' }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% endfor %}
+  </div>
+</div>
+
+<div class="grid cols-2">
+  <div class="card">
+    <header><span>Enregistrer la liasse</span></header>
+    <div class="body">
+      <form method="post" action="/liasse/enregistrer">
+        <input type="hidden" name="year" value="{{ exercice }}">
+        <input type="hidden" name="modele" value="{{ modele_choisi }}">
+        <div class="field">
+          <label for="mode_depot">Mode de dépôt</label>
+          <select id="mode_depot" name="mode_depot">
+            <option value="EFI">EFI — saisie assistée sur SIMPL</option>
+            <option value="EDI">EDI — fichier XML validé par le schéma</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="avec_xml">Fichier XML</label>
+          <label style="font-weight:400">
+            <input type="checkbox" id="avec_xml" name="avec_xml" value="1">
+            produire et joindre le XML validé (obligatoire en EDI)
+          </label>
+        </div>
+        <button type="submit" class="btn btn-primary">Enregistrer (brouillon)</button>
+      </form>
+    </div>
+  </div>
+  <div class="card">
+    <header><span>Dépôt et accusé de réception</span></header>
+    <div class="body">
+      <form method="post" action="/liasse/depot">
+        <input type="hidden" name="year" value="{{ exercice }}">
+        <input type="hidden" name="modele" value="{{ modele_choisi }}">
+        <div class="grid cols-3">
+          <div class="field">
+            <label for="jour">Date de dépôt</label>
+            <input type="date" id="jour" name="jour">
+          </div>
+          <div class="field">
+            <label for="accuse_le">Accusé de réception</label>
+            <input type="date" id="accuse_le" name="accuse_le">
+          </div>
+          <div class="field">
+            <label for="motif_rejet">Motif de rejet</label>
+            <input type="text" id="motif_rejet" name="motif_rejet" maxlength="500">
+          </div>
+        </div>
+        <p style="font-size:12px; margin:0 0 8px 0">
+          Date d'accusé renseignée : déclaration <strong>acceptée</strong> ; motif renseigné :
+          déclaration <strong>rejetée</strong> ; sinon : <strong>soumise</strong> (accusé en attente).
+        </p>
+        <button type="submit" class="btn">Enregistrer le dépôt</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <header><span>Registre des liasses ({{ declarations | length }})</span></header>
+  <div class="body">
+    <table>
+      <thead>
+        <tr>
+          <th>Exercice</th><th>Modèle</th><th>Dépôt</th><th>Statut</th><th>Cellules</th>
+          <th>Impôt dû</th><th>Fichier</th><th>Empreinte</th><th>Dépôt le</th><th>Accusé le</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for declaration in declarations %}
+        <tr>
+          <td>{{ declaration.periode }}</td>
+          <td style="font-size:12px">{{ declaration.regime or '' }}</td>
+          <td>{{ declaration.mode_depot }}</td>
+          <td>{{ declaration.statut_libelle }}</td>
+          <td class="num">{{ declaration.nb_lignes }}</td>
+          <td class="num">{{ declaration.montant | amount }}</td>
+          <td style="font-size:12px">{{ declaration.fichier_nom or '' }}</td>
+          <td style="font-size:11px">{{ (declaration.fichier_hash or '')[:16] }}</td>
+          <td>{{ declaration.soumise_le | date_fr }}</td>
+          <td>{{ declaration.accuse_le | date_fr }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% if not declarations %}
+    <p style="margin:0">Aucune liasse enregistrée pour ce dossier.</p>
+    {% endif %}
+  </div>
+</div>
+
+<div class="card">
+  <header><span>À confirmer — annexe DGI « Codification des cellules »</span></header>
+  <div class="body" style="font-size:13px; line-height:1.7">
+    <p style="margin:0 0 6px 0">
+      Le schéma XSD officiel fixe la structure et les codes autorisés (id du modèle,
+      <code>tableau/id</code>, <code>cellule/codeEdi</code>, <code>extraField</code>) mais
+      <strong>ne porte aucun libellé</strong> : la correspondance <code>codeEdi</code> ↔
+      rubrique comptable est décrite par le référentiel
+      <code>referentiels/liasse/codification_liasse.csv</code>, à valider par
+      l'expert-comptable (<strong>ambiguïté A22</strong> — annexe non fournie). Aucun code
+      n'est deviné : un code ou un tableau hors schéma <strong>bloque</strong> le dépôt.
+    </p>
+    <p style="margin:0">
+      Outils : <code>tools/liasse_codification.py --contrat</code> (structure du schéma),
+      <code>--gabarit</code> (trame à compléter), <code>--verifier</code> (contrôle du
+      référentiel). Le contrôle « Σ liasses = balance » est vérifié cellule par cellule
+      ({{ dossier.reconciliation.nb_rapprochements }} rapprochement(s),
+      {{ 'conforme' if dossier.reconciliation.conforme else 'écarts détectés' }}).
+    </p>
+  </div>
+</div>
+{% endif %}
+{% endblock %}

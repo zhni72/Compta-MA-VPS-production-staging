@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="page-head no-print">
+  <div>
+    <h1>Impression de la facture {{ facture.number or 'brouillon' }}</h1>
+    <div class="breadcrumb">
+      <a href="/">Accueil</a> &middot; <a href="/factures/{{ facture.id }}">Fiche facture</a> &middot; Aperçu avant impression
+    </div>
+  </div>
+  <div class="actions">
+    <button type="button" class="btn btn-primary" onclick="window.print()">Imprimer</button>
+    <a class="btn" href="/factures/{{ facture.id }}">Retour</a>
+  </div>
+</div>
+
+<div class="card">
+  <div class="body">
+    <div class="invoice-print">
+      <div class="entete">
+        <div>
+          <h2>{{ company.name }}</h2>
+          <div class="mentions">
+            {% if company.legal_form %}{{ company.legal_form }}<br>{% endif %}
+            {{ company.address or '' }}{% if company.city %}<br>{{ company.city }}{% endif %}<br>
+            {% if company.ice %}ICE : {{ company.ice }}<br>{% endif %}
+            {% if company.fiscal_id %}IF : {{ company.fiscal_id }}<br>{% endif %}
+            {% if company.rc %}RC : {{ company.rc }}<br>{% endif %}
+            {% if company.patente %}Patente : {{ company.patente }}<br>{% endif %}
+            {% if company.cnss_number %}CNSS : {{ company.cnss_number }}<br>{% endif %}
+            {% if company.phone %}Tél. : {{ company.phone }}<br>{% endif %}
+            {% if company.email %}{{ company.email }}{% endif %}
+          </div>
+        </div>
+        <div class="bloc-client">
+          <strong>{% if facture.invoice_type == 'vente' %}Client{% else %}Fournisseur{% endif %}</strong><br>
+          {{ tiers.name if tiers else '—' }}<br>
+          {% if tiers and tiers.address %}{{ tiers.address }}<br>{% endif %}
+          {% if tiers and tiers.city %}{{ tiers.city }}<br>{% endif %}
+          {% if tiers and tiers.ice %}ICE : {{ tiers.ice }}<br>{% endif %}
+          {% if tiers and tiers.fiscal_id %}IF : {{ tiers.fiscal_id }}<br>{% endif %}
+          {% if tiers and tiers.rc %}RC : {{ tiers.rc }}{% endif %}
+        </div>
+      </div>
+
+      <div class="titre-doc">
+        {% if facture.is_credit_note %}Avoir{% else %}Facture{% endif %}
+        {% if facture.invoice_type == 'achat' %} d'achat{% endif %}
+      </div>
+      {% if incoherences %}
+      <div class="alert alert-error" style="margin:10px 0">
+        <strong>Document incohérent</strong> — impression à ne pas transmettre :
+        <ul style="margin:6px 0 0 18px">
+          {% for anomalie in incoherences %}<li>{{ anomalie }}</li>{% endfor %}
+        </ul>
+      </div>
+      {% endif %}
+      <div class="sous-titre">
+        N° {{ facture.number or '— (brouillon non validé) —' }}
+        &nbsp;|&nbsp; Date : {{ facture.invoice_date | date_fr }}
+        {% if facture.due_date %}&nbsp;|&nbsp; Échéance : {{ facture.due_date | date_fr }}{% endif %}
+      </div>
+
+      <table class="data">
+        <thead>
+          <tr>
+            <th style="width:44%">Désignation</th>
+            <th class="num">Quantité</th>
+            <th class="num">P.U. HT</th>
+            <th class="num">Total HT</th>
+            <th class="num">TVA</th>
+            <th class="num">Total TTC</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for l in facture.lines %}
+          <tr>
+            <td>{{ l.designation }}</td>
+            <td class="num">{{ l.quantity | qte }}</td>
+            <td class="num">{{ l.unit_price | amount }}</td>
+            <td class="num">{{ l.line_ht | amount }}</td>
+            <td class="num">{{ l.vat_rate | amount }} %</td>
+            <td class="num">{{ l.line_ttc | amount }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+
+      <div style="display:flex; margin-top:18px">
+        <div class="mentions" style="max-width:340px">
+          Mode de règlement : {{ facture.payment_mode or 'à convenir' }}<br>
+          {% if facture.reference %}Référence : {{ facture.reference }}<br>{% endif %}
+          Arrêtée la présente facture à la somme de
+          <strong>{{ facture.total_ttc | money }}</strong> toutes taxes comprises.
+        </div>
+        <div class="totaux">
+          <div class="line"><span>Total HT</span><span>{{ facture.total_ht | amount }} DH</span></div>
+          <div class="line"><span>Total TVA</span><span>{{ facture.total_vat | amount }} DH</span></div>
+          <div class="line total"><span>Total TTC</span><span>{{ facture.total_ttc | amount }} DH</span></div>
+        </div>
+      </div>
+
+      <table class="data" style="margin-top:18px; width:auto">
+        <thead><tr><th>Taux de TVA</th><th class="num">Base HT</th><th class="num">Montant TVA</th></tr></thead>
+        <tbody>
+          {% for t in ventilation_tva %}
+          <tr>
+            <td class="num">{{ t.taux }} %</td>
+            <td class="num">{{ t.base | amount }}</td>
+            <td class="num">{{ t.tva | amount }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+
+      <div class="pied">
+        {% if facture.status == 'cancelled' %}
+        <strong>DOCUMENT ANNULÉ — ne pas utiliser comme pièce justificative.</strong><br>
+        {% elif not facture.number %}
+        <strong>BROUILLON — document non validé, sans valeur comptable.</strong><br>
+        {% endif %}
+        Facture originale — le duplicata est délivré sur demande.<br>
+        Document généré par {{ app_name }} — conservation obligatoire 10 ans (CGNC / CGI).
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

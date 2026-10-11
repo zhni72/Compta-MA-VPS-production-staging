@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1>{{ code }} — {{ title }}</h1>
+    <div class="breadcrumb"><a href="/">Accueil</a> &middot; {{ title }}</div>
+  </div>
+  <div class="actions"><a class="btn btn-primary" href="/">Retour au tableau de bord</a></div>
+</div>
+
+<div class="card">
+  <div class="body">
+    <p style="font-size:14px; margin:0 0 10px">{{ message }}</p>
+    <p class="field-help" style="margin:0">
+      Rappel des rôles : Administrateur, Expert-comptable (validation et clôture),
+      Comptable (saisie et facturation), Caissier (règlements), Commercial
+      (factures clients), Lecteur / Auditeur (consultation).
+    </p>
+  </div>
+</div>
+{% endblock %}

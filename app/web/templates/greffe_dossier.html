@@ -1,0 +1,345 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1>Dépôt au greffe</h1>
+    <div class="breadcrumb">
+      <a href="/">Accueil</a> &middot; États de synthèse &middot; exercice {{ exercice }}
+      {% if depot %}&middot; {{ depot.etat_libelle }}{% else %}&middot; aucun dossier{% endif %}
+    </div>
+  </div>
+  <div class="actions">
+    <form method="get" action="/greffe" class="inline">
+      <input type="number" name="year" value="{{ exercice }}" min="2000" max="2100"
+             style="width:90px" aria-label="Exercice">
+      <button type="submit" class="btn">Afficher</button>
+    </form>
+    {% if depot %}
+    <form method="post" action="/greffe/{{ depot.id }}/pieces/generer" class="inline">
+      <label class="hint" for="date_ag_generer" style="margin-right:6px">Date AG</label>
+      <input type="date" id="date_ag_generer" name="date_ag" style="width:150px"
+             value="{{ depot.date_ag.isoformat() if depot.date_ag else '' }}"
+             aria-label="Date de l'assemblée générale">
+      <button type="submit" class="btn btn-primary">Générer les pièces</button>
+    </form>
+    <a class="btn" href="/greffe/{{ depot.id }}/dossier">⬇ Archive ZIP</a>
+    <a class="btn" href="/greffe/{{ depot.id }}/bordereau.pdf">Bordereau PDF</a>
+    {% endif %}
+  </div>
+</div>
+
+<div class="grid cols-3">
+  <div class="kpi">
+    <div class="label">État de la demande</div>
+    <div class="value" style="font-size:18px">{{ depot.etat_libelle if depot else '—' }}</div>
+    <div class="hint">
+      Portail : <a href="{{ portail }}" target="_blank">{{ portail }}</a><br>
+      Forme {{ depot.forme_juridique if depot else '—' }} &middot;
+      limite AG/dépôt
+      {% if depot %}{{ depot.date_limite_depot | date_fr }}{% else %}—{% endif %}
+    </div>
+  </div>
+  <div class="kpi {{ 'positive' if completude and completude.complete else 'negative' }}">
+    <div class="label">Complétude du dossier</div>
+    <div class="value">
+      {% if completude %}{{ completude.nb_fournies }}/{{ completude.nb_exigees }}{% else %}—{% endif %}
+    </div>
+    <div class="hint">Pièces obligatoires fournies &middot; PDF ≤ 10 Mo par fichier</div>
+  </div>
+  <div class="kpi {{ 'positive' if taxes and taxes.solde == 0 else '' }}">
+    <div class="label">Taxes du dépôt</div>
+    <div class="value">{{ taxes.montant | money if taxes else '—' }}</div>
+    <div class="hint">
+      {% if taxes %}
+      Payé {{ taxes.paye | amount }} DH &middot; reste {{ taxes.solde | amount }} DH<br>
+      Paiement sous 3 jours après approbation
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+{% if alertes %}
+<div class="card">
+  <header><span>Alertes ({{ alertes | length }})</span></header>
+  <div class="body">
+    <ul style="margin:0; padding-left:18px; font-size:13px; line-height:1.8">
+      {% for alerte in alertes %}
+      <li><span class="badge badge-{{ 'red' if alerte.niveau == 'urgent' else 'orange' }}">{{ alerte.niveau }}</span>
+        {{ alerte.message }}</li>
+      {% endfor %}
+    </ul>
+  </div>
+</div>
+{% endif %}
+
+{% if not depot %}
+<div class="card">
+  <header><span>Nouveau dossier de dépôt — exercice {{ exercice }}</span></header>
+  <div class="body">
+    <p style="font-size:13px; line-height:1.7; margin-top:0">
+      L'assemblée générale approuve les états de synthèse <strong>dans les six mois</strong>
+      de la clôture (loi 5-96, art. 10) et le dépôt au greffe se fait par dépôt de pièces
+      (art. 93 ; loi 17-95 art. 14 pour les SA). Un seul dossier par exercice.
+    </p>
+    <form method="post" action="/greffe/dossier">
+      <input type="hidden" name="exercice" value="{{ exercice }}">
+      <div class="grid cols-3">
+        <div class="field">
+          <label for="forme_juridique">Forme juridique <span class="required">*</span></label>
+          <select id="forme_juridique" name="forme_juridique">
+            {% for forme in formes %}
+            <option value="{{ forme }}" {{ 'selected' if forme == company.legal_form }}>{{ forme }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="field">
+          <label for="date_ag">Date de l'AG d'approbation</label>
+          <input type="date" id="date_ag" name="date_ag">
+        </div>
+        <div class="field">
+          <label for="montant_taxes">Taxes du dépôt (DH)</label>
+          <input type="number" id="montant_taxes" name="montant_taxes" step="0.01" min="0" value="0">
+        </div>
+        <div class="field">
+          <label for="notes">Notes</label>
+          <input type="text" id="notes" name="notes" maxlength="200">
+        </div>
+      </div>
+      <button type="submit" class="btn btn-primary">Créer le dossier</button>
+    </form>
+  </div>
+</div>
+{% endif %}
+
+{% if depot and controles %}
+<div class="card">
+  <header><span>Contrôles préalables ({{ controles | length }})</span></header>
+  <div class="body">
+    <ul style="margin:0; padding-left:18px; font-size:13px; line-height:1.8">
+      {% for controle in controles %}
+      <li><strong>{{ '⛔' if controle.niveau == 'bloquant' else '⚠' }}</strong>
+        {{ controle.message }}</li>
+      {% endfor %}
+    </ul>
+  </div>
+</div>
+{% endif %}
+
+{% if depot %}
+<div class="card">
+  <header><span>Checklist des pièces — {{ depot.forme_juridique }}</span></header>
+  <div class="body">
+    <table class="data">
+      <thead>
+        <tr>
+          <th>Pièce</th><th>Exigence</th><th>État</th><th>Fichier</th>
+          <th>Taille</th><th>SHA-256</th><th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for ligne in catalogue %}
+        <tr>
+          <td>{{ ligne.libelle }}<div class="hint">{{ ligne.commentaire }}</div></td>
+          <td>
+            {% if ligne.obligatoire %}<span class="badge badge-blue">obligatoire</span>
+            {% elif ligne.conditionnelle %}<span class="badge badge-grey">si CAC nommé</span>
+            {% else %}<span class="badge badge-grey">selon seuils</span>{% endif %}
+          </td>
+          <td>
+            {% if ligne.fournie %}
+              <span class="badge badge-green">fournie</span>
+              {% if ligne.par_paiement %}<div class="hint">par le paiement enregistré</div>{% endif %}
+            {% elif ligne.statut == 'invalide' %}
+              <span class="badge badge-red">refusée (contenu)</span>
+            {% else %}<span class="badge badge-red">à joindre</span>{% endif %}
+            {% if ligne.analyse %}<div class="hint">{{ ligne.analyse }}</div>{% endif %}
+            {% if ligne.anomalie %}<div class="hint" style="color:#b00">{{ ligne.anomalie }}</div>{% endif %}
+          </td>
+          <td>{{ ligne.nom_fichier or '—' }}</td>
+          <td>{{ ligne.taille_lisible or '—' }}</td>
+          <td style="font-family:monospace; font-size:11px">{{ (ligne.hash_sha256 or '—')[:20] }}</td>
+          <td>
+            {% if ligne.fournie and ligne.document_id %}
+            <form method="post" class="inline"
+                  action="/greffe/{{ depot.id }}/pieces/{{ ligne.code }}/supprimer">
+              <button type="submit" class="btn btn-small">Retirer</button>
+            </form>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endif %}
+
+{% if depot %}
+<div class="grid cols-3">
+  <div class="card">
+    <header><span>Téléverser une pièce</span></header>
+    <div class="body">
+      <form method="post" action="/greffe/{{ depot.id }}/pieces"
+            enctype="multipart/form-data">
+        <div class="field">
+          <label for="piece_code">Pièce <span class="required">*</span></label>
+          <select id="piece_code" name="piece_code">
+            {% for piece in pieces_disponibles %}
+            <option value="{{ piece.code }}">{{ piece.libelle }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="field">
+          <label for="fichier">Fichier PDF (≤ 10 Mo) <span class="required">*</span></label>
+          <input type="file" id="fichier" name="fichier" accept="application/pdf" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Téléverser</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="card">
+    <header><span>Suivi du dossier (7 états)</span></header>
+    <div class="body">
+      <form method="post" action="/greffe/{{ depot.id }}/etat">
+        <div class="field">
+          <label for="etat">Nouvel état</label>
+          <select id="etat" name="etat">
+            {% for code, libelle in etats_possibles %}
+            <option value="{{ code }}">{{ libelle }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="field">
+          <label for="motif">Motif (rejet, annulation, amender, dépôt final)</label>
+          <input type="text" id="motif" name="motif" maxlength="200">
+        </div>
+        <div class="field">
+          <label>
+            <input type="checkbox" name="forcer" value="1">
+            Assumer un dépôt hors délai (risque d'amende)
+          </label>
+        </div>
+        <button type="submit" class="btn btn-primary">Enregistrer l'état</button>
+      </form>
+      {% if depot.amende_montant %}
+      <p style="font-size:12px">
+        Amende provisionnée : {{ depot.amende_montant | amount }} DH
+        (dotation 6195 / provision 1515).
+      </p>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="card">
+    <header><span>Taxes et certificat</span></header>
+    <div class="body">
+      <form method="post" action="/greffe/{{ depot.id }}/paiement">
+        <div class="field">
+          <label for="montant">Paiement des taxes (DH)</label>
+          <input type="number" id="montant" name="montant" step="0.01" min="0.01" required>
+        </div>
+        <div class="field">
+          <label for="moyen">Moyen</label>
+          <select id="moyen" name="moyen">
+            {% for code, libelle in moyens.items() %}
+            <option value="{{ code }}">{{ libelle }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="field">
+          <label for="reference">Référence</label>
+          <input type="text" id="reference" name="reference" maxlength="80">
+        </div>
+        <button type="submit" class="btn">Enregistrer le paiement</button>
+      </form>
+      <hr>
+      <form method="post" action="/greffe/{{ depot.id }}/certificat"
+            enctype="multipart/form-data">
+        <div class="field">
+          <label for="certificat">Certificat de dépôt (PDF)</label>
+          <input type="file" id="certificat" name="fichier" accept="application/pdf" required>
+        </div>
+        <div class="field">
+          <label for="reference_certificat">Référence du certificat</label>
+          <input type="text" id="reference_certificat" name="reference" maxlength="80">
+        </div>
+        <button type="submit" class="btn">Archiver le certificat</button>
+      </form>
+      {% if depot.certificat_hash %}
+      <p style="font-size:12px">
+        Certificat archivé le {{ depot.certificat_depose_le | date_fr }} — SHA-256
+        <code>{{ depot.certificat_hash[:24] }}…</code><br>
+        <a class="btn btn-small" href="/greffe/{{ depot.id }}/certificat.pdf">⬇ Certificat</a>
+        <a class="btn btn-small" href="/greffe/{{ depot.id }}/attestation.pdf">Attestation taxes</a>
+      </p>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endif %}
+
+{% if journal %}
+<div class="card">
+  <header><span>Journal des états ({{ journal | length }} transition(s))</span></header>
+  <div class="body">
+    <table class="data">
+      <thead>
+        <tr><th>Date</th><th>État avant</th><th>État après</th><th>Motif</th></tr>
+      </thead>
+      <tbody>
+        {% for evenement in journal %}
+        <tr>
+          <td>{{ evenement.date_evenement | date_fr }}</td>
+          <td>{{ etats.get(evenement.etat_avant, evenement.etat_avant) }}</td>
+          <td>{{ etats.get(evenement.etat_apres, evenement.etat_apres) }}</td>
+          <td>{{ evenement.motif or '—' }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endif %}
+
+{% if dossiers %}
+<div class="card">
+  <header><span>Suivi des dépôts ({{ dossiers | length }} exercice(s))</span></header>
+  <div class="body">
+    <table class="data">
+      <thead>
+        <tr>
+          <th>Exercice</th><th>Forme</th><th>État</th><th>Limite AG / dépôt</th>
+          <th>Approbation</th><th>Limite paiement</th><th>Dépôt</th><th>Certificat</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for ligne in dossiers %}
+        <tr>
+          <td><a href="/greffe?year={{ ligne.exercice }}">{{ ligne.exercice }}</a></td>
+          <td>{{ ligne.forme_juridique }}</td>
+          <td>{{ ligne.etat_libelle }}</td>
+          <td>{{ ligne.date_limite_depot | date_fr }}</td>
+          <td>{{ ligne.date_approbation | date_fr }}</td>
+          <td>{{ ligne.date_limite_paiement | date_fr }}</td>
+          <td>{{ ligne.date_depot | date_fr }}</td>
+          <td>
+            {% if ligne.certificat_hash %}
+            <span class="badge badge-green">archivé</span>
+            {% else %}<span class="badge badge-orange">à archiver</span>{% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <p style="font-size:12px; line-height:1.7">
+      Références : <strong>loi 5-96</strong> (art. 10 : assemblée dans les six mois de la
+      clôture ; art. 93 : publicité par dépôt au greffe du tribunal du siège social) et
+      <strong>loi 17-95</strong> (art. 14) pour les sociétés anonymes — guide officiel
+      « Dépôt électronique des états de synthèse » (Ministère de la Justice, novembre 2025).
+    </p>
+  </div>
+</div>
+{% endif %}
+{% endblock %}

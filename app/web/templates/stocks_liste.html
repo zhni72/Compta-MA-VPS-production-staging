@@ -1,0 +1,173 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1>Stocks</h1>
+    <div class="breadcrumb">
+      <a href="/">Accueil</a> &middot; Stocks &amp; inventaire permanent &middot;
+      exercice {{ exercice }} &middot; {{ etat.nb_articles }} article(s)
+    </div>
+  </div>
+  <div class="actions">
+    <form method="post" action="/stocks/stock-final" style="display:inline">
+      <input type="hidden" name="exercice" value="{{ exercice }}">
+      <button type="submit" class="btn">Constater le stock final {{ exercice }}</button>
+    </form>
+    <a class="btn" href="/immobilisations">Immobilisations</a>
+  </div>
+</div>
+
+<div class="grid cols-3">
+  <div class="kpi">
+    <div class="label">Valeur du stock (fiches)</div>
+    <div class="value">{{ etat.total_valeur | money }}</div>
+    <div class="hint">Σ (quantité × coût unitaire) — CMUP / FIFO</div>
+  </div>
+  <div class="kpi">
+    <div class="label">Comptes de stock (grand livre)</div>
+    <div class="value">{{ etat.total_comptable | money }}</div>
+    <div class="hint">Comptes 3xxx au {{ etat.au | date_fr }}</div>
+  </div>
+  <div class="kpi {{ 'positive' if etat.conforme else 'negative' }}">
+    <div class="label">Contrôle de valorisation</div>
+    <div class="value" style="font-size:18px">
+      {{ 'Conforme' if etat.conforme else 'Écart ' ~ (etat.ecart | amount) ~ ' DH' }}
+    </div>
+    <div class="hint">
+      Variation {{ exercice }} : {{ variation.total_variation | amount }} DH —
+      {{ etat.nb_sous_seuil }} article(s) sous seuil
+    </div>
+  </div>
+</div>
+
+{% if controles %}
+<div class="card">
+  <header><span>Contrôles de cohérence ({{ controles | length }})</span></header>
+  <div class="body">
+    <ul style="margin:0; padding-left:18px; font-size:13px; line-height:1.7">
+      {% for controle in controles %}
+      <li><strong>{{ '⛔' if controle.niveau == 'bloquant' else '⚠' }}</strong>
+        {{ controle.message }}</li>
+      {% endfor %}
+    </ul>
+  </div>
+</div>
+{% endif %}
+
+<div class="card">
+  <header><span>Nouvel article</span></header>
+  <div class="body">
+    <form method="post" action="/stocks/article">
+      <div class="grid cols-3">
+        <div class="field">
+          <label for="reference">Référence <span class="required">*</span></label>
+          <input type="text" id="reference" name="reference" required maxlength="40">
+        </div>
+        <div class="field">
+          <label for="label">Désignation <span class="required">*</span></label>
+          <input type="text" id="label" name="label" required maxlength="180">
+        </div>
+        <div class="field">
+          <label for="stock_account">Compte de stock (3xxx)</label>
+          <input type="text" id="stock_account" name="stock_account" value="3111" maxlength="12">
+        </div>
+        <div class="field">
+          <label for="family">Famille</label>
+          <input type="text" id="family" name="family" maxlength="60">
+        </div>
+        <div class="field">
+          <label for="valuation_method">Valorisation</label>
+          <select id="valuation_method" name="valuation_method">
+            {% for code, libelle in methodes.items() %}
+            <option value="{{ code }}">{{ libelle }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="field">
+          <label for="alert_threshold">Seuil d'alerte</label>
+          <input type="number" id="alert_threshold" name="alert_threshold" step="0.001" min="0" value="0">
+        </div>
+      </div>
+      <button type="submit" class="btn btn-primary">Créer l'article</button>
+    </form>
+  </div>
+</div>
+
+<div class="card">
+  <form class="filters" method="get" action="/stocks">
+    <div class="field">
+      <label for="year">Exercice</label>
+      <input type="number" id="year" name="year" value="{{ exercice }}" min="2000" max="2100" style="min-width:110px">
+    </div>
+    <div class="field">
+      <label for="sous_seuil">Filtre</label>
+      <select id="sous_seuil" name="sous_seuil">
+        <option value="">Tous les articles</option>
+        <option value="1" {{ 'selected' if sous_seuil == '1' }}>Articles sous seuil</option>
+      </select>
+    </div>
+    <button type="submit" class="btn">Filtrer</button>
+    <a class="btn" href="/stocks">Réinitialiser</a>
+  </form>
+
+  <div class="body tight table-wrap">
+    <table class="data">
+      <thead>
+        <tr>
+          <th>Référence</th><th>Désignation</th><th>Compte</th><th class="center">Valorisation</th>
+          <th class="num">Quantité</th><th class="num">Coût unitaire</th><th class="num">Valeur</th>
+          <th class="num">Seuil</th><th>Mouvement</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for ligne in etat.lignes %}
+        <tr>
+          <td class="code">{{ ligne.reference }}</td>
+          <td>{{ ligne.label }}</td>
+          <td class="code">{{ ligne.stock_account }}</td>
+          <td class="center">{{ 'CMUP' if ligne.valuation_method == 'cmup' else 'FIFO' }}</td>
+          <td class="num">{{ ligne.quantity }}</td>
+          <td class="num">{{ ligne.cmup | amount }}</td>
+          <td class="num">{{ ligne.value | amount }}</td>
+          <td class="num">
+            {{ ligne.alert_threshold }}
+            {% if ligne.sous_seuil %}<span class="badge badge-orange">seuil</span>{% endif %}
+          </td>
+          <td>
+            <form method="post" action="/stocks/{{ ligne.reference }}/mouvement"
+                  style="display:flex; gap:4px; align-items:center">
+              <select name="movement_type" style="width:90px">
+                <option value="entree">Entrée</option>
+                <option value="sortie">Sortie</option>
+              </select>
+              <input type="date" name="movement_date" value="{{ etat.au }}" style="width:130px" required>
+              <input type="number" name="quantity" step="0.001" min="0.001" placeholder="Qté"
+                     style="width:80px" required>
+              <input type="number" name="unit_cost" step="0.01" min="0" placeholder="Coût"
+                     style="width:80px">
+              <button type="submit" class="btn btn-small">Valider</button>
+            </form>
+          </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="9" class="empty">Aucun article enregistré. Créez un article ci-dessus.</td></tr>
+        {% endfor %}
+      </tbody>
+      <tfoot>
+        <tr>
+          <td colspan="6">TOTAL (fiches)</td>
+          <td class="num">{{ etat.total_valeur | amount }}</td>
+          <td colspan="2" class="num">Comptabilité : {{ etat.total_comptable | amount }}</td>
+        </tr>
+      </tfoot>
+    </table>
+    <p class="field-help" style="padding:10px 14px">
+      Entrée : coût unitaire obligatoire (coût d'acquisition + frais accessoires) — écriture
+      <strong>3111 / 6114</strong>. Sortie : valorisée au <strong>CMUP</strong> ou en
+      <strong>FIFO</strong> selon la fiche — écriture <strong>6114 / 3111</strong>.
+      Le CGNC admet CMUP et FIFO (LIFO proscrit) avec <strong>permanence des méthodes</strong>.
+    </p>
+  </div>
+</div>
+{% endblock %}

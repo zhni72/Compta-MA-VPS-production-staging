@@ -1,0 +1,320 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1>Paie</h1>
+    <div class="breadcrumb">
+      <a href="/">Accueil</a> &middot; Paie &amp; DTS « 9421 » &middot; exercice {{ exercice }}
+      {% if run %}&middot; période {{ periode }} — {{ run.statut_libelle }}{% endif %}
+    </div>
+  </div>
+  <div class="actions">
+    <form method="get" action="/paie" class="inline">
+      <input type="number" name="year" value="{{ exercice }}" min="2000" max="2100" style="width:90px">
+      <input type="text" name="periode" value="{{ periode }}" maxlength="7" style="width:80px" placeholder="2026-01">
+      <button type="submit" class="btn">Afficher</button>
+    </form>
+    {% if dts %}
+    <a class="btn" href="/paie/dts.xml?year={{ exercice }}">⬇ DTS XML (EDI)</a>
+    <a class="btn" href="/paie/dts.pdf?year={{ exercice }}">Fiche DTS (PDF)</a>
+    {% endif %}
+  </div>
+</div>
+
+<div class="grid cols-3">
+  <div class="kpi">
+    <div class="label">Effectif</div>
+    <div class="value">{{ employes | length }}</div>
+    <div class="hint">Fiches salariés du dossier (dont {{ livre.nb_salaries if livre else 0 }} payé(s) en {{ exercice }})</div>
+  </div>
+  <div class="kpi {{ 'positive' if run and run.statut == 'paye' else '' }}">
+    <div class="label">Paie {{ periode }}</div>
+    <div class="value" style="font-size:18px">{{ run.statut_libelle if run else 'Non préparée' }}</div>
+    <div class="hint">
+      {% if run %}
+      Brut {{ run.total_brut | amount }} DH &middot; net {{ run.total_net | amount }} DH<br>
+      IR {{ run.total_ir | amount }} DH &middot; coût employeur {{ run.total_employeur | amount }} DH
+      {% endif %}
+    </div>
+  </div>
+  <div class="kpi {{ 'positive' if dts else '' }}">
+    <div class="label">DTS « 9421 » {{ exercice }}</div>
+    <div class="value" style="font-size:18px">
+      {{ dts.totaux.nb_salaries if dts else '—' }} salarié(s)
+    </div>
+    <div class="hint">
+      {% if dts %}
+      IR retenu {{ dts.totaux.ir_retenu | amount }} DH &middot;
+      CNSS/AMO {{ dts.totaux.cnss_total | amount }} DH
+      {% else %}Préparez et validez la paie pour générer la déclaration{% endif %}
+    </div>
+  </div>
+</div>
+
+{% if controles %}
+<div class="card">
+  <header><span>Contrôles de la paie {{ periode }} ({{ controles | length }})</span></header>
+  <div class="body">
+    <ul style="margin:0; padding-left:18px; font-size:13px; line-height:1.8">
+      {% for controle in controles %}
+      <li><strong>{{ '⛔' if controle.niveau == 'bloquant' else '⚠' }}</strong>
+        {{ controle.message }}</li>
+      {% endfor %}
+    </ul>
+  </div>
+</div>
+{% endif %}
+
+{% if dts and dts.avertissements %}
+<div class="card">
+  <header><span>Avertissements de la DTS</span></header>
+  <div class="body">
+    <ul style="margin:0; padding-left:18px; font-size:13px; line-height:1.8">
+      {% for message in dts.avertissements %}<li>{{ message }}</li>{% endfor %}
+    </ul>
+  </div>
+</div>
+{% endif %}
+
+<div class="card">
+  <header><span>Nouvelle fiche salarié</span></header>
+  <div class="body">
+    <form method="post" action="/paie/salarie">
+      <div class="grid cols-3">
+        <div class="field">
+          <label for="matricule">Matricule <span class="required">*</span></label>
+          <input type="text" id="matricule" name="matricule" required maxlength="20">
+        </div>
+        <div class="field">
+          <label for="nom">Nom et prénom <span class="required">*</span></label>
+          <input type="text" id="nom" name="nom" required maxlength="160">
+        </div>
+        <div class="field">
+          <label for="date_entree">Entrée <span class="required">*</span></label>
+          <input type="date" id="date_entree" name="date_entree" required value="{{ exercice }}-01-01">
+        </div>
+        <div class="field">
+          <label for="cin">CIN</label>
+          <input type="text" id="cin" name="cin" maxlength="20">
+        </div>
+        <div class="field">
+          <label for="cnss">N° CNSS (obligatoire pour la DTS)</label>
+          <input type="text" id="cnss" name="cnss" maxlength="20">
+        </div>
+        <div class="field">
+          <label for="situation_familiale">Situation de famille</label>
+          <select id="situation_familiale" name="situation_familiale">
+            {% for code, libelle in situations.items() %}
+            <option value="{{ code }}">{{ libelle }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="field">
+          <label for="enfants">Enfants (IR)</label>
+          <input type="number" id="enfants" name="enfants" min="0" max="30" value="0">
+        </div>
+        <div class="field">
+          <label for="type_contrat">Contrat</label>
+          <select id="type_contrat" name="type_contrat">
+            {% for code, libelle in contrats.items() %}
+            <option value="{{ code }}">{{ libelle }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="field">
+          <label for="fonction">Fonction</label>
+          <input type="text" id="fonction" name="fonction" maxlength="120">
+        </div>
+        <div class="field">
+          <label for="salaire_base">Salaire de base (DH) <span class="required">*</span></label>
+          <input type="number" id="salaire_base" name="salaire_base" step="0.01" min="0" required>
+        </div>
+        <div class="field">
+          <label>
+            <input type="checkbox" name="exoneration" value="1">
+            Nouveau recrutement exonéré (art. 57-20° du CGI)
+          </label>
+        </div>
+      </div>
+      <button type="submit" class="btn btn-primary">Créer le salarié</button>
+    </form>
+  </div>
+</div>
+
+<div class="grid cols-3">
+  <div class="card">
+    <header><span>Cycle de paie {{ periode }}</span></header>
+    <div class="body">
+      <form method="post" action="/paie/preparer" class="inline">
+        <input type="hidden" name="periode" value="{{ periode }}">
+        <button type="submit" class="btn btn-primary">Préparer (calculer)</button>
+      </form>
+      <form method="post" action="/paie/valider" class="inline">
+        <input type="hidden" name="periode" value="{{ periode }}">
+        <button type="submit" class="btn">Valider (écriture)</button>
+      </form>
+      <form method="post" action="/paie/payer">
+        <input type="hidden" name="periode" value="{{ periode }}">
+        <div class="field">
+          <label for="mode">Règlement du net</label>
+          <select id="mode" name="mode">
+            {% for code, libelle in paiements.items() %}
+            <option value="{{ code }}">{{ libelle }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <button type="submit" class="btn">Payer les salaires</button>
+      </form>
+      {% if run and run.entry_id %}
+      <p style="font-size:12px">
+        Écriture de paie n° {{ run.entry_id }}
+        {% if run.paiement_entry_id %}&middot; règlement n° {{ run.paiement_entry_id }}{% endif %}
+      </p>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="card">
+    <header><span>Salariés ({{ employes | length }})</span></header>
+    <div class="body">
+      <table class="data">
+        <thead><tr><th>Matricule</th><th>Nom</th><th>N° CNSS</th><th>Enfants</th></tr></thead>
+        <tbody>
+          {% for employe in employes %}
+          <tr>
+            <td>{{ employe.matricule }}</td>
+            <td>{{ employe.nom }}{% if employe.exoneration_art_57_20 %}
+              <span class="badge badge-blue">57-20°</span>{% endif %}</td>
+            <td>{{ employe.cnss or '—' }}</td>
+            <td>{{ employe.enfants }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <header><span>DTS « 9421 » {{ exercice }}</span></header>
+    <div class="body">
+      {% if dts %}
+      <p style="font-size:12px; line-height:1.7">
+        {{ dts.totaux.nb_salaries }} salarié(s) &middot; brut {{ dts.totaux.brut_imposable | amount }} DH<br>
+        IR retenu {{ dts.totaux.ir_retenu | amount }} DH &middot;
+        net {{ dts.totaux.net_a_payer | amount }} DH<br>
+        CNSS/AMO {{ dts.totaux.cnss_total | amount }} DH &middot;
+        coût employeur {{ dts.totaux.cout_employeur | amount }} DH
+      </p>
+      <p style="font-size:12px">
+        <a class="btn btn-small" href="/paie/dts.xml?year={{ exercice }}">⬇ XML EDI</a>
+        <a class="btn btn-small" href="/paie/dts.pdf?year={{ exercice }}">Fiche PDF</a>
+      </p>
+      {% else %}
+      <p style="font-size:12px">Aucune déclaration possible : validez d'abord la paie.</p>
+      {% endif %}
+      {% if dts_declarations %}
+      <table class="data">
+        <thead><tr><th>Période</th><th>Mode</th><th>État</th><th>Accusé</th></tr></thead>
+        <tbody>
+          {% for declaration in dts_declarations %}
+          <tr>
+            <td>{{ declaration.periode }}</td>
+            <td>{{ declaration.mode_depot }}</td>
+            <td>{{ declaration.statut_libelle }}</td>
+            <td>{{ declaration.accuse_le | date_fr }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+{% if bulletins %}
+<div class="card">
+  <header><span>Bulletins de {{ periode }} ({{ bulletins | length }})</span></header>
+  <div class="body">
+    <table class="data">
+      <thead>
+        <tr>
+          <th>Salarié</th><th>Brut imposable</th><th>Net imposable</th>
+          <th>CNSS/AMO</th><th>IR</th><th>Net à payer</th><th>Coût employeur</th><th>PDF</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for bulletin in bulletins %}
+        <tr>
+          <td>{{ bulletin.employee_id }}</td>
+          <td>{{ bulletin.brut_imposable | amount }}</td>
+          <td>{{ bulletin.net_imposable | amount }}</td>
+          <td>{{ bulletin.cotisations_salariales | amount }}</td>
+          <td>{{ bulletin.ir | amount }}</td>
+          <td><strong>{{ bulletin.net | amount }}</strong></td>
+          <td>{{ bulletin.cout_employeur | amount }}</td>
+          <td><a class="btn btn-small" href="/paie/bulletin/{{ bulletin.id }}/pdf">Bulletin</a></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endif %}
+
+{% if livre and livre.salaries %}
+<div class="card">
+  <header><span>Livre de paie {{ exercice }} — {{ livre.totaux.brut | amount }} DH de brut</span></header>
+  <div class="body">
+    <table class="data">
+      <thead>
+        <tr><th>Matricule</th><th>Nom</th><th>Brut</th><th>CNSS/AMO</th><th>IR</th><th>Net</th><th>Coût employeur</th></tr>
+      </thead>
+      <tbody>
+        {% for ligne in livre.salaries %}
+        <tr>
+          <td>{{ ligne.matricule }}</td>
+          <td>{{ ligne.nom }}</td>
+          <td>{{ ligne.brut | amount }}</td>
+          <td>{{ ligne.cotisations | amount }}</td>
+          <td>{{ ligne.ir | amount }}</td>
+          <td>{{ ligne.net | amount }}</td>
+          <td>{{ ligne.cout_employeur | amount }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endif %}
+
+{% if cotisations and cotisations.lignes %}
+<div class="card">
+  <header><span>Cotisations et IR retenus {{ exercice }} (par mois)</span></header>
+  <div class="body">
+    <table class="data">
+      <thead>
+        <tr><th>Période</th><th>Brut</th><th>CNSS/AMO salariales</th><th>CNSS/AMO patronales</th><th>IR</th><th>Total CNSS/AMO</th></tr>
+      </thead>
+      <tbody>
+        {% for ligne in cotisations.lignes %}
+        <tr>
+          <td>{{ ligne.periode }}</td>
+          <td>{{ ligne.brut | amount }}</td>
+          <td>{{ (ligne.cnss_salariale + ligne.amo_salariale) | amount }}</td>
+          <td>{{ (ligne.cnss_patronale + ligne.amo_patronale + ligne.prestations_familiales + ligne.taxe_formation) | amount }}</td>
+          <td>{{ ligne.ir | amount }}</td>
+          <td>{{ ligne.total_cnss | amount }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <p style="font-size:12px">
+      L'IR retenu ({{ cotisations.totaux.ir | amount }} DH) et le total CNSS/AMO
+      ({{ cotisations.totaux.total_cnss | amount }} DH) sont à verser par les
+      déclarations et télépaiements en vigueur (DTS « 9421 », CNSS/AMO).
+    </p>
+  </div>
+</div>
+{% endif %}
+{% endblock %}

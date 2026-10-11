@@ -1,0 +1,131 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1>Tableau de bord</h1>
+    <div class="breadcrumb">Exercice {{ year }} &middot; situation au {{ today | date_fr }}</div>
+  </div>
+  <div class="actions">
+    <a class="btn btn-primary" href="/factures/nouvelle?type=vente">+ Facture de vente</a>
+    <a class="btn" href="/factures/nouvelle?type=achat">+ Facture d'achat</a>
+    <a class="btn" href="/ecritures/nouvelle">+ Écriture</a>
+  </div>
+</div>
+
+<div class="grid cols-4">
+  <div class="kpi {% if resultat >= 0 %}positive{% else %}negative{% endif %}">
+    <div class="label">Résultat de l'exercice</div>
+    <div class="value">{{ resultat | money }}</div>
+    <div class="hint">{{ 'Bénéfice' if resultat >= 0 else 'Perte' }} &middot; produits {{ total_produits | money }}</div>
+  </div>
+  <div class="kpi">
+    <div class="label">Charges de l'exercice</div>
+    <div class="value">{{ total_charges | money }}</div>
+    <div class="hint">Classe 6 &middot; exercice {{ year }}</div>
+  </div>
+  <div class="kpi">
+    <div class="label">TVA {{ tva_periode }}</div>
+    <div class="value">{{ tva_a_payer | money }}</div>
+    <div class="hint">Collectée {{ tva_collectee | money }} &middot; déductible {{ tva_deductible | money }}</div>
+  </div>
+  <div class="kpi">
+    <div class="label">Trésorerie (banque + caisse)</div>
+    <div class="value">{{ tresorerie | money }}</div>
+    <div class="hint">Comptes 5141 et 5161</div>
+  </div>
+</div>
+
+<div class="grid cols-3">
+  <div class="kpi">
+    <div class="label">Créances clients</div>
+    <div class="value">{{ creances_clients | money }}</div>
+    <div class="hint">{{ nb_factures_impayees }} facture(s) non réglée(s)</div>
+  </div>
+  <div class="kpi">
+    <div class="label">Dettes fournisseurs</div>
+    <div class="value">{{ dettes_fournisseurs | money }}</div>
+    <div class="hint">Solde créditeur du compte 4411</div>
+  </div>
+  <div class="kpi">
+    <div class="label">Prochaine échéance TVA</div>
+    <div class="value" style="font-size:17px">{{ echeance_tva | date_fr }}</div>
+    <div class="hint">Dépôt et paiement le 20 (SIMPL-TVA)</div>
+  </div>
+</div>
+
+<div class="card">
+  <header>
+    <span>Dernières factures</span>
+    <a class="btn btn-small" href="/factures">Tout afficher</a>
+  </header>
+  <div class="body tight table-wrap">
+    <table class="data">
+      <thead>
+        <tr>
+          <th>N°</th><th>Date</th><th>Type</th><th>Tiers</th>
+          <th class="num">Total HT</th><th class="num">TVA</th><th class="num">Total TTC</th><th>État</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for f in derniers_documents %}
+        <tr>
+          <td><a href="/factures/{{ f.id }}">{{ f.number or 'Brouillon #' ~ f.id }}</a></td>
+          <td>{{ f.invoice_date | date_fr }}</td>
+          <td>{{ 'Vente' if f.invoice_type == 'vente' else 'Achat' }}{% if f.is_credit_note %} (avoir){% endif %}</td>
+          <td>{{ tiers_map.get(f.partner_id, '—') }}</td>
+          <td class="num">{{ f.total_ht | amount }}</td>
+          <td class="num">{{ f.total_vat | amount }}</td>
+          <td class="num">{{ f.total_ttc | amount }}</td>
+          <td><span class="badge {{ STATUS_BADGES.get(f.status) }}">{{ STATUS_LABELS.get(f.status) }}</span></td>
+        </tr>
+        {% else %}
+        <tr><td colspan="8" class="empty">Aucune facture enregistrée. Commencez par créer une facture de vente.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="grid cols-2">
+  <div class="card">
+    <header><span>Factures non réglées</span></header>
+    <div class="body tight table-wrap">
+      <table class="data">
+        <thead><tr><th>N°</th><th>Tiers</th><th>Échéance</th><th class="num">Reste à payer</th></tr></thead>
+        <tbody>
+          {% for f in factures_impayees %}
+          <tr>
+            <td><a href="/factures/{{ f.id }}">{{ f.number }}</a></td>
+            <td>{{ tiers_map.get(f.partner_id, '—') }}</td>
+            <td>{{ f.due_date | date_fr }}</td>
+            <td class="num">{{ f.remaining_amount | amount }}</td>
+          </tr>
+          {% else %}
+          <tr><td colspan="4" class="empty">Aucune facture en attente de règlement.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <header><span>Points de conformité</span></header>
+    <div class="body">
+      <ul style="margin:0; padding-left:18px; font-size:13.5px; line-height:1.9">
+        <li>Barème TVA {{ year }} : <strong>20 %</strong> (normal) et <strong>10 %</strong> (réduit).</li>
+        <li>ICE obligatoire sur les factures de vente entre professionnels.</li>
+        <li>Numérotation continue et sans trou, attribuée à la validation.</li>
+        <li>Écriture validée immuable : correction par contre-écriture.</li>
+        {% if alerts %}
+        <li class="text-danger"><strong>{{ alerts }}</strong> tiers professionnel(s) sans ICE.</li>
+        {% endif %}
+      </ul>
+      <div style="margin-top:12px">
+        <a class="btn btn-small" href="/etats/balance">Balance générale</a>
+        <a class="btn btn-small" href="/tva">Déclaration de TVA</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

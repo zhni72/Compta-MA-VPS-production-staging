@@ -1,0 +1,241 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1>
+      {% if facture.number %}Facture {{ facture.number }}{% else %}Brouillon #{{ facture.id }}{% endif %}
+      <span class="badge {{ STATUS_BADGES.get(facture.status) }}">{{ STATUS_LABELS.get(facture.status) }}</span>
+      {% if facture.is_credit_note %}<span class="badge badge-grey">Avoir</span>{% endif %}
+    </h1>
+    <div class="breadcrumb">
+      <a href="/">Accueil</a> &middot;
+      <a href="/factures?type={{ facture.invoice_type }}">
+        {{ "Factures d'achat" if facture.invoice_type == 'achat' else 'Factures de vente' }}</a>
+      &middot; {{ facture.invoice_date | date_fr }}
+    </div>
+  </div>
+  <div class="actions">
+    <a class="btn btn-primary" href="/factures/{{ facture.id }}/pdf" >⬇ Télécharger le PDF</a>
+    <a class="btn" href="/factures/{{ facture.id }}/impression" target="_blank">Aperçu avant impression</a>
+    <a class="btn" href="/factures/{{ facture.id }}/pdf?duplicata=1">⬇ Duplicata</a>
+    {% if facture.status == 'draft' %}
+    <form method="post" action="/factures/{{ facture.id }}/valider" style="display:inline"
+          onsubmit="return confirm('Valider la facture ? Un numéro définitif sera attribué et l''écriture comptable sera générée.');">
+      <button type="submit" class="btn btn-success">Valider et comptabiliser</button>
+    </form>
+    {% endif %}
+  </div>
+</div>
+
+<div class="grid cols-2">
+  <div class="card">
+    <header><span>{{ 'Fournisseur' if facture.invoice_type == 'achat' else 'Client' }}</span></header>
+    <div class="body">
+      <div style="font-size:15px; font-weight:600">{{ tiers.name if tiers else '—' }}</div>
+      <div style="color:var(--text-muted); font-size:13px; line-height:1.8">
+        Code tiers : {{ tiers.code if tiers else '—' }}<br>
+        ICE : {% if tiers and tiers.ice %}{{ tiers.ice }}
+              {% elif tiers and tiers.is_individual %}dispensé (particulier)
+              {% else %}non renseigné{% endif %}<br>
+        IF : {{ tiers.fiscal_id if tiers and tiers.fiscal_id else '—' }}<br>
+        {{ tiers.address or '' }}{% if tiers and tiers.city %} — {{ tiers.city }}{% endif %}
+      </div>
+      {% if tiers and tiers.requires_ice and not tiers.ice %}
+      <div class="alert alert-warning" style="margin-top:10px; margin-bottom:0">
+        ICE manquant : la validation de la facture sera refusée (obligation CGI).
+      </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="card">
+    <header><span>Informations du document</span></header>
+    <div class="body tight">
+      <table class="data">
+        <tbody>
+          <tr><td>Date de facture</td><td class="num">{{ facture.invoice_date | date_fr }}</td></tr>
+          <tr><td>Échéance</td><td class="num">{{ facture.due_date | date_fr }}</td></tr>
+          <tr><td>Mode de règlement</td><td class="num">{{ facture.payment_mode or '—' }}</td></tr>
+          <tr><td>Référence</td><td class="num">{{ facture.reference or '—' }}</td></tr>
+          <tr>
+            <td>Écriture comptable</td>
+            <td class="num">
+              {% if ecriture %}{{ ecriture.entry_number }} ({{ ecriture.entry_date | date_fr }})
+              {% else %}—{% endif %}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <header><span>Lignes de la facture</span></header>
+  <div class="body tight table-wrap">
+    {% if incoherences %}
+    <div class="alert alert-error" style="margin:10px">
+      <strong>Document incohérent</strong> — la facture ne peut pas être imprimée ni transmise :
+      <ul style="margin:6px 0 0 18px">
+        {% for anomalie in incoherences %}<li>{{ anomalie }}</li>{% endfor %}
+      </ul>
+    </div>
+    {% endif %}
+    <table class="data">
+      <thead>
+        <tr>
+          <th>#</th><th>Désignation</th><th>Compte</th><th class="num">Quantité</th>
+          <th class="num">Prix unitaire HT</th><th class="num">Total HT</th>
+          <th class="num">TVA %</th><th class="num">Montant TVA</th><th class="num">Total TTC</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for l in facture.lines %}
+        <tr>
+          <td>{{ loop.index }}</td>
+          <td>{{ l.designation }}</td>
+          <td class="code">{{ l.account_number }}</td>
+          <td class="num">{{ l.quantity | qte }}</td>
+          <td class="num">{{ l.unit_price | amount }}</td>
+          <td class="num">{{ l.line_ht | amount }}</td>
+          <td class="num">{{ l.vat_rate | amount }}</td>
+          <td class="num">{{ l.line_vat | amount }}</td>
+          <td class="num">{{ l.line_ttc | amount }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+      <tfoot>
+        <tr>
+          <td colspan="5">Totaux</td>
+          <td class="num">{{ facture.total_ht | amount }}</td>
+          <td></td>
+          <td class="num">{{ facture.total_vat | amount }}</td>
+          <td class="num">{{ facture.total_ttc | amount }}</td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+</div>
+
+<div class="grid cols-2">
+  <div class="card">
+    <header><span>Règlements</span></header>
+    <div class="body tight table-wrap">
+      <table class="data">
+        <thead><tr><th>Date</th><th>Mode</th><th>Référence</th><th class="num">Montant</th></tr></thead>
+        <tbody>
+          {% for r in reglements %}
+          <tr>
+            <td>{{ r.payment_date | date_fr }}</td>
+            <td>{{ r.method }}</td>
+            <td>{{ r.reference or '—' }}</td>
+            <td class="num">{{ r.amount | amount }}</td>
+          </tr>
+          {% else %}
+          <tr><td colspan="4" class="empty">Aucun règlement enregistré.</td></tr>
+          {% endfor %}
+        </tbody>
+        <tfoot>
+          <tr>
+            <td colspan="3">Reste à régler</td>
+            <td class="num">{{ facture.remaining_amount | amount }}</td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <header><span>Actions</span></header>
+    <div class="body">
+      {% if facture.status in ('validated', 'partially_paid') %}
+      <form method="post" action="/factures/{{ facture.id }}/regler">
+        <div class="form-grid cols-2">
+          <div>
+            <label for="amount" class="required">Montant encaissé / payé</label>
+            <input type="number" step="0.01" min="0.01" id="amount" name="amount"
+                   value="{{ facture.remaining_amount }}" required>
+          </div>
+          <div>
+            <label for="payment_date">Date du règlement</label>
+            <input type="date" id="payment_date" name="payment_date" value="{{ today }}">
+          </div>
+          <div>
+            <label for="method">Mode</label>
+            <select id="method" name="method">
+              <option value="virement">Virement bancaire</option>
+              <option value="prelevement">Prélèvement</option>
+              <option value="cheque">Chèque</option>
+              <option value="espece">Espèces</option>
+              <option value="effet">Effet</option>
+              <option value="compensation">Compensation</option>
+            </select>
+          </div>
+          <div>
+            <label for="reference">Référence</label>
+            <input type="text" id="reference" name="reference" maxlength="60"
+                   placeholder="n° chèque, virement…">
+          </div>
+        </div>
+        <div style="margin-top:12px">
+          <button type="submit" class="btn btn-primary">Enregistrer le règlement</button>
+        </div>
+      </form>
+      {% elif facture.status == 'draft' %}
+      <p class="field-help" style="margin:0">
+        Validez d'abord la facture pour pouvoir enregistrer des règlements.
+      </p>
+      {% elif facture.status == 'paid' %}
+      <p style="margin:0"><span class="badge badge-green">Facture intégralement réglée</span></p>
+      {% else %}
+      <p style="margin:0"><span class="badge badge-red">Facture annulée</span></p>
+      {% endif %}
+
+      {% if facture.status != 'cancelled' and facture.paid_amount == 0 %}
+      <hr style="margin:16px 0; border:none; border-top:1px solid var(--border)">
+      <form method="post" action="/factures/{{ facture.id }}/annuler"
+            onsubmit="return confirm('Annuler ce document ? Une contre-écriture sera générée et le numéro restera consommé.');">
+        <label for="reason" class="required">Motif d'annulation</label>
+        <input type="text" id="reason" name="reason" required minlength="3"
+               placeholder="ex. erreur de client, doublon…">
+        <div style="margin-top:10px">
+          <button type="submit" class="btn btn-danger">Annuler la facture</button>
+        </div>
+      </form>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+{% if ecriture %}
+<div class="card">
+  <header>
+    <span>Écriture comptable générée — {{ ecriture.entry_number }}</span>
+    <span class="badge badge-blue">{{ STATUS_LABELS.get(ecriture.status, ecriture.status) }}</span>
+  </header>
+  <div class="body tight table-wrap">
+    <table class="data">
+      <thead><tr><th>Compte</th><th>Libellé</th><th class="num">Débit</th><th class="num">Crédit</th></tr></thead>
+      <tbody>
+        {% for l in ecriture.lines %}
+        <tr>
+          <td class="code">{{ l.account_number }}</td>
+          <td>{{ l.label }}</td>
+          <td class="num">{{ l.debit | amount }}</td>
+          <td class="num">{{ l.credit | amount }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+      <tfoot>
+        <tr>
+          <td colspan="2">Totaux — écriture équilibrée : {{ 'oui' if ecriture.is_balanced else 'NON' }}</td>
+          <td class="num">{{ ecriture.total_debit | amount }}</td>
+          <td class="num">{{ ecriture.total_credit | amount }}</td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+</div>
+{% endif %}
+{% endblock %}

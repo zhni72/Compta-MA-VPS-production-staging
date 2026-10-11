@@ -1,0 +1,150 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1>Journal d'audit</h1>
+    <div class="breadcrumb">
+      <a href="/">Accueil</a> &middot; Audit &amp; traçabilité &middot; {{ nb_entrees }} entrée(s)
+    </div>
+  </div>
+  <div class="actions">
+    <a class="btn btn-primary" href="/audit/export">⬇ Export CSV</a>
+    {% if controle.integre %}
+    <span class="badge badge-green">Piste d'audit intègre</span>
+    {% else %}
+    <span class="badge badge-red">Piste d'audit rompue</span>
+    {% endif %}
+  </div>
+</div>
+
+<div class="grid cols-3">
+  <div class="kpi">
+    <div class="label">Écritures validées / scellées</div>
+    <div class="value">{{ controle.nb_scellees }} / {{ controle.nb_ecritures }}</div>
+    <div class="hint">Empreinte SHA-256 chaînée (CGNC : livres sans altération)</div>
+  </div>
+  <div class="kpi {{ 'positive' if controle.integre else 'negative' }}">
+    <div class="label">Contrôle du chaînage</div>
+    <div class="value" style="font-size:18px">
+      {{ 'Aucune rupture' if controle.integre else controle.ruptures | length ~ ' rupture(s)' }}
+    </div>
+    <div class="hint">
+      {% if controle.derniere_empreinte %}Dernière empreinte : {{ controle.derniere_empreinte[:16] }}…{% endif %}
+    </div>
+  </div>
+  <div class="kpi {{ 'negative' if alertes else 'positive' }}">
+    <div class="label">Alertes de traçabilité</div>
+    <div class="value">{{ alertes | length }}</div>
+    <div class="hint">Écarts bancaires non justifiés depuis plus de 3 mois</div>
+  </div>
+</div>
+
+{% if not controle.integre %}
+<div class="card">
+  <header><span>⛔ Ruptures de chaînage détectées</span></header>
+  <div class="body">
+    <ul style="margin:0; padding-left:18px; font-size:13px; line-height:1.7">
+      {% for rupture in controle.ruptures %}
+      <li><strong>{{ rupture.entry_number or rupture.entry_id }}</strong> — {{ rupture.type }} : {{ rupture.detail }}</li>
+      {% endfor %}
+    </ul>
+    <form method="post" action="/audit/sceller" style="margin-top:10px">
+      <button type="submit" class="btn">Sceller les écritures non chaînées</button>
+    </form>
+  </div>
+</div>
+{% endif %}
+
+{% if alertes %}
+<div class="card">
+  <header><span>⚠ Écarts bancaires anciens (alerte rouge, CDC § 3.6)</span></header>
+  <div class="body tight table-wrap">
+    <table class="data">
+      <thead>
+        <tr><th>Compte</th><th>Date</th><th>Libellé</th><th class="num">Montant</th><th class="num">Ancienneté</th></tr>
+      </thead>
+      <tbody>
+        {% for alerte in alertes %}
+        <tr>
+          <td class="code">{{ alerte.compte }}</td>
+          <td>{{ alerte.date | date_fr }}</td>
+          <td>{{ alerte.label }}</td>
+          <td class="num">{{ alerte.montant | amount }}</td>
+          <td class="num">{{ alerte.anciennete_jours }} j</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endif %}
+
+<div class="card">
+  <form class="filters" method="get" action="/audit">
+    <div class="field">
+      <label for="action">Action</label>
+      <select id="action" name="action">
+        <option value="">Toutes</option>
+        {% for code in actions %}
+        <option value="{{ code }}" {{ 'selected' if filtre.action == code }}>{{ code }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="field">
+      <label for="user_id">Utilisateur</label>
+      <select id="user_id" name="user_id">
+        <option value="">Tous</option>
+        {% for identifiant, libelle in utilisateurs %}
+        <option value="{{ identifiant }}" {{ 'selected' if filtre.user_id == identifiant | string }}>{{ libelle }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="field">
+      <label for="date_from">Du</label>
+      <input type="date" id="date_from" name="date_from" value="{{ filtre.date_from }}">
+    </div>
+    <div class="field">
+      <label for="date_to">Au</label>
+      <input type="date" id="date_to" name="date_to" value="{{ filtre.date_to }}">
+    </div>
+    <div class="field">
+      <label for="search">Recherche (détail)</label>
+      <input type="search" id="search" name="search" value="{{ filtre.search }}">
+    </div>
+    <button type="submit" class="btn">Filtrer</button>
+    <a class="btn" href="/audit">Réinitialiser</a>
+  </form>
+
+  <div class="body tight table-wrap">
+    <table class="data">
+      <thead>
+        <tr>
+          <th>Horodatage</th><th>Utilisateur</th><th>Action</th><th>Entité</th>
+          <th>Réf.</th><th>Détail</th><th>IP</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for entree in entrees %}
+        <tr>
+          <td>{{ entree.created_at.strftime('%d/%m/%Y %H:%M:%S') if entree.created_at else '—' }}</td>
+          <td>{{ entree.user_id or '—' }}</td>
+          <td><strong>{{ entree.action }}</strong></td>
+          <td>{{ entree.entity }}</td>
+          <td class="code">{{ entree.entity_id or '—' }}</td>
+          <td style="font-size:12px">{{ entree.payload_json or '—' }}</td>
+          <td class="code">{{ entree.ip_address or '—' }}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="7" class="empty">Aucune entrée pour ces critères.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <p class="field-help" style="padding:10px 14px">
+      Journal <strong>append-only</strong> (aucune modification possible depuis l'interface) —
+      conservation 10 ans (CGI). L'export CSV <strong>masque les données personnelles</strong>
+      conformément à la loi 09-08 (CNDP).
+    </p>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TraitementEtSalaire xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="traitementSalaire.xsd">
+  <identifiantFiscal>1234567</identifiantFiscal>
+  <raisonSociale>SOCIETE RECETTE MAROC SARL AU</raisonSociale>
+  <exerciceFiscalDu>2026-01-01</exerciceFiscalDu>
+  <exerciceFiscalAu>2026-12-31</exerciceFiscalAu>
+  <annee>2026</annee>
+  <numeroCNSS>9876543</numeroCNSS>
+  <numeroRC>12345</numeroRC>
+  <nbrPersoPermanent>3</nbrPersoPermanent>
+  <nbrPersoOccasionnel>0</nbrPersoOccasionnel>
+  <nbrStagiaires>0</nbrStagiaires>
+  <totalMtRevenuBrutImposablePP>26000.00</totalMtRevenuBrutImposablePP>
+  <totalMtRevenuNetImposablePP>22439.74</totalMtRevenuNetImposablePP>
+  <totalMtTotalDeductionPP>1259.60</totalMtTotalDeductionPP>
+  <totalMtIrPrelevePP>2300.66</totalMtIrPrelevePP>
+  <totalMtBrutSommesPO>0.00</totalMtBrutSommesPO>
+  <totalIrPrelevePO>0.00</totalIrPrelevePO>
+  <totalMtBrutTraitSalaireSTG>0.00</totalMtBrutTraitSalaireSTG>
+  <totalMtBrutIndemnitesSTG>0.00</totalMtBrutIndemnitesSTG>
+  <totalMtRetenuesSTG>0.00</totalMtRetenuesSTG>
+  <totalMtRevenuNetImpSTG>0.00</totalMtRevenuNetImpSTG>
+  <totalSommePayeRTS>22439.74</totalSommePayeRTS>
+  <totalmtAnuuelRevenuSalarial>26000.00</totalmtAnuuelRevenuSalarial>
+  <totalmtAbondement>0.00</totalmtAbondement>
+  <montantPermanent>2300.66</montantPermanent>
+  <montantOccasionnel>0.00</montantOccasionnel>
+  <montantStagiaire>0.00</montantStagiaire>
+  <listPersonnelPermanent>
+    <PersonnelPermanent>
+      <nom>EMP001</nom>
+      <prenom>— Seuil exonéré</prenom>
+      <numCNI>CIN001TEST1</numCNI>
+      <numCE>CNSS001TEST</numCE>
+      <matricule>EMP001</matricule>
+      <montantRevenuBrutImposable>3000.00</montantRevenuBrutImposable>
+      <montantRetenues>202.20</montantRetenues>
+      <montantIrPreleve>0.00</montantIrPreleve>
+      <montantRevenuNetImposable>2797.80</montantRevenuNetImposable>
+    </PersonnelPermanent>
+    <PersonnelPermanent>
+      <nom>EMP002</nom>
+      <prenom>— Tranche 30%</prenom>
+      <numCNI>CIN002TEST1</numCNI>
+      <numCE>CNSS002TEST</numCE>
+      <matricule>EMP002</matricule>
+      <montantRevenuBrutImposable>7000.00</montantRevenuBrutImposable>
+      <montantRetenues>427.00</montantRetenues>
+      <montantIrPreleve>0.00</montantIrPreleve>
+      <montantRevenuNetImposable>6573.00</montantRevenuNetImposable>
+    </PersonnelPermanent>
+    <PersonnelPermanent>
+      <nom>EMP003</nom>
+      <prenom>— Tranche 37%</prenom>
+      <numCNI>CIN003TEST1</numCNI>
+      <numCE>CNSS003TEST</numCE>
+      <matricule>EMP003</matricule>
+      <montantRevenuBrutImposable>16000.00</montantRevenuBrutImposable>
+      <montantRetenues>630.40</montantRetenues>
+      <montantIrPreleve>2300.66</montantIrPreleve>
+      <montantRevenuNetImposable>13068.94</montantRevenuNetImposable>
+    </PersonnelPermanent>
+  </listPersonnelPermanent>
+  <listPersonnelOccasionnel>
+  </listPersonnelOccasionnel>
+  <listStagiaires>
+  </listStagiaires>
+</TraitementEtSalaire>

@@ -1,0 +1,150 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1>Rapprochement bancaire</h1>
+    <div class="breadcrumb">
+      <a href="/">Accueil</a> &middot; Audit &amp; traçabilité &middot; {{ releves | length }} relevé(s)
+    </div>
+  </div>
+  <div class="actions">
+    {% if courant %}
+    <form method="post" action="/rapprochement/{{ courant.id }}/auto" style="display:inline">
+      <button type="submit" class="btn btn-primary">Appariement automatique</button>
+    </form>
+    {% endif %}
+    <a class="btn" href="/audit">Journal d'audit</a>
+  </div>
+</div>
+
+{% if alertes %}
+<div class="card">
+  <header><span>⚠ Écarts anciens (&gt; 3 mois)</span></header>
+  <div class="body">
+    <ul style="margin:0; padding-left:18px; font-size:13px; line-height:1.7">
+      {% for alerte in alertes %}
+      <li>Compte {{ alerte.compte }} — {{ alerte.date | date_fr }} — {{ alerte.label }} :
+        <strong>{{ alerte.montant | amount }} DH</strong> ({{ alerte.anciennete_jours }} jours)</li>
+      {% endfor %}
+    </ul>
+  </div>
+</div>
+{% endif %}
+
+<div class="card">
+  <header><span>Importer un relevé (CSV : date;libelle;reference;debit;credit)</span></header>
+  <div class="body">
+    <form method="post" action="/rapprochement/importer">
+      <div class="grid cols-3">
+        <div class="field">
+          <label for="account_number">Compte de trésorerie</label>
+          <select id="account_number" name="account_number">
+            {% for numero, libelle in comptes_tresorerie %}
+            <option value="{{ numero }}">{{ numero }} — {{ libelle }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="field">
+          <label for="date_from">Du</label>
+          <input type="date" id="date_from" name="date_from" required>
+        </div>
+        <div class="field">
+          <label for="date_to">Au</label>
+          <input type="date" id="date_to" name="date_to" required>
+        </div>
+        <div class="field">
+          <label for="opening_balance">Solde initial (DH)</label>
+          <input type="number" id="opening_balance" name="opening_balance" step="0.01" value="0">
+        </div>
+        <div class="field">
+          <label for="closing_balance">Solde final du relevé (DH)</label>
+          <input type="number" id="closing_balance" name="closing_balance" step="0.01" required>
+        </div>
+      </div>
+      <div class="field">
+        <label for="contenu">Lignes du relevé (une par ligne, séparateur « ; »)</label>
+        <textarea id="contenu" name="contenu" rows="6" required
+                  style="width:100%; font-family:monospace"
+                  placeholder="2026-06-02;Virement client;VIR-001;12000,00;&#10;2026-06-05;Loyer;CHQ-1234;;3500,00"></textarea>
+      </div>
+      <button type="submit" class="btn btn-primary">Importer le relevé</button>
+    </form>
+  </div>
+</div>
+
+{% if courant and etat %}
+<div class="grid cols-3">
+  <div class="kpi">
+    <div class="label">Solde comptable au {{ etat.date_to | date_fr }}</div>
+    <div class="value">{{ etat.solde_comptable | money }}</div>
+    <div class="hint">Compte {{ etat.account_number }} (grand livre)</div>
+  </div>
+  <div class="kpi">
+    <div class="label">Solde bancaire (relevé)</div>
+    <div class="value">{{ etat.solde_bancaire | money }}</div>
+    <div class="hint">Écarts non justifiés : {{ etat.ecarts_non_justifies | amount }} DH</div>
+  </div>
+  <div class="kpi {{ 'positive' if etat.justifie else 'negative' }}">
+    <div class="label">Contrôle du rapprochement</div>
+    <div class="value" style="font-size:18px">
+      {{ 'Justifié' if etat.justifie else 'Écart ' ~ (etat.ecart | amount) ~ ' DH' }}
+    </div>
+    <div class="hint">{{ etat.nb_rapprochees }}/{{ etat.nb_lignes }} ligne(s) rapprochée(s)</div>
+  </div>
+</div>
+
+<div class="card">
+  <header>
+    <span>Relevé du {{ courant.date_from | date_fr }} au {{ courant.date_to | date_fr }}
+      ({{ courant.file_name or 'saisie manuelle' }})</span>
+    <a class="btn btn-small" href="/rapprochement">Changer de relevé</a>
+  </header>
+  <div class="body tight table-wrap">
+    <table class="data">
+      <thead>
+        <tr>
+          <th>Date</th><th>Libellé</th><th>Référence</th><th class="num">Débit</th>
+          <th class="num">Crédit</th><th class="center">État</th><th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for ligne in courant.lines %}
+        <tr>
+          <td>{{ ligne.line_date | date_fr }}</td>
+          <td>{{ ligne.label }}</td>
+          <td class="code">{{ ligne.reference or '—' }}</td>
+          <td class="num">{{ ligne.debit | amount }}</td>
+          <td class="num">{{ ligne.credit | amount }}</td>
+          <td class="center">
+            {% if ligne.reconciled %}
+            <span class="badge badge-green">{{ ligne.match_type or 'rapproché' }}</span>
+            {% else %}
+            <span class="badge badge-orange">à rapprocher</span>
+            {% endif %}
+          </td>
+          <td>
+            {% if ligne.reconciled %}
+            <form method="post" action="/rapprochement/lignes/{{ ligne.id }}/de-rapprocher">
+              <button type="submit" class="btn btn-small">Annuler</button>
+            </form>
+            {% else %}
+            <span class="secondary">voir ci-dessous</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+      <tfoot>
+        <tr>
+          <td colspan="3">TOTAUX</td>
+          <td class="num">{{ courant.lines | sum(attribute='debit') | amount }}</td>
+          <td class="num">{{ courant.lines | sum(attribute='credit') | amount }}</td>
+          <td colspan="2" class="num">Écart à justifier : {{ etat.ecart | amount }} DH</td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+</div>
+{% endif %}
+{% endblock %}

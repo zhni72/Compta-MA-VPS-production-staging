@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1>Immobilisations</h1>
+    <div class="breadcrumb">
+      <a href="/">Accueil</a> &middot; Immobilisations &middot; exercice {{ exercice }} &middot;
+      {{ fiches | length }} fiche(s)
+    </div>
+  </div>
+  <div class="actions">
+    <a class="btn btn-primary" href="/immobilisations/nouvelle">+ Immobilisation</a>
+    <a class="btn" href="/immobilisations/etats?year={{ exercice }}">États</a>
+    <a class="btn" href="/immobilisations/etat/pdf?year={{ exercice }}">⬇ État PDF</a>
+    <a class="btn" href="/immobilisations/cessions/pdf?year={{ exercice }}">⬇ Cessions PDF</a>
+  </div>
+</div>
+
+<div class="grid cols-3">
+  <div class="kpi">
+    <div class="label">Valeurs brutes (fiches)</div>
+    <div class="value">{{ etat.total_brut | money }}</div>
+    <div class="hint">Comptes d'actif immobilisé (2xxx)</div>
+  </div>
+  <div class="kpi">
+    <div class="label">Amortissements cumulés</div>
+    <div class="value">{{ etat.total_amortissements | money }}</div>
+    <div class="hint">Dotations constatées (comptes 28x)</div>
+  </div>
+  <div class="kpi {{ 'positive' if etat.ecarts.brut == 0 and etat.ecarts.amortissements == 0 else 'negative' }}">
+    <div class="label">VNC / cohérence comptable</div>
+    <div class="value">{{ etat.total_vnc | money }}</div>
+    <div class="hint">
+      {% if etat.ecarts.brut == 0 and etat.ecarts.amortissements == 0 %}
+      Écart fiches / grand livre : nul
+      {% else %}
+      Écart brut {{ etat.ecarts.brut | amount }} / amortissements {{ etat.ecarts.amortissements | amount }}
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+{% if bloquants or avertissements %}
+<div class="card">
+  <header>
+    <span>Contrôles de cohérence</span>
+    <span class="badge badge-red">{{ bloquants }} bloquant(s)</span>
+    <span class="badge badge-orange">{{ avertissements }} avertissement(s)</span>
+  </header>
+  <div class="body">
+    <ul style="margin:0; padding-left:18px; font-size:13px; line-height:1.7">
+      {% for controle in controles %}
+      <li>
+        <strong>{{ '⛔' if controle.niveau == 'bloquant' else '⚠' }}</strong>
+        {{ controle.message }}
+      </li>
+      {% endfor %}
+    </ul>
+  </div>
+</div>
+{% endif %}
+
+<div class="card">
+  <form class="filters" method="get" action="/immobilisations">
+    <div class="field">
+      <label for="year">Exercice</label>
+      <input type="number" id="year" name="year" value="{{ exercice }}" min="2000" max="2100" style="min-width:110px">
+    </div>
+    <div class="field">
+      <label for="statut">Statut</label>
+      <select id="statut" name="statut">
+        <option value="">Tous</option>
+        {% for code, libelle in statuts.items() %}
+        <option value="{{ code }}" {{ 'selected' if statut == code }}>{{ libelle }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <button type="submit" class="btn">Filtrer</button>
+    <a class="btn" href="/immobilisations">Réinitialiser</a>
+  </form>
+
+  <div class="body tight table-wrap">
+    <table class="data">
+      <thead>
+        <tr>
+          <th>Code</th><th>Libellé</th><th>Compte</th><th>Acquisition</th>
+          <th class="num">Valeur d'origine</th><th class="num">Durée</th><th>Mode</th>
+          <th class="num">Amortissements</th><th class="num">VNC</th><th class="center">État</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for f in fiches %}
+        <tr>
+          <td><a href="/immobilisations/{{ f.code }}">{{ f.code }}</a></td>
+          <td>{{ f.label }}</td>
+          <td class="code">{{ f.account_number }}</td>
+          <td>{{ f.acquisition_date | date_fr }}{% if f.service_date %}<br><span class="secondary">service : {{ f.service_date | date_fr }}</span>{% endif %}</td>
+          <td class="num">{{ f.valeur_origine | amount }}</td>
+          <td class="center">{{ f.duree_annees }} an(s)</td>
+          <td>{{ methodes.get(f.mode, f.mode) }}</td>
+          <td class="num">{{ (f.valeur_origine - vnc_par_fiche.get(f.id, f.valeur_origine)) | amount }}</td>
+          <td class="num">{{ vnc_par_fiche.get(f.id, f.valeur_origine) | amount }}</td>
+          <td class="center">
+            {% if f.statut == 'en_service' %}<span class="badge badge-green">{{ statuts.get(f.statut) }}</span>
+            {% elif f.statut == 'cede' %}<span class="badge badge-blue">{{ statuts.get(f.statut) }}</span>
+            {% else %}<span class="badge badge-grey">{{ statuts.get(f.statut) }}</span>{% endif %}
+          </td>
+        </tr>
+        {% else %}
+        <tr>
+          <td colspan="10" class="empty">
+            Aucune immobilisation enregistrée.
+            <a href="/immobilisations/nouvelle">Créer une fiche d'immobilisation</a>.
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+      <tfoot>
+        <tr>
+          <td colspan="4">TOTAUX (fiches et comptabilité)</td>
+          <td class="num">{{ etat.total_brut | amount }}</td>
+          <td colspan="2"></td>
+          <td class="num">{{ etat.total_amortissements | amount }}</td>
+          <td class="num">{{ etat.total_vnc | amount }}</td>
+          <td></td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+</div>
+{% endblock %}

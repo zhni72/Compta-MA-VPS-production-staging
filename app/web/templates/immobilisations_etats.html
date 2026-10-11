@@ -1,0 +1,233 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1>États des immobilisations</h1>
+    <div class="breadcrumb">
+      <a href="/">Accueil</a> &middot; <a href="/immobilisations">Immobilisations</a> &middot;
+      exercice {{ exercice }}
+    </div>
+  </div>
+  <div class="actions">
+    <a class="btn" href="/immobilisations/etat/pdf?year={{ exercice }}">⬇ État PDF</a>
+    <a class="btn" href="/immobilisations/cessions/pdf?year={{ exercice }}">⬇ Cessions PDF</a>
+    <a class="btn" href="/immobilisations?year={{ exercice }}">Retour</a>
+  </div>
+</div>
+
+<div class="card">
+  <form class="filters" method="get" action="/immobilisations/etats">
+    <div class="field">
+      <label for="year">Exercice</label>
+      <input type="number" id="year" name="year" value="{{ exercice }}" min="2000" max="2100" style="min-width:110px">
+    </div>
+    <button type="submit" class="btn">Actualiser</button>
+  </form>
+</div>
+
+<div class="grid cols-3">
+  <div class="kpi">
+    <div class="label">Valeurs brutes</div>
+    <div class="value">{{ etat.total_brut | money }}</div>
+    <div class="hint">Fiches d'immobilisation (comptes 2xxx)</div>
+  </div>
+  <div class="kpi">
+    <div class="label">Amortissements cumulés</div>
+    <div class="value">{{ etat.total_amortissements | money }}</div>
+    <div class="hint">Dotations constatées (comptes 28x)</div>
+  </div>
+  <div class="kpi">
+    <div class="label">VNC</div>
+    <div class="value">{{ etat.total_vnc | money }}</div>
+    <div class="hint">Brut − amortissements cumulés</div>
+  </div>
+</div>
+
+<div class="card">
+  <header><span>Tableau des immobilisations par poste (CGNC, titre II chapitre I)</span></header>
+  <div class="body tight table-wrap">
+    <table class="data">
+      <thead>
+        <tr>
+          <th>Compte</th><th>Poste</th><th class="num">Brut</th>
+          <th class="num">Amortissements</th><th class="num">Net (VNC)</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for poste in etat.postes %}
+        <tr>
+          <td class="code">{{ poste.compte }}</td>
+          <td><strong>{{ poste.libelle }}</strong></td>
+          <td class="num">{{ poste.brut | amount }}</td>
+          <td class="num">{{ poste.amortissements | amount }}</td>
+          <td class="num">{{ poste.vnc | amount }}</td>
+        </tr>
+        {% for bien in poste.biens %}
+        <tr>
+          <td class="code">{{ bien.code }}</td>
+          <td style="padding-left:26px">{{ bien.label }}
+            <span class="secondary">(acquis le {{ bien.date_acquisition | date_fr }})</span></td>
+          <td class="num">{{ bien.valeur_origine | amount }}</td>
+          <td class="num">{{ bien.amortissements | amount }}</td>
+          <td class="num">{{ bien.vnc | amount }}</td>
+        </tr>
+        {% endfor %}
+        {% else %}
+        <tr><td colspan="5" class="empty">Aucune immobilisation inscrite sur l'exercice.</td></tr>
+        {% endfor %}
+      </tbody>
+      <tfoot>
+        <tr>
+          <td colspan="2">TOTAUX (fiches)</td>
+          <td class="num">{{ etat.total_brut | amount }}</td>
+          <td class="num">{{ etat.total_amortissements | amount }}</td>
+          <td class="num">{{ etat.total_vnc | amount }}</td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+</div>
+
+<div class="card">
+  <header>
+    <span>Réconciliation avec la comptabilité</span>
+    {% if etat.ecarts.brut == 0 and etat.ecarts.amortissements == 0 %}
+    <span class="badge badge-green">aucun écart</span>
+    {% else %}
+    <span class="badge badge-orange">écart à expliquer</span>
+    {% endif %}
+  </header>
+  <div class="body tight table-wrap">
+    <table class="data">
+      <thead>
+        <tr><th>Contrôle</th><th class="num">Fiches</th><th class="num">Grand livre</th><th class="num">Écart</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Valeurs brutes (comptes 2xxx)</td>
+          <td class="num">{{ etat.total_brut | amount }}</td>
+          <td class="num">{{ etat.comptabilite.brut | amount }}</td>
+          <td class="num">{{ etat.ecarts.brut | amount }}</td>
+        </tr>
+        <tr>
+          <td>Amortissements (comptes 28x)</td>
+          <td class="num">{{ etat.total_amortissements | amount }}</td>
+          <td class="num">{{ etat.comptabilite.amortissements | amount }}</td>
+          <td class="num">{{ etat.ecarts.amortissements | amount }}</td>
+        </tr>
+      </tbody>
+    </table>
+    <p class="field-help" style="padding:10px 14px">
+      Un écart signale une immobilisation comptabilisée sans fiche (ou l'inverse) : la
+      fiche doit être créée pour que le suivi des amortissements soit complet.
+    </p>
+  </div>
+</div>
+
+<div class="card">
+  <header><span>Amortissements de l'exercice (fiscalement déductibles — CGI art. 10)</span></header>
+  <div class="body tight table-wrap">
+    <table class="data">
+      <thead>
+        <tr>
+          <th>Code</th><th>Libellé</th><th>Compte</th><th class="num">Base</th>
+          <th class="num">Dotation</th><th class="num">Cumul</th><th class="num">VNC</th>
+          <th class="center">Constatée</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for ligne in amortissements.lignes %}
+        <tr>
+          <td><a href="/immobilisations/{{ ligne.code }}">{{ ligne.code }}</a></td>
+          <td>{{ ligne.label }}</td>
+          <td class="code">{{ ligne.compte }}</td>
+          <td class="num">{{ ligne.base | amount }}</td>
+          <td class="num">{{ ligne.dotation | amount }}</td>
+          <td class="num">{{ ligne.cumul | amount }}</td>
+          <td class="num">{{ ligne.vnc | amount }}</td>
+          <td class="center">
+            {% if ligne.constatee %}<span class="badge badge-green">oui</span>
+            {% else %}<span class="badge badge-orange">à constater</span>{% endif %}
+          </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="8" class="empty">Aucun amortissement sur l'exercice.</td></tr>
+        {% endfor %}
+      </tbody>
+      <tfoot>
+        <tr>
+          <td colspan="3">TOTAUX</td>
+          <td class="num"></td>
+          <td class="num">{{ amortissements.total_dotation | amount }}</td>
+          <td class="num">{{ amortissements.total_cumul | amount }}</td>
+          <td class="num">{{ amortissements.total_vnc | amount }}</td>
+          <td class="center">{{ amortissements.nb_non_constatees }} à constater</td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+</div>
+
+<div class="card">
+  <header><span>Tableau des cessions et mises au rebut de l'exercice</span></header>
+  <div class="body tight table-wrap">
+    <table class="data">
+      <thead>
+        <tr>
+          <th>Code</th><th>Libellé</th><th>Sortie</th><th>Type</th>
+          <th class="num">Valeur d'origine</th><th class="num">Amortissements</th>
+          <th class="num">VNC</th><th class="num">Prix</th><th class="num">Résultat</th>
+          <th class="num">Régul. TVA</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for ligne in cessions.lignes %}
+        <tr>
+          <td><a href="/immobilisations/{{ ligne.code }}">{{ ligne.code }}</a></td>
+          <td>{{ ligne.label }}</td>
+          <td>{{ ligne.date_sortie | date_fr }}</td>
+          <td>{{ statuts.get(ligne.type, ligne.type) }}</td>
+          <td class="num">{{ ligne.valeur_origine | amount }}</td>
+          <td class="num">{{ ligne.amortissements | amount }}</td>
+          <td class="num">{{ ligne.vnc | amount }}</td>
+          <td class="num">{{ ligne.prix | amount }}</td>
+          <td class="num">{{ ligne.resultat | amount }}</td>
+          <td class="num">{{ ligne.regularisation_tva | amount }}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="10" class="empty">Aucune cession ni mise au rebut sur l'exercice.</td></tr>
+        {% endfor %}
+      </tbody>
+      <tfoot>
+        <tr>
+          <td colspan="4">TOTAUX</td>
+          <td class="num">{{ cessions.total_valeur_origine | amount }}</td>
+          <td class="num"></td>
+          <td class="num">{{ cessions.total_vnc | amount }}</td>
+          <td class="num">{{ cessions.total_prix | amount }}</td>
+          <td class="num">{{ cessions.total_resultat | amount }}</td>
+          <td class="num">{{ cessions.total_regularisation | amount }}</td>
+        </tr>
+      </tfoot>
+    </table>
+    <p class="field-help" style="padding:10px 14px">
+      Régularisation de TVA (CGI art. 106) : fractions égales sur 5 ans (meubles) ou 10 ans
+      (immeubles) — durée et base à confirmer par l'expert-comptable.
+    </p>
+  </div>
+</div>
+
+{% if controles %}
+<div class="card">
+  <header><span>Contrôles de cohérence</span></header>
+  <div class="body">
+    <ul style="margin:0; padding-left:18px; font-size:13px; line-height:1.7">
+      {% for controle in controles %}
+      <li><strong>{{ '⛔' if controle.niveau == 'bloquant' else '⚠' }}</strong> {{ controle.message }}</li>
+      {% endfor %}
+    </ul>
+  </div>
+</div>
+{% endif %}
+{% endblock %}

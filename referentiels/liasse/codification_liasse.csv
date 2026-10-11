@@ -1,0 +1,2 @@
+modele,tableau_id,tableau_libelle,code_edi,rubrique,libelle,numero_ligne,extra_field,origine
+liasse_modele_normal,1,Passif du bilan,13400,solde:1111,Capital social ou personnel,,,CC EDI Simpl-IS v2.0.3 § 4.3.1 (exemple officiel : code 13400 = capital social, tableau id 1 = passif du bilan)

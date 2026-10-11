@@ -1,0 +1,229 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1>Immobilisation {{ fiche.code }}</h1>
+    <div class="breadcrumb">
+      <a href="/">Accueil</a> &middot; <a href="/immobilisations">Immobilisations</a> &middot;
+      {{ fiche.label }}
+    </div>
+  </div>
+  <div class="actions">
+    <a class="btn" href="/immobilisations/{{ fiche.code }}/plan/pdf">⬇ Plan d'amortissement PDF</a>
+    <a class="btn" href="/immobilisations">Retour</a>
+  </div>
+</div>
+
+<div class="grid cols-3">
+  <div class="kpi">
+    <div class="label">Valeur d'origine</div>
+    <div class="value">{{ fiche.valeur_origine | money }}</div>
+    <div class="hint">Compte {{ fiche.account_number }} ({{ fiche.duree_annees }} an(s), {{ methodes.get(fiche.mode, fiche.mode) }})</div>
+  </div>
+  <div class="kpi">
+    <div class="label">Amortissements cumulés</div>
+    <div class="value">{{ cumul | money }}</div>
+    <div class="hint">{{ comptes.dotation }} / {{ comptes.amortissement }}</div>
+  </div>
+  <div class="kpi {{ 'positive' if fiche.statut == 'en_service' else 'negative' }}">
+    <div class="label">VNC au {{ jour | date_fr }}</div>
+    <div class="value">{{ vnc | money }}</div>
+    <div class="hint">
+      Statut : {{ statuts.get(fiche.statut) }}
+      {% if fiche.disposal_date %} le {{ fiche.disposal_date | date_fr }}{% endif %}
+    </div>
+  </div>
+</div>
+
+{% if comptes.avertissement %}
+<div class="card">
+  <header><span>Avertissement comptable</span></header>
+  <div class="body"><p style="margin:0">{{ comptes.avertissement }}</p></div>
+</div>
+{% endif %}
+
+<div class="card">
+  <header><span>Fiche d'immobilisation</span></header>
+  <div class="body tight table-wrap">
+    <table class="data">
+      <tbody>
+        <tr><td style="width:240px"><strong>Compte d'immobilisation</strong></td><td>{{ fiche.account_number }}</td></tr>
+        <tr><td><strong>Dates</strong></td><td>Acquisition {{ fiche.acquisition_date | date_fr }} — mise en service {{ fiche.service_date | date_fr if fiche.service_date else 'non renseignée' }}</td></tr>
+        <tr><td><strong>Base amortissable</strong></td><td>{{ (fiche.valeur_origine - fiche.valeur_residuelle) | amount }} DH (valeur résiduelle {{ fiche.valeur_residuelle | amount }} DH)</td></tr>
+        <tr><td><strong>Mode / prorata</strong></td><td>{{ methodes.get(fiche.mode, fiche.mode) }}{% if fiche.coefficient %} — coefficient {{ fiche.coefficient }}{% endif %} — prorata temporis : {{ 'oui' if fiche.prorata_temporis else 'non (annuité pleine)' }}</td></tr>
+        <tr><td><strong>TVA récupérable</strong></td><td>{{ fiche.tva_montant | amount }} DH au compte {{ fiche.tva_compte }}</td></tr>
+        <tr><td><strong>Dotation {{ exercice }}</strong></td>
+          <td>
+            {% if dotation_annee and dotation_annee.annuite is defined %}
+            {{ dotation_annee.annuite | amount }} DH — constatée (écriture n° {{ dotation_annee.entry_id }})
+            {% elif dotation_annee %}
+            {{ dotation_annee | amount }} DH — à constater
+            {% else %}aucune dotation sur cet exercice{% endif %}
+          </td>
+        </tr>
+        {% if fiche.notes %}<tr><td><strong>Notes</strong></td><td>{{ fiche.notes }}</td></tr>{% endif %}
+        {% if fiche.disposal_reason %}<tr><td><strong>Motif de sortie</strong></td><td>{{ fiche.disposal_reason }}</td></tr>{% endif %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="card">
+  <header><span>Plan d'amortissement</span></header>
+  <div class="body tight table-wrap">
+    <table class="data">
+      <thead>
+        <tr>
+          <th class="num">Exercice</th><th class="num">Base</th><th class="num">Annuité</th>
+          <th class="num">Cumul</th><th class="num">VNC</th><th class="center">État</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for ligne in plan %}
+        <tr>
+          <td class="num">{{ ligne.exercice }}</td>
+          <td class="num">{{ ligne.base | amount }}</td>
+          <td class="num">{{ ligne.annuite | amount }}</td>
+          <td class="num">{{ ligne.cumul | amount }}</td>
+          <td class="num">{{ ligne.vnc | amount }}</td>
+          <td class="center">
+            {% if ligne.constatee %}<span class="badge badge-green">constatée</span>
+            {% else %}<span class="badge badge-grey">projetée</span>{% endif %}
+          </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="6" class="empty">Aucun plan : bien non amortissable (immobilisation financière ou en cours).</td></tr>
+        {% endfor %}
+      </tbody>
+      <tfoot>
+        <tr>
+          <td colspan="4">Contrôle : Σ cumul + VNC = valeur d'origine</td>
+          <td class="num">{{ vnc | amount }}</td>
+          <td class="num">{{ (cumul + vnc) | amount }}</td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+</div>
+
+{% if fiche.statut == 'en_service' %}
+<div class="grid cols-2">
+  <div class="card">
+    <header><span>Constater la dotation ({{ comptes.dotation }} / {{ comptes.amortissement }})</span></header>
+    <div class="body">
+      <form method="post" action="/immobilisations/{{ fiche.code }}/doter">
+        <div class="field">
+          <label for="exercice_dotation">Exercice</label>
+          <input type="number" id="exercice_dotation" name="exercice" min="2000" max="2100"
+                 value="{{ exercice }}" required style="min-width:120px">
+        </div>
+        <button type="submit" class="btn btn-primary">Comptabiliser la dotation</button>
+      </form>
+      <p class="field-help" style="margin-top:8px">
+        Écriture générée : débit {{ comptes.dotation }} / crédit {{ comptes.amortissement }},
+        validée et numérotée. Une dotation déjà constatée est refusée.
+      </p>
+    </div>
+  </div>
+
+  <div class="card">
+    <header><span>Cession (sortie d'actif : 6513/6512 et 7513/7512)</span></header>
+    <div class="body">
+      <form method="post" action="/immobilisations/{{ fiche.code }}/ceder">
+        <div class="grid cols-2">
+          <div class="field">
+            <label for="date_cession">Date de cession <span class="required">*</span></label>
+            <input type="date" id="date_cession" name="date_cession" value="{{ jour }}" required>
+          </div>
+          <div class="field">
+            <label for="prix">Prix de cession (DH) <span class="required">*</span></label>
+            <input type="number" id="prix" name="prix" step="0.01" min="0" required>
+          </div>
+          <div class="field">
+            <label for="tva_taux">TVA sur cession (%)</label>
+            <input type="number" id="tva_taux" name="tva_taux" step="0.01" min="0" max="20" value="0">
+          </div>
+          <div class="field">
+            <label for="compte_encaissement">Compte de contrepartie</label>
+            <input type="text" id="compte_encaissement" name="compte_encaissement"
+                   placeholder="3481 (à recevoir) ou 5141 (encaissé)">
+          </div>
+        </div>
+        <div class="field">
+          <label for="motif_cession">Motif / référence</label>
+          <input type="text" id="motif_cession" name="motif" maxlength="255">
+        </div>
+        <div class="field">
+          <label>
+            <input type="checkbox" name="regulariser_tva" value="1" checked>
+            Appliquer la régularisation de TVA (CGI art. 106)
+          </label>
+          <div class="field-help">
+            {% if regularisation.applicable %}
+            Régularisation estimée au {{ jour | date_fr }} : {{ regularisation.montant | amount }} DH
+            ({{ regularisation.annees_restantes }}/{{ regularisation.annees_regularisation }} an(s)) —
+            durée à confirmer avec l'expert-comptable.
+            {% else %}
+            Non applicable : {{ regularisation.motif }}
+            {% endif %}
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary">Enregistrer la cession</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <header><span>Mise au rebut (6513 — sortie sans contrepartie)</span></header>
+  <div class="body">
+    <form method="post" action="/immobilisations/{{ fiche.code }}/rebut">
+      <div class="grid cols-3">
+        <div class="field">
+          <label for="date_rebut">Date de la mise au rebut <span class="required">*</span></label>
+          <input type="date" id="date_rebut" name="date_rebut" value="{{ jour }}" required>
+        </div>
+        <div class="field">
+          <label for="motif_rebut">Motif (justificatif) <span class="required">*</span></label>
+          <input type="text" id="motif_rebut" name="motif" maxlength="255" required
+                 placeholder="Mise au rebut, destruction, obsolescence…">
+        </div>
+        <div class="field">
+          <label>&nbsp;</label>
+          <label>
+            <input type="checkbox" name="regulariser_tva" value="1" checked>
+            Régularisation TVA (art. 106)
+          </label>
+        </div>
+      </div>
+      <button type="submit" class="btn btn-primary">Enregistrer la mise au rebut</button>
+    </form>
+  </div>
+</div>
+{% endif %}
+
+<div class="card">
+  <header><span>Journal des mouvements (piste d'audit)</span></header>
+  <div class="body tight table-wrap">
+    <table class="data">
+      <thead>
+        <tr><th>Date</th><th>Type</th><th class="num">Montant</th><th>Motif</th><th>Écriture</th></tr>
+      </thead>
+      <tbody>
+        {% for evenement in fiche.events | sort(attribute='event_date') %}
+        <tr>
+          <td>{{ evenement.event_date | date_fr }}</td>
+          <td>{{ evenement.event_type }}</td>
+          <td class="num">{{ evenement.montant | amount }}</td>
+          <td>{{ evenement.motif or '—' }}</td>
+          <td>{% if evenement.entry_id %}n° {{ evenement.entry_id }}{% else %}—{% endif %}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="5" class="empty">Aucun mouvement enregistré.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

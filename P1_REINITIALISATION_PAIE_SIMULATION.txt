@@ -1,0 +1,56 @@
+Sauvegarde : sauvegarde verifiee : compta_ma.db.bak-p1-20260923-150952 (1064 Ko)
+Societe : SOCIETE RECETTE MAROC SARL AU | exercice 2026 : open
+Verrous de periode : aucun
+
+------------------------------------------------------------------------------------------------
+A. Ecritures de paie HORS module a retirer (12)
+------------------------------------------------------------------------------------------------
+  2026-01-28 EC202600011    piece=PAIE26-01    source=import_jeu_j9  Paie et charges 01/2026
+  2026-02-28 EC202600018    piece=PAIE26-02    source=import_jeu_j9  Paie et charges 02/2026
+  2026-03-28 EC202600025    piece=PAIE26-03    source=import_jeu_j9  Paie et charges 03/2026
+  2026-04-28 EC202600032    piece=PAIE26-04    source=import_jeu_j9  Paie et charges 04/2026
+  2026-05-28 EC202600039    piece=PAIE26-05    source=import_jeu_j9  Paie et charges 05/2026
+  2026-06-28 EC202600046    piece=PAIE26-06    source=import_jeu_j9  Paie et charges 06/2026
+  2026-07-28 EC202600053    piece=PAIE26-07    source=import_jeu_j9  Paie et charges 07/2026
+  2026-08-28 EC202600060    piece=PAIE26-08    source=import_jeu_j9  Paie et charges 08/2026
+  2026-09-28 EC202600067    piece=PAIE26-09    source=import_jeu_j9  Paie et charges 09/2026
+  2026-10-28 EC202600074    piece=PAIE26-10    source=import_jeu_j9  Paie et charges 10/2026
+  2026-11-28 EC202600081    piece=PAIE26-11    source=import_jeu_j9  Paie et charges 11/2026
+  2026-12-28 EC202600088    piece=PAIE26-12    source=import_jeu_j9  Paie et charges 12/2026
+
+------------------------------------------------------------------------------------------------
+B. Ecritures de paie du MODULE a retirer (1)
+------------------------------------------------------------------------------------------------
+  2026-01-31 EC202600094    piece=PAIE 2026-01 source=payroll        Paie 2026-01 - 3 bulletin(s)
+
+------------------------------------------------------------------------------------------------
+C. Cycles de paie a supprimer (1)
+------------------------------------------------------------------------------------------------
+  2026-01 statut=valide    brut  26,000.00 net  22,439.74 employeur  30,495.60 ecriture=183 paiement=None
+
+------------------------------------------------------------------------------------------------
+D. Declarations DTS a regenerer (1)
+------------------------------------------------------------------------------------------------
+  #1 DTS 2026 statut=brouillon montant=2,300.66 lignes=3 fichier=DTS_1234567_2026.xml
+
+------------------------------------------------------------------------------------------------
+REINITIALISATION (SIMULATION)
+------------------------------------------------------------------------------------------------
+  retrait 2026-01-31 EC202600094    piece=PAIE 2026-01 source=payroll
+  retrait 2026-01-28 EC202600011    piece=PAIE26-01    source=import_jeu_j9
+  retrait 2026-02-28 EC202600018    piece=PAIE26-02    source=import_jeu_j9
+  retrait 2026-03-28 EC202600025    piece=PAIE26-03    source=import_jeu_j9
+  retrait 2026-04-28 EC202600032    piece=PAIE26-04    source=import_jeu_j9
+  retrait 2026-05-28 EC202600039    piece=PAIE26-05    source=import_jeu_j9
+  retrait 2026-06-28 EC202600046    piece=PAIE26-06    source=import_jeu_j9
+  retrait 2026-07-28 EC202600053    piece=PAIE26-07    source=import_jeu_j9
+  retrait 2026-08-28 EC202600060    piece=PAIE26-08    source=import_jeu_j9
+  retrait 2026-09-28 EC202600067    piece=PAIE26-09    source=import_jeu_j9
+  retrait 2026-10-28 EC202600074    piece=PAIE26-10    source=import_jeu_j9
+  retrait 2026-11-28 EC202600081    piece=PAIE26-11    source=import_jeu_j9
+  retrait 2026-12-28 EC202600088    piece=PAIE26-12    source=import_jeu_j9
+  cycles de paie a supprimer : [1]
+  declaration DTS #1 (2026) a supprimer
+
+  controle journal : Σ debit 3,709,055.60 = Σ credit 3,709,055.60 -> True
+  controle piste d'audit : 184 ecriture(s) (184 scellee(s)), 0 rupture(s), integre=True

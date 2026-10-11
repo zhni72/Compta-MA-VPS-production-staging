@@ -1,0 +1,39 @@
+# Compta MA - exclusions du contexte de construction Docker.
+# Le conteneur embarque uniquement l'application, les migrations et les
+# referentiels metier. Les donnees locales, le venv Windows, les caches et
+# les secrets n'ont pas a entrer dans l'image.
+
+# --- Python / venv local ---
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# --- Secrets / config locale ---
+.env
+.env.*
+!.env.example
+
+# --- Donnees locales (bases, sauvegardes, pieces, exports) ---
+*.db
+*.sqlite
+*.sqlite3
+*.bak*
+media/
+exports/
+backups/
+
+# --- Fichiers temporaires / artefacts locaux ---
+*.tmp
+*.log
+
+# --- VCS / IDE / documentation hors runtime ---
+.git/
+.gitignore
+.vscode/
+.idea/
+Thumbs.db

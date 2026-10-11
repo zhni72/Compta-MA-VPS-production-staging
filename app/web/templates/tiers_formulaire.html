@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1>Nouveau tiers</h1>
+    <div class="breadcrumb">
+      <a href="/">Accueil</a> &middot; <a href="/tiers">Tiers</a> &middot; Création
+    </div>
+  </div>
+  <div class="actions"><a class="btn" href="/tiers">Annuler</a></div>
+</div>
+
+<form method="post" action="/tiers/nouveau">
+  <div class="card">
+    <header><span>Identité</span></header>
+    <div class="body">
+      <div class="form-grid cols-3">
+        <div>
+          <label for="kind" class="required">Type de tiers</label>
+          <select id="kind" name="kind">
+            <option value="client" {{ 'selected' if kind == 'client' }}>Client (compte 3421)</option>
+            <option value="fournisseur" {{ 'selected' if kind == 'fournisseur' }}>Fournisseur (compte 4411)</option>
+            <option value="salarie" {{ 'selected' if kind == 'salarie' }}>Salarié (compte 3431)</option>
+          </select>
+        </div>
+        <div style="grid-column: span 2">
+          <label for="name" class="required">Raison sociale / Nom</label>
+          <input type="text" id="name" name="name" required maxlength="180" autofocus
+                 placeholder="ex. ATLAS INFORMATIQUE SARL">
+        </div>
+      </div>
+
+      <div class="form-grid cols-4" style="margin-top:12px">
+        <div>
+          <label for="ice">ICE (15 chiffres)</label>
+          <input type="text" id="ice" name="ice" maxlength="15" placeholder="001234567000012">
+          <div class="field-help">Obligatoire sur les factures entre professionnels (CGI).</div>
+        </div>
+        <div>
+          <label for="fiscal_id">Identifiant fiscal (IF)</label>
+          <input type="text" id="fiscal_id" name="fiscal_id" maxlength="8" placeholder="1084612">
+          <div class="field-help">7 ou 8 chiffres, saisi tel quel (ex. <code>1084612</code>) : aucun zéro n'est ajouté.</div>
+        </div>
+        <div>
+          <label for="rc">Registre de commerce (RC)</label>
+          <input type="text" id="rc" name="rc" maxlength="30">
+        </div>
+        <div>
+          <label for="payment_terms_days">Délai de règlement (jours)</label>
+          <input type="number" id="payment_terms_days" name="payment_terms_days" value="0" min="0" max="365">
+        </div>
+      </div>
+
+      <div style="margin-top:12px">
+        <label>
+          <input type="checkbox" id="is_individual" name="is_individual" value="1"
+                 style="width:auto; margin-right:6px">
+          Personne physique (particulier) — dispensée d'ICE
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <header><span>Coordonnées</span></header>
+    <div class="body">
+      <div class="form-grid cols-2">
+        <div>
+          <label for="address">Adresse</label>
+          <input type="text" id="address" name="address" maxlength="255">
+        </div>
+        <div>
+          <label for="city">Ville</label>
+          <input type="text" id="city" name="city" maxlength="80" placeholder="Casablanca">
+        </div>
+        <div>
+          <label for="phone">Téléphone</label>
+          <input type="text" id="phone" name="phone" maxlength="30" placeholder="+212 5 22 00 00 00">
+        </div>
+        <div>
+          <label for="email">E-mail</label>
+          <input type="email" id="email" name="email" maxlength="120">
+        </div>
+      </div>
+    </div>
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary">Enregistrer le tiers</button>
+      <a class="btn" href="/tiers">Annuler</a>
+      <span class="field-help" style="align-self:center">
+        Un sous-compte du plan comptable marocain sera créé automatiquement (ex. 34210001).
+      </span>
+    </div>
+  </div>
+</form>
+
+<script>
+  // Le champ ICE est inutile pour un particulier : on le désactive visuellement.
+  document.getElementById('is_individual').addEventListener('change', function (e) {
+    const ice = document.getElementById('ice');
+    ice.disabled = e.target.checked;
+    ice.value = e.target.checked ? '' : ice.value;
+  });
+</script>
+{% endblock %}

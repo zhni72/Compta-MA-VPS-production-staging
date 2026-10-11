@@ -1,0 +1,405 @@
+SOCIETE : SOCIETE RECETTE MAROC SARL AU | ICE 001234567000099 | IF 1234567 | TVA mensuel
+
+====================================================================================================
+A2/A8 — DOUBLE ALIMENTATION DE LA PAIE 2026
+====================================================================================================
+84 ligne(s) de charges de personnel / dettes sociales en 2026 :
+  2026-01-31 EC202600096    OD ref=PAIE 2026-01   src=payroll      61711  D  26,000.00 C       0.00  Paie 2026-01 - 3 bulletin(s)
+  2026-01-31 EC202600096    OD ref=PAIE 2026-01   src=payroll      61741  D   2,415.60 C       0.00  Paie 2026-01 - 3 bulletin(s)
+  2026-01-31 EC202600096    OD ref=PAIE 2026-01   src=payroll      61744  D   1,664.00 C       0.00  Paie 2026-01 - 3 bulletin(s)
+  2026-01-31 EC202600096    OD ref=PAIE 2026-01   src=payroll      61768  D     416.00 C       0.00  Paie 2026-01 - 3 bulletin(s)
+  2026-01-31 EC202600096    OD ref=PAIE 2026-01   src=payroll      4432   D       0.00 C  22,439.74  Paie 2026-01 - 3 bulletin(s)
+  2026-01-31 EC202600096    OD ref=PAIE 2026-01   src=payroll      4441   D       0.00 C   5,755.20  Paie 2026-01 - 3 bulletin(s)
+  2026-01-31 EC202600097    BQ ref=PAIE 2026-01   src=payroll      4432   D  22,439.74 C       0.00  Règlement des salaires 2026-01
+  2026-02-28 EC202600098    OD ref=PAIE 2026-02   src=payroll      61711  D  26,000.00 C       0.00  Paie 2026-02 - 3 bulletin(s)
+  2026-02-28 EC202600098    OD ref=PAIE 2026-02   src=payroll      61741  D   2,415.60 C       0.00  Paie 2026-02 - 3 bulletin(s)
+  2026-02-28 EC202600098    OD ref=PAIE 2026-02   src=payroll      61744  D   1,664.00 C       0.00  Paie 2026-02 - 3 bulletin(s)
+  2026-02-28 EC202600098    OD ref=PAIE 2026-02   src=payroll      61768  D     416.00 C       0.00  Paie 2026-02 - 3 bulletin(s)
+  2026-02-28 EC202600098    OD ref=PAIE 2026-02   src=payroll      4432   D       0.00 C  22,439.74  Paie 2026-02 - 3 bulletin(s)
+  2026-02-28 EC202600098    OD ref=PAIE 2026-02   src=payroll      4441   D       0.00 C   5,755.20  Paie 2026-02 - 3 bulletin(s)
+  2026-02-28 EC202600099    BQ ref=PAIE 2026-02   src=payroll      4432   D  22,439.74 C       0.00  Règlement des salaires 2026-02
+  2026-03-31 EC202600100    OD ref=PAIE 2026-03   src=payroll      61711  D  26,000.00 C       0.00  Paie 2026-03 - 3 bulletin(s)
+  2026-03-31 EC202600100    OD ref=PAIE 2026-03   src=payroll      61741  D   2,415.60 C       0.00  Paie 2026-03 - 3 bulletin(s)
+  2026-03-31 EC202600100    OD ref=PAIE 2026-03   src=payroll      61744  D   1,664.00 C       0.00  Paie 2026-03 - 3 bulletin(s)
+  2026-03-31 EC202600100    OD ref=PAIE 2026-03   src=payroll      61768  D     416.00 C       0.00  Paie 2026-03 - 3 bulletin(s)
+  2026-03-31 EC202600100    OD ref=PAIE 2026-03   src=payroll      4432   D       0.00 C  22,439.74  Paie 2026-03 - 3 bulletin(s)
+  2026-03-31 EC202600100    OD ref=PAIE 2026-03   src=payroll      4441   D       0.00 C   5,755.20  Paie 2026-03 - 3 bulletin(s)
+  2026-03-31 EC202600101    BQ ref=PAIE 2026-03   src=payroll      4432   D  22,439.74 C       0.00  Règlement des salaires 2026-03
+  2026-04-30 EC202600102    OD ref=PAIE 2026-04   src=payroll      61711  D  26,000.00 C       0.00  Paie 2026-04 - 3 bulletin(s)
+  2026-04-30 EC202600102    OD ref=PAIE 2026-04   src=payroll      61741  D   2,415.60 C       0.00  Paie 2026-04 - 3 bulletin(s)
+  2026-04-30 EC202600102    OD ref=PAIE 2026-04   src=payroll      61744  D   1,664.00 C       0.00  Paie 2026-04 - 3 bulletin(s)
+  2026-04-30 EC202600102    OD ref=PAIE 2026-04   src=payroll      61768  D     416.00 C       0.00  Paie 2026-04 - 3 bulletin(s)
+  2026-04-30 EC202600102    OD ref=PAIE 2026-04   src=payroll      4432   D       0.00 C  22,439.74  Paie 2026-04 - 3 bulletin(s)
+  2026-04-30 EC202600102    OD ref=PAIE 2026-04   src=payroll      4441   D       0.00 C   5,755.20  Paie 2026-04 - 3 bulletin(s)
+  2026-04-30 EC202600103    BQ ref=PAIE 2026-04   src=payroll      4432   D  22,439.74 C       0.00  Règlement des salaires 2026-04
+  2026-05-31 EC202600104    OD ref=PAIE 2026-05   src=payroll      61711  D  26,000.00 C       0.00  Paie 2026-05 - 3 bulletin(s)
+  2026-05-31 EC202600104    OD ref=PAIE 2026-05   src=payroll      61741  D   2,415.60 C       0.00  Paie 2026-05 - 3 bulletin(s)
+  2026-05-31 EC202600104    OD ref=PAIE 2026-05   src=payroll      61744  D   1,664.00 C       0.00  Paie 2026-05 - 3 bulletin(s)
+  2026-05-31 EC202600104    OD ref=PAIE 2026-05   src=payroll      61768  D     416.00 C       0.00  Paie 2026-05 - 3 bulletin(s)
+  2026-05-31 EC202600104    OD ref=PAIE 2026-05   src=payroll      4432   D       0.00 C  22,439.74  Paie 2026-05 - 3 bulletin(s)
+  2026-05-31 EC202600104    OD ref=PAIE 2026-05   src=payroll      4441   D       0.00 C   5,755.20  Paie 2026-05 - 3 bulletin(s)
+  2026-05-31 EC202600105    BQ ref=PAIE 2026-05   src=payroll      4432   D  22,439.74 C       0.00  Règlement des salaires 2026-05
+  2026-06-30 EC202600106    OD ref=PAIE 2026-06   src=payroll      61711  D  26,000.00 C       0.00  Paie 2026-06 - 3 bulletin(s)
+  2026-06-30 EC202600106    OD ref=PAIE 2026-06   src=payroll      61741  D   2,415.60 C       0.00  Paie 2026-06 - 3 bulletin(s)
+  2026-06-30 EC202600106    OD ref=PAIE 2026-06   src=payroll      61744  D   1,664.00 C       0.00  Paie 2026-06 - 3 bulletin(s)
+  2026-06-30 EC202600106    OD ref=PAIE 2026-06   src=payroll      61768  D     416.00 C       0.00  Paie 2026-06 - 3 bulletin(s)
+  2026-06-30 EC202600106    OD ref=PAIE 2026-06   src=payroll      4432   D       0.00 C  22,439.74  Paie 2026-06 - 3 bulletin(s)
+  2026-06-30 EC202600106    OD ref=PAIE 2026-06   src=payroll      4441   D       0.00 C   5,755.20  Paie 2026-06 - 3 bulletin(s)
+  2026-06-30 EC202600107    BQ ref=PAIE 2026-06   src=payroll      4432   D  22,439.74 C       0.00  Règlement des salaires 2026-06
+  2026-07-31 EC202600108    OD ref=PAIE 2026-07   src=payroll      61711  D  26,000.00 C       0.00  Paie 2026-07 - 3 bulletin(s)
+  2026-07-31 EC202600108    OD ref=PAIE 2026-07   src=payroll      61741  D   2,415.60 C       0.00  Paie 2026-07 - 3 bulletin(s)
+  2026-07-31 EC202600108    OD ref=PAIE 2026-07   src=payroll      61744  D   1,664.00 C       0.00  Paie 2026-07 - 3 bulletin(s)
+  2026-07-31 EC202600108    OD ref=PAIE 2026-07   src=payroll      61768  D     416.00 C       0.00  Paie 2026-07 - 3 bulletin(s)
+  2026-07-31 EC202600108    OD ref=PAIE 2026-07   src=payroll      4432   D       0.00 C  22,439.74  Paie 2026-07 - 3 bulletin(s)
+  2026-07-31 EC202600108    OD ref=PAIE 2026-07   src=payroll      4441   D       0.00 C   5,755.20  Paie 2026-07 - 3 bulletin(s)
+  2026-07-31 EC202600109    BQ ref=PAIE 2026-07   src=payroll      4432   D  22,439.74 C       0.00  Règlement des salaires 2026-07
+  2026-08-31 EC202600110    OD ref=PAIE 2026-08   src=payroll      61711  D  26,000.00 C       0.00  Paie 2026-08 - 3 bulletin(s)
+  2026-08-31 EC202600110    OD ref=PAIE 2026-08   src=payroll      61741  D   2,415.60 C       0.00  Paie 2026-08 - 3 bulletin(s)
+  2026-08-31 EC202600110    OD ref=PAIE 2026-08   src=payroll      61744  D   1,664.00 C       0.00  Paie 2026-08 - 3 bulletin(s)
+  2026-08-31 EC202600110    OD ref=PAIE 2026-08   src=payroll      61768  D     416.00 C       0.00  Paie 2026-08 - 3 bulletin(s)
+  2026-08-31 EC202600110    OD ref=PAIE 2026-08   src=payroll      4432   D       0.00 C  22,439.74  Paie 2026-08 - 3 bulletin(s)
+  2026-08-31 EC202600110    OD ref=PAIE 2026-08   src=payroll      4441   D       0.00 C   5,755.20  Paie 2026-08 - 3 bulletin(s)
+  2026-08-31 EC202600111    BQ ref=PAIE 2026-08   src=payroll      4432   D  22,439.74 C       0.00  Règlement des salaires 2026-08
+  2026-09-30 EC202600112    OD ref=PAIE 2026-09   src=payroll      61711  D  26,000.00 C       0.00  Paie 2026-09 - 3 bulletin(s)
+  2026-09-30 EC202600112    OD ref=PAIE 2026-09   src=payroll      61741  D   2,415.60 C       0.00  Paie 2026-09 - 3 bulletin(s)
+  2026-09-30 EC202600112    OD ref=PAIE 2026-09   src=payroll      61744  D   1,664.00 C       0.00  Paie 2026-09 - 3 bulletin(s)
+  2026-09-30 EC202600112    OD ref=PAIE 2026-09   src=payroll      61768  D     416.00 C       0.00  Paie 2026-09 - 3 bulletin(s)
+  2026-09-30 EC202600112    OD ref=PAIE 2026-09   src=payroll      4432   D       0.00 C  22,439.74  Paie 2026-09 - 3 bulletin(s)
+  2026-09-30 EC202600112    OD ref=PAIE 2026-09   src=payroll      4441   D       0.00 C   5,755.20  Paie 2026-09 - 3 bulletin(s)
+  2026-09-30 EC202600113    BQ ref=PAIE 2026-09   src=payroll      4432   D  22,439.74 C       0.00  Règlement des salaires 2026-09
+  2026-10-31 EC202600114    OD ref=PAIE 2026-10   src=payroll      61711  D  26,000.00 C       0.00  Paie 2026-10 - 3 bulletin(s)
+  2026-10-31 EC202600114    OD ref=PAIE 2026-10   src=payroll      61741  D   2,415.60 C       0.00  Paie 2026-10 - 3 bulletin(s)
+  2026-10-31 EC202600114    OD ref=PAIE 2026-10   src=payroll      61744  D   1,664.00 C       0.00  Paie 2026-10 - 3 bulletin(s)
+  2026-10-31 EC202600114    OD ref=PAIE 2026-10   src=payroll      61768  D     416.00 C       0.00  Paie 2026-10 - 3 bulletin(s)
+  2026-10-31 EC202600114    OD ref=PAIE 2026-10   src=payroll      4432   D       0.00 C  22,439.74  Paie 2026-10 - 3 bulletin(s)
+  2026-10-31 EC202600114    OD ref=PAIE 2026-10   src=payroll      4441   D       0.00 C   5,755.20  Paie 2026-10 - 3 bulletin(s)
+  2026-10-31 EC202600115    BQ ref=PAIE 2026-10   src=payroll      4432   D  22,439.74 C       0.00  Règlement des salaires 2026-10
+  2026-11-30 EC202600116    OD ref=PAIE 2026-11   src=payroll      61711  D  26,000.00 C       0.00  Paie 2026-11 - 3 bulletin(s)
+  2026-11-30 EC202600116    OD ref=PAIE 2026-11   src=payroll      61741  D   2,415.60 C       0.00  Paie 2026-11 - 3 bulletin(s)
+  2026-11-30 EC202600116    OD ref=PAIE 2026-11   src=payroll      61744  D   1,664.00 C       0.00  Paie 2026-11 - 3 bulletin(s)
+  2026-11-30 EC202600116    OD ref=PAIE 2026-11   src=payroll      61768  D     416.00 C       0.00  Paie 2026-11 - 3 bulletin(s)
+  2026-11-30 EC202600116    OD ref=PAIE 2026-11   src=payroll      4432   D       0.00 C  22,439.74  Paie 2026-11 - 3 bulletin(s)
+  2026-11-30 EC202600116    OD ref=PAIE 2026-11   src=payroll      4441   D       0.00 C   5,755.20  Paie 2026-11 - 3 bulletin(s)
+  2026-11-30 EC202600117    BQ ref=PAIE 2026-11   src=payroll      4432   D  22,439.74 C       0.00  Règlement des salaires 2026-11
+  2026-12-31 EC202600118    OD ref=PAIE 2026-12   src=payroll      61711  D  26,000.00 C       0.00  Paie 2026-12 - 3 bulletin(s)
+  2026-12-31 EC202600118    OD ref=PAIE 2026-12   src=payroll      61741  D   2,415.60 C       0.00  Paie 2026-12 - 3 bulletin(s)
+  2026-12-31 EC202600118    OD ref=PAIE 2026-12   src=payroll      61744  D   1,664.00 C       0.00  Paie 2026-12 - 3 bulletin(s)
+  2026-12-31 EC202600118    OD ref=PAIE 2026-12   src=payroll      61768  D     416.00 C       0.00  Paie 2026-12 - 3 bulletin(s)
+  2026-12-31 EC202600118    OD ref=PAIE 2026-12   src=payroll      4432   D       0.00 C  22,439.74  Paie 2026-12 - 3 bulletin(s)
+  2026-12-31 EC202600118    OD ref=PAIE 2026-12   src=payroll      4441   D       0.00 C   5,755.20  Paie 2026-12 - 3 bulletin(s)
+  2026-12-31 EC202600119    BQ ref=PAIE 2026-12   src=payroll      4432   D  22,439.74 C       0.00  Règlement des salaires 2026-12
+Totaux 2026 par compte :
+  4432     debit   269,276.88  credit   269,276.88
+  4441     debit         0.00  credit    69,062.40
+  61711    debit   312,000.00  credit         0.00
+  61741    debit    28,987.20  credit         0.00
+  61744    debit    19,968.00  credit         0.00
+  61768    debit     4,992.00  credit         0.00
+
+36 bulletin(s) de paie :
+  id=1 periode=2026-01 EMP001 — Seuil exonéré     brut   3,000.00 net   2,797.80 cout employeur   3,632.70 statut=paye entry_id=185 (4 lignes)
+  id=2 periode=2026-01 EMP002 — Tranche 30%       brut   7,000.00 net   6,573.00 cout employeur   8,386.50 statut=paye entry_id=185 (4 lignes)
+  id=3 periode=2026-01 EMP003 — Tranche 37%       brut  16,000.00 net  13,068.94 cout employeur  18,476.40 statut=paye entry_id=185 (4 lignes)
+  id=4 periode=2026-02 EMP001 — Seuil exonéré     brut   3,000.00 net   2,797.80 cout employeur   3,632.70 statut=paye entry_id=187 (4 lignes)
+  id=5 periode=2026-02 EMP002 — Tranche 30%       brut   7,000.00 net   6,573.00 cout employeur   8,386.50 statut=paye entry_id=187 (4 lignes)
+  id=6 periode=2026-02 EMP003 — Tranche 37%       brut  16,000.00 net  13,068.94 cout employeur  18,476.40 statut=paye entry_id=187 (4 lignes)
+  id=7 periode=2026-03 EMP001 — Seuil exonéré     brut   3,000.00 net   2,797.80 cout employeur   3,632.70 statut=paye entry_id=189 (4 lignes)
+  id=8 periode=2026-03 EMP002 — Tranche 30%       brut   7,000.00 net   6,573.00 cout employeur   8,386.50 statut=paye entry_id=189 (4 lignes)
+  id=9 periode=2026-03 EMP003 — Tranche 37%       brut  16,000.00 net  13,068.94 cout employeur  18,476.40 statut=paye entry_id=189 (4 lignes)
+  id=10 periode=2026-04 EMP001 — Seuil exonéré     brut   3,000.00 net   2,797.80 cout employeur   3,632.70 statut=paye entry_id=191 (4 lignes)
+  id=11 periode=2026-04 EMP002 — Tranche 30%       brut   7,000.00 net   6,573.00 cout employeur   8,386.50 statut=paye entry_id=191 (4 lignes)
+  id=12 periode=2026-04 EMP003 — Tranche 37%       brut  16,000.00 net  13,068.94 cout employeur  18,476.40 statut=paye entry_id=191 (4 lignes)
+  id=13 periode=2026-05 EMP001 — Seuil exonéré     brut   3,000.00 net   2,797.80 cout employeur   3,632.70 statut=paye entry_id=193 (4 lignes)
+  id=14 periode=2026-05 EMP002 — Tranche 30%       brut   7,000.00 net   6,573.00 cout employeur   8,386.50 statut=paye entry_id=193 (4 lignes)
+  id=15 periode=2026-05 EMP003 — Tranche 37%       brut  16,000.00 net  13,068.94 cout employeur  18,476.40 statut=paye entry_id=193 (4 lignes)
+  id=16 periode=2026-06 EMP001 — Seuil exonéré     brut   3,000.00 net   2,797.80 cout employeur   3,632.70 statut=paye entry_id=195 (4 lignes)
+  id=17 periode=2026-06 EMP002 — Tranche 30%       brut   7,000.00 net   6,573.00 cout employeur   8,386.50 statut=paye entry_id=195 (4 lignes)
+  id=18 periode=2026-06 EMP003 — Tranche 37%       brut  16,000.00 net  13,068.94 cout employeur  18,476.40 statut=paye entry_id=195 (4 lignes)
+  id=19 periode=2026-07 EMP001 — Seuil exonéré     brut   3,000.00 net   2,797.80 cout employeur   3,632.70 statut=paye entry_id=197 (4 lignes)
+  id=20 periode=2026-07 EMP002 — Tranche 30%       brut   7,000.00 net   6,573.00 cout employeur   8,386.50 statut=paye entry_id=197 (4 lignes)
+  id=21 periode=2026-07 EMP003 — Tranche 37%       brut  16,000.00 net  13,068.94 cout employeur  18,476.40 statut=paye entry_id=197 (4 lignes)
+  id=22 periode=2026-08 EMP001 — Seuil exonéré     brut   3,000.00 net   2,797.80 cout employeur   3,632.70 statut=paye entry_id=199 (4 lignes)
+  id=23 periode=2026-08 EMP002 — Tranche 30%       brut   7,000.00 net   6,573.00 cout employeur   8,386.50 statut=paye entry_id=199 (4 lignes)
+  id=24 periode=2026-08 EMP003 — Tranche 37%       brut  16,000.00 net  13,068.94 cout employeur  18,476.40 statut=paye entry_id=199 (4 lignes)
+  id=25 periode=2026-09 EMP001 — Seuil exonéré     brut   3,000.00 net   2,797.80 cout employeur   3,632.70 statut=paye entry_id=201 (4 lignes)
+  id=26 periode=2026-09 EMP002 — Tranche 30%       brut   7,000.00 net   6,573.00 cout employeur   8,386.50 statut=paye entry_id=201 (4 lignes)
+  id=27 periode=2026-09 EMP003 — Tranche 37%       brut  16,000.00 net  13,068.94 cout employeur  18,476.40 statut=paye entry_id=201 (4 lignes)
+  id=28 periode=2026-10 EMP001 — Seuil exonéré     brut   3,000.00 net   2,797.80 cout employeur   3,632.70 statut=paye entry_id=203 (4 lignes)
+  id=29 periode=2026-10 EMP002 — Tranche 30%       brut   7,000.00 net   6,573.00 cout employeur   8,386.50 statut=paye entry_id=203 (4 lignes)
+  id=30 periode=2026-10 EMP003 — Tranche 37%       brut  16,000.00 net  13,068.94 cout employeur  18,476.40 statut=paye entry_id=203 (4 lignes)
+  id=31 periode=2026-11 EMP001 — Seuil exonéré     brut   3,000.00 net   2,797.80 cout employeur   3,632.70 statut=paye entry_id=205 (4 lignes)
+  id=32 periode=2026-11 EMP002 — Tranche 30%       brut   7,000.00 net   6,573.00 cout employeur   8,386.50 statut=paye entry_id=205 (4 lignes)
+  id=33 periode=2026-11 EMP003 — Tranche 37%       brut  16,000.00 net  13,068.94 cout employeur  18,476.40 statut=paye entry_id=205 (4 lignes)
+  id=34 periode=2026-12 EMP001 — Seuil exonéré     brut   3,000.00 net   2,797.80 cout employeur   3,632.70 statut=paye entry_id=207 (4 lignes)
+  id=35 periode=2026-12 EMP002 — Tranche 30%       brut   7,000.00 net   6,573.00 cout employeur   8,386.50 statut=paye entry_id=207 (4 lignes)
+  id=36 periode=2026-12 EMP003 — Tranche 37%       brut  16,000.00 net  13,068.94 cout employeur  18,476.40 statut=paye entry_id=207 (4 lignes)
+
+12 cycle(s) de paie :
+  periode 2026-01 statut=paye brut  26,000.00 IR  2,300.66 net  22,439.74 employeur  30,495.60 ecriture=185 paiement=186
+  periode 2026-02 statut=paye brut  26,000.00 IR  2,300.66 net  22,439.74 employeur  30,495.60 ecriture=187 paiement=188
+  periode 2026-03 statut=paye brut  26,000.00 IR  2,300.66 net  22,439.74 employeur  30,495.60 ecriture=189 paiement=190
+  periode 2026-04 statut=paye brut  26,000.00 IR  2,300.66 net  22,439.74 employeur  30,495.60 ecriture=191 paiement=192
+  periode 2026-05 statut=paye brut  26,000.00 IR  2,300.66 net  22,439.74 employeur  30,495.60 ecriture=193 paiement=194
+  periode 2026-06 statut=paye brut  26,000.00 IR  2,300.66 net  22,439.74 employeur  30,495.60 ecriture=195 paiement=196
+  periode 2026-07 statut=paye brut  26,000.00 IR  2,300.66 net  22,439.74 employeur  30,495.60 ecriture=197 paiement=198
+  periode 2026-08 statut=paye brut  26,000.00 IR  2,300.66 net  22,439.74 employeur  30,495.60 ecriture=199 paiement=200
+  periode 2026-09 statut=paye brut  26,000.00 IR  2,300.66 net  22,439.74 employeur  30,495.60 ecriture=201 paiement=202
+  periode 2026-10 statut=paye brut  26,000.00 IR  2,300.66 net  22,439.74 employeur  30,495.60 ecriture=203 paiement=204
+  periode 2026-11 statut=paye brut  26,000.00 IR  2,300.66 net  22,439.74 employeur  30,495.60 ecriture=205 paiement=206
+  periode 2026-12 statut=paye brut  26,000.00 IR  2,300.66 net  22,439.74 employeur  30,495.60 ecriture=207 paiement=208
+
+====================================================================================================
+A3/A4 — FACTURES : COHERENCE LIGNES / ENTETE (base du releve XML DGI)
+====================================================================================================
+
+FA26-08 du 2026-08-08 statut=paid : entete HT 9,000.00 TVA 1,800.00 TTC 10,800.00
+  L1 6111 — Achat marchandises 08/2 qte    1.000 PU   9,000.00 taux 20.00 -> HT   9,000.00 TVA  1,800.00 TTC  10,800.00 cpt 6111
+  => lignes : HT 9,000.00 / TVA 1,800.00  |  ecart entete : HT 0.00 / TVA 0.00
+
+FA26-09 du 2026-09-08 statut=paid : entete HT 9,000.00 TVA 1,800.00 TTC 10,800.00
+  L1 6111 — Achat marchandises 09/2 qte    1.000 PU   9,000.00 taux 20.00 -> HT   9,000.00 TVA  1,800.00 TTC  10,800.00 cpt 6111
+  => lignes : HT 9,000.00 / TVA 1,800.00  |  ecart entete : HT 0.00 / TVA 0.00
+
+FA26-12 du 2026-12-08 statut=partially_paid : entete HT 9,000.00 TVA 1,800.00 TTC 10,800.00
+  L1 6111 — Achat marchandises 12/2 qte    1.000 PU   9,000.00 taux 20.00 -> HT   9,000.00 TVA  1,800.00 TTC  10,800.00 cpt 6111
+  => lignes : HT 9,000.00 / TVA 1,800.00  |  ecart entete : HT 0.00 / TVA 0.00
+
+FA26-01 du 2026-01-08 statut=paid : entete HT 9,000.00 TVA 1,800.00 TTC 10,800.00
+  L1 6111 — Achat marchandises 01/2 qte    1.000 PU   9,000.00 taux 20.00 -> HT   9,000.00 TVA  1,800.00 TTC  10,800.00 cpt 6111
+  => lignes : HT 9,000.00 / TVA 1,800.00  |  ecart entete : HT 0.00 / TVA 0.00
+
+FA25-01 du 2025-01-08 statut=paid : entete HT 8,000.00 TVA 1,600.00 TTC 9,600.00
+  L1 6111 — Achat marchandises 01/2 qte    1.000 PU   8,000.00 taux 20.00 -> HT   8,000.00 TVA  1,600.00 TTC   9,600.00 cpt 6111
+  => lignes : HT 8,000.00 / TVA 1,600.00  |  ecart entete : HT 0.00 / TVA 0.00
+
+0 facture(s) dont les lignes ne reconcilient pas l'entete :
+
+====================================================================================================
+A3 — RELEVE DES DEDUCTIONS TVA : CONTENU REEL DES LIGNES (2026-08 et 2026-12)
+====================================================================================================
+
+-- aout 2026 | base_periode=paiement : 3 ligne(s) --
+   ord=1   FA26-07      mht   3,150.00 tva    630.00 ttc   3,780.00 tx 20.00 %  dpai=2026-08-18 dfac=2026-07-08
+   ord=2   FA26-08      mht   5,400.00 tva  1,080.00 ttc   6,480.00 tx 20.00 %  dpai=2026-08-18 dfac=2026-08-08
+   ord=3   LOY26-08     mht   2,200.00 tva    440.00 ttc   2,640.00 tx 20.00 %  dpai=2026-08-18 dfac=2026-08-03
+   totaux : 10,750.00 / 2,150.00
+   ! FA26-08 : Facture partiellement reglee a la fin de la periode (6480.00 / 10800.00) : base et TVA deductibles limitees a la fraction reglee (bloquant=False)
+
+-- aout 2026 | base_periode=facture : 2 ligne(s) --
+   ord=1   LOY26-08     mht   2,200.00 tva    440.00 ttc   2,640.00 tx 20.00 %  dpai=2026-08-18 dfac=2026-08-03
+   ord=2   FA26-08      mht   9,000.00 tva  1,800.00 ttc  10,800.00 tx 20.00 %  dpai=2026-09-18 dfac=2026-08-08
+   totaux : 11,200.00 / 2,240.00
+
+-- decembre 2026 | base_periode=paiement : 3 ligne(s) --
+   ord=1   FA26-11      mht   4,950.00 tva    990.00 ttc   5,940.00 tx 20.00 %  dpai=2026-12-18 dfac=2026-11-08
+   ord=2   FA26-12      mht   3,600.00 tva    720.00 ttc   4,320.00 tx 20.00 %  dpai=2026-12-18 dfac=2026-12-08
+   ord=3   LOY26-12     mht   2,200.00 tva    440.00 ttc   2,640.00 tx 20.00 %  dpai=2026-12-18 dfac=2026-12-03
+   totaux : 10,750.00 / 2,150.00
+   ! FA26-12 : Facture partiellement reglee (reste 6480.00) (bloquant=False)
+   ! FA26-12 : Facture partiellement reglee a la fin de la periode (4320.00 / 10800.00) : base et TVA deductibles limitees a la fraction reglee (bloquant=False)
+
+-- decembre 2026 | base_periode=facture : 2 ligne(s) --
+   ord=1   LOY26-12     mht   2,200.00 tva    440.00 ttc   2,640.00 tx 20.00 %  dpai=2026-12-18 dfac=2026-12-03
+   ord=2   FA26-12      mht   9,000.00 tva  1,800.00 ttc  10,800.00 tx 20.00 %  dpai=2026-12-18 dfac=2026-12-08
+   totaux : 11,200.00 / 2,240.00
+   ! FA26-12 : Facture partiellement reglee (reste 6480.00) (bloquant=False)
+
+====================================================================================================
+A4 — DOCUMENT PDF DE LA FACTURE FA26-12 (contenu des lignes)
+====================================================================================================
+  titre : FACTURE D ACHAT - FA26-12 | sous-titre : SOCIETE RECETTE MAROC SARL AU - ICE : 001234567000099 — IF : 1234567 — RC : 12345 — Patente : 12345678 | Date : 08/12/2026 | Echeance : —
+  -- tableau Detail des lignes --
+     Designation | Qte | P.U. HT | Total HT | TVA | Total TTC
+     6111 — Achat marchandises 12/2026 | 1 | 9 000,00 | 9 000,00 | 20 % | 10 800,00
+     TOTAL :  |  |  | 9 000,00 | 1 800,00 | 10 800,00
+  -- tableau Ventilation de la TVA par taux --
+     Taux | Base HT | Montant TVA
+     20 % | 9 000,00 | 1 800,00
+  -- tableau Recapitulatif --
+     Element | Montant
+     Total HT | 9 000,00
+     Total TVA | 1 800,00
+     Total TTC | 10 800,00
+     Deja regle | 4 320,00
+     Reste a payer | 6 480,00
+     TOTAL : TOTAL TTC | 10 800,00 DH
+  -- tableau Mentions legales --
+     Mention | Valeur
+     Document | Facture originale - le duplicata est delivre sur demande
+     Mode de reglement | espece
+     Reference | FA26-12
+     Identifiants du tiers | ICE : 000000000000202 - IF : 1000202
+     Arretee la presente facture a la somme de | 10 800,00 DH toutes taxes comprises
+     Conservation | 10 ans (CGNC / CGI) - document genere par Compta MA
+
+====================================================================================================
+A6 — CLASSEMENT COMPTABLE DES IMMOBILISATIONS (2340 vs outillage / informatique)
+====================================================================================================
+Comptes du plan comptable utilises par les fiches :
+  2333   Emballages récupérables identifiables  (classe 2)
+  2340   Matériel de transport  (classe 2)
+  2351   Mobilier de bureau  (classe 2)
+  2355   Matériel informatique  (classe 2)
+  2834   Amortissements du matériel de transport  (classe 2)
+
+2 fiche(s) d'immobilisation :
+  IMM-001    Matériel et outillage                    compte 2340   « Matériel de transport » valeur    60,000.00 acquis le 2025-01-02
+  IMM-002    Matériel informatique complémentaire     compte 2340   « Matériel de transport » valeur    30,000.00 acquis le 2026-07-01
+
+Ecritures au compte 2340 (grand livre) :
+  2025-01-02 EC202500002 2340 D    60,000.00 C         0.00 Acquisition matériel amortissable
+  2026-01-01 EC202600001 2340 D    60,000.00 C         0.00 A-nouveaux de l'exercice 2026
+  2026-07-01 EC202600090 2340 D    30,000.00 C         0.00 Acquisition matériel 2026
+
+====================================================================================================
+A7 — ETIC : CHARGES DE PERSONNEL (comptes 61x) ALORS QUE LE CPC PORTE DES 617 — 2026
+====================================================================================================
+  6111     Achats de marchandises "groupe A debit   108,000.00 credit         0.00 solde   108,000.00
+  6114     Variation de stocks de marchandi debit    20,000.00 credit    25,000.00 solde    -5,000.00
+  6131     Locations et charges locatives   debit    26,400.00 credit         0.00 solde    26,400.00
+  6148     Autres charges externes des exer debit    15,000.00 credit         0.00 solde    15,000.00
+  61711    Appointements et salaires        debit   312,000.00 credit         0.00 solde   312,000.00
+  61741    Cotisations de sécurité sociale  debit    28,987.20 credit         0.00 solde    28,987.20
+  61744    Prestations familiales           debit    19,968.00 credit         0.00 solde    19,968.00
+  61768    Autres charges sociales diverses debit     4,992.00 credit         0.00 solde     4,992.00
+  6193     Dotations d’exploitation aux amo debit    15,000.00 credit         0.00 solde    15,000.00
+
+====================================================================================================
+A9/A10 — OUVERTURE ET REOUVERTURE D'EXERCICES
+====================================================================================================
+  2025 statut=closed  du 2025-01-01 au 2025-12-31 cloture=2026-09-23 03:07:37.757021 : 89 ecriture(s)
+  2026 statut=open    du 2026-01-01 au 2026-12-31 cloture=- : 106 ecriture(s)
+
+====================================================================================================
+A5 — DOSSIER GREFFE : DEPOTS, PIECES ET CONTENU
+====================================================================================================
+  table greffe_deposits : 1 ligne(s)
+  table greffe_documents : 5 ligne(s)
+  table greffe_events : 2 ligne(s)
+  table greffe_payments : 1 ligne(s)
+
+  -- greffe_deposits --
+   id=1 | company_id=1 | fiscal_year_id=2 | exercice=2025 | forme_juridique=SARL | statut=approuve | date_ag=None | date_limite_depot=2026-06-30 | date_soumission=2026-01-10 | date_approbation=2026-01-10 | date_limite_paiement=2026-01-13 | date_depot=None | montant_taxes=1000 | amende_montant=None | amende_motif=None | reference_certificat=None | certificat_path=None | certificat_hash=None | certificat_nom=None | certificat_depose_le=None | dernier_motif=None | notes=Dossier de recette J9 (exercice 2025 clos) | created_by=1 | created_at=2026-09-23 01:25:11 | updated_at=2026-09-23 01:30:43
+
+  -- greffe_documents --
+   id=1 | deposit_id=1 | piece_code=etats_synthese | libelle=Etats de synthese (bilan, CPC, ESG, ETIC) certifies conformes | nom_fichier=Etats_synthese_2025.pdf | chemin=1/1/etats_synthese_Etats_synthese_2025.pdf | type_mime=application/pdf | taille_octets=13220 | hash_sha256=cff6e28321f6078a7ab6978e2adf6105ea611e0850fb3c6e561e20fff30de2f7 | source=genere | created_by=1 | created_at=2026-09-23 01:25:12
+   id=2 | deposit_id=1 | piece_code=etat_complementaire | libelle=Etat de synthese / declaration complementaire du portail | nom_fichier=Bordereau_depot_greffe_2025.pdf | chemin=1/1/etat_complementaire_Bordereau_depot_greffe_2025.pdf | type_mime=application/pdf | taille_octets=4032 | hash_sha256=72841b15c4789739dda55130e97282f8333d54994ae65802ef928c544f90e39f | source=genere | created_by=1 | created_at=2026-09-23 01:25:12
+   id=3 | deposit_id=1 | piece_code=rapport_gestion | libelle=Rapport de gestion | nom_fichier=rapport_gestion_j9.pdf | chemin=1/1/rapport_gestion_rapport_gestion_j9.pdf | type_mime=application/pdf | taille_octets=193 | hash_sha256=794abaa4f6f06fc519895c22944a0ab43ad02b4fb32bdefa1952ce81613cb47b | source=televerse | created_by=1 | created_at=2026-09-23 01:30:42
+   id=4 | deposit_id=1 | piece_code=pv_ag | libelle=Proces-verbal de l'assemblee generale d'approbation et texte des resolutions | nom_fichier=pv_ag_j9.pdf | chemin=1/1/pv_ag_pv_ag_j9.pdf | type_mime=application/pdf | taille_octets=193 | hash_sha256=794abaa4f6f06fc519895c22944a0ab43ad02b4fb32bdefa1952ce81613cb47b | source=televerse | created_by=1 | created_at=2026-09-23 01:30:43
+   id=5 | deposit_id=1 | piece_code=justificatif_paiement | libelle=Justificatif de paiement des taxes | nom_fichier=Attestation_paiement_taxes_2025.pdf | chemin=1/1/justificatif_paiement_Attestation_paiement_taxes_2025.pdf | type_mime=application/pdf | taille_octets=2312 | hash_sha256=32087a59470e5a81eb4bafc21227d0101c3bf60734daf2ae2e22d05a991ce331 | source=genere | created_by=1 | created_at=2026-09-23 01:33:48
+
+  -- greffe_events --
+   id=1 | deposit_id=1 | etat_avant=nouveau | etat_apres=en_cours | date_evenement=2026-01-10 | motif=None | user_id=1 | created_at=2026-09-23 01:30:43
+   id=2 | deposit_id=1 | etat_avant=en_cours | etat_apres=approuve | date_evenement=2026-01-10 | motif=None | user_id=1 | created_at=2026-09-23 01:30:43
+
+  -- greffe_payments --
+   id=1 | deposit_id=1 | montant=1000 | date_paiement=2026-01-15 | moyen=virement | reference=PAI-J9 | notes=None | created_by=1 | created_at=2026-09-23 01:30:43
+
+====================================================================================================
+A3 bis — SCAN DE TOUTES LES PERIODES 2025-2026 : COHERENCE mht / taux / tva DU RELEVE
+====================================================================================================
+
+  Bilan du scan : 48 periode(s) analysees, 0 ligne(s) incoherente(s).
+     base = date de facture : 0 ligne(s)
+     base = date de paiement (defaut) : 0 ligne(s)
+
+====================================================================================================
+A8 — IS 2025 / 2026 CALCULE SUR LE RESULTAT COMPTABLE
+====================================================================================================
+  2025 :
+     resultat_comptable     73600.00
+     resultat_avant_impot   92000.00
+     total_reintegrations   0.00
+     total_deductions       0.00
+     resultat_fiscal        92000.00
+     cotisation_minimale    0.00
+     impot_du               18400.00
+     (autres cles : ['annee', 'exercice_id', 'statut_exercice', 'impots_resultats_comptabilises', 'detail_reintegrations', 'detail_deductions', 'resultat_avant_report', 'report_deficitaire_disponible', 'report_deficitaire_utilise', 'report_deficitaire_restant', 'deficit_constate', 'nature_resultat_fiscal', 'is_theorique', 'chiffre_affaires_ht', 'tva_collectee', 'chiffre_affaires_ttc', 'cotisation_minimale_due', 'acomptes_verses', 'credits_impot', 'total_credits', 'solde_a_payer', 'excedent_a_reporter', 'taux_effectif', 'propositions_reintegration'])
+  2026 :
+     resultat_comptable     -113307.20
+     resultat_avant_impot   -93347.20
+     total_reintegrations   0.00
+     total_deductions       0.00
+     resultat_fiscal        -93347.20
+     cotisation_minimale    0.00
+     impot_du               0.00
+     (autres cles : ['annee', 'exercice_id', 'statut_exercice', 'impots_resultats_comptabilises', 'detail_reintegrations', 'detail_deductions', 'resultat_avant_report', 'report_deficitaire_disponible', 'report_deficitaire_utilise', 'report_deficitaire_restant', 'deficit_constate', 'nature_resultat_fiscal', 'is_theorique', 'chiffre_affaires_ht', 'tva_collectee', 'chiffre_affaires_ttc', 'cotisation_minimale_due', 'acomptes_verses', 'credits_impot', 'total_credits', 'solde_a_payer', 'excedent_a_reporter', 'taux_effectif', 'propositions_reintegration'])
+
+====================================================================================================
+A4 bis — ECRANS HTML : OU APPARAISSENT DES ZEROS POUR FA26-12
+====================================================================================================
+
+  detail (/factures/72) -> HTTP 200, 3 bloc(s) contenant FA26-12
+     FA26-12 — Compta MA
+     Facture FA26-12 | Partiellement réglée
+     Référence | | FA26-12
+
+  impression (/factures/72/impression) -> HTTP 200, 4 bloc(s) contenant FA26-12
+     Impression FA26-12 — Compta MA
+     Impression de la facture FA26-12
+     N° FA26-12 &nbsp;|&nbsp; Date : 08/12/2026
+     Mode de règlement : espece | Référence : FA26-12 | Arrêtée la présente facture à la somme de | 10 800,00 DH | toutes taxes comprises.
+
+  liste achats (/factures?type=achat&year=2026) -> HTTP 200, 1 bloc(s) contenant FA26-12
+     FA26-12 | | | 08/12/2026 | | FR0001 - FOURNISSEUR-DIVERS | | 9 000,00 | | 1 800,00 | | | 10 800,00 | | | 4 320,00 | | 6 480,00 | | | | | Partiellement réglée | | | | Imprimer
+
+  declaration TVA 12/2026 (/tva?year=2026&month=12) -> HTTP 200, 0 bloc(s) contenant FA26-12
+
+  releve EDI 12/2026 (/tva/edi?year=2026&month=12) -> HTTP 200, 3 bloc(s) contenant FA26-12
+     FA26-12 | | Facture partiellement reglee (reste 6480.00)
+     FA26-12 | | Facture partiellement reglee a la fin de la periode (4320.00 / 10800.00) : base et TVA deductibles limitees a la fraction reglee
+     2 | | FA26-12 | | 6111 — Achat marchandises 12/2026 | | 08/12/2026 | | 1000202 | | 000000000000202 | | 20,00 | | 1 | | 18/12/2026 | | 3 600,00 | | 720,00 | | 4 320,00
+
+  grand livre 12/2026 (/etats/grand-livre?year=2026&month=12) -> HTTP 200, 0 bloc(s) contenant FA26-12
+
+====================================================================================================
+A1 bis — COLLISIONS DE ROUTES API / INTERFACE (pages masquees)
+====================================================================================================
+141 route(s) API + 96 route(s) d'interface ; 0 collision(s) : l'API etant montee en premier (app/main.py), elle masque l'ecran.
+
+====================================================================================================
+A1 ter — BALAYAGE DE TOUS LES ECRANS GET (statut HTTP reel avec session)
+====================================================================================================
+40 ecran(s) GET testé(s) ; 3 en anomalie :
+  /connexion                         HTTP 303   
+  /deconnexion                       HTTP 303   
+  /etats/liasse.xml                  HTTP 303   
+
+====================================================================================================
+A1 — ECRANS : ACCESSIBILITE HTTP (session, role, erreurs 500)
+====================================================================================================
+Duree de vie de session : 480 minute(s) (cookie compta_session, HttpOnly) | utilisateur teste : admin@compta.ma
+
+-- SANS session (attendu : 303 vers /connexion) --
+  /etats/journal         303  ->  /connexion?next=/etats/journal
+  /audit                 303  ->  /connexion?next=/audit
+  /stocks                303  ->  /connexion?next=/stocks
+  /                      303  ->  /connexion?next=/
+
+-- AVEC session administrateur --
+  /                          200
+  /etats/journal             200
+  /audit                     200
+  /audit/export              200
+  /stocks                    200
+  /rapprochement             200
+  /etats/balance             200
+  /etats/grand-livre         200
+  /etats/cpc                 200
+  /etats/bilan               200
+  /tva                       200
+  /tva/edi                   200
+  /immobilisations           200
+  /paie                      200
+  /greffe                    200
+  /liasse                    200
+  /reglements                200
+  /ecritures                 200
+  /comptes                   200
+  /tiers                     200
+  /factures                  200
+  /parametres/societe        200
+  /parametres/exercices      200
+  /parametres/utilisateurs   200
+  /provisions                404
+  /etats/provisions          404

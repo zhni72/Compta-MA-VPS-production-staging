@@ -1,0 +1,562 @@
+/* ==========================================================================
+   Compta MA - theme de gestion (inspiration Sage Comptabilite / Ciel)
+   Palette sobre : bleu ardoise, gris, badges d'etat, tableaux denses.
+   ========================================================================== */
+
+:root {
+  --primary: #0b5c8f;
+  --primary-dark: #084a74;
+  --primary-light: #e8f1f8;
+  --navy: #10283b;
+  --navy-light: #1b3a52;
+  --bg: #f2f5f8;
+  --surface: #ffffff;
+  --border: #d8e0e8;
+  --border-strong: #c2cdd8;
+  --text: #1d2b36;
+  --text-muted: #64798c;
+  --green: #1e7d45;
+  --green-bg: #e6f4ec;
+  --orange: #b76a00;
+  --orange-bg: #fdf1e0;
+  --red: #b3261e;
+  --red-bg: #fbeae9;
+  --blue-bg: #e8f1f8;
+  --grey-bg: #eef1f4;
+  --radius: 4px;
+  --shadow: 0 1px 2px rgba(16, 40, 59, .08);
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+a { color: var(--primary); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+/* ---------------------------------------------------------------- Bandeau */
+.topbar {
+  height: 52px;
+  background: var(--navy);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 0 16px;
+  position: sticky;
+  top: 0;
+  z-index: 20;
+}
+.topbar .brand {
+  font-weight: 600;
+  font-size: 16px;
+  letter-spacing: .3px;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.topbar .brand span.logo {
+  background: var(--primary);
+  border-radius: var(--radius);
+  padding: 2px 7px;
+  font-size: 12px;
+  font-weight: 700;
+}
+.topbar .dossier {
+  font-size: 13px;
+  color: #cfe0ec;
+  border-left: 1px solid rgba(255, 255, 255, .2);
+  padding-left: 18px;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.topbar .dossier strong { color: #fff; }
+.topbar .spacer { flex: 1; }
+.topbar .user {
+  font-size: 13px;
+  color: #cfe0ec;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.topbar .user a { color: #fff; }
+
+/* --------------------------------------------------------------- Ensemble */
+.layout { display: flex; min-height: calc(100vh - 52px); }
+
+.sidebar {
+  width: 246px;
+  background: var(--navy-light);
+  color: #dbe7f0;
+  padding: 10px 0 30px;
+  flex-shrink: 0;
+}
+.sidebar .group-title {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: .8px;
+  color: #7fa2ba;
+  padding: 14px 16px 6px;
+}
+.sidebar a {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #dbe7f0;
+  padding: 8px 16px;
+  font-size: 13.5px;
+  border-left: 3px solid transparent;
+}
+.sidebar a:hover { background: rgba(255, 255, 255, .06); text-decoration: none; }
+.sidebar a.active {
+  background: var(--primary);
+  border-left-color: #7fc4f0;
+  color: #fff;
+  font-weight: 600;
+}
+.sidebar a .ico { width: 18px; text-align: center; opacity: .9; }
+.sidebar button.group-title {
+  background: none;
+  border: 0;
+  width: 100%;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-family: inherit;
+  font-weight: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.sidebar button.group-title:hover { color: #b9d2e4; background: rgba(255, 255, 255, .06); }
+.sidebar button.group-title:focus-visible { outline: 2px solid #7fc4f0; outline-offset: -2px; }
+.sidebar .group-title .caret { font-size: 9px; color: #7fa2ba; display: inline-block; }
+.sidebar button.group-title[aria-expanded="false"] .caret { transform: rotate(-90deg); }
+.sidebar .group-items[hidden] { display: none; }
+.sidebar .group-items.subnav a { padding-left: 30px; font-size: 12.5px; }
+.sidebar a.telechargement { font-style: italic; opacity: .92; }
+
+.content { flex: 1; padding: 18px 22px 60px; min-width: 0; }
+
+/* ---------------------------------------------------------- Titre de page */
+.page-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+}
+.page-head h1 { font-size: 20px; margin: 0 0 4px; font-weight: 600; }
+.breadcrumb { font-size: 12.5px; color: var(--text-muted); }
+.breadcrumb a { color: var(--text-muted); }
+.actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+/* ------------------------------------------------------------ Composants */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  margin-bottom: 16px;
+}
+.card > header {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border);
+  font-weight: 600;
+  font-size: 13.5px;
+  background: #fafbfc;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.card > .body { padding: 14px; }
+.card > .body.tight { padding: 0; }
+
+.grid { display: grid; gap: 14px; }
+.grid.cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.grid.cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.grid.cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+/* Bande 1024 px : petit desktop / tablette paysage - le menu reste complet,
+   seules les grilles et les formulaires se compactent (voir bas de fichier). */
+@media (max-width: 1024px) {
+  .grid.cols-3, .grid.cols-4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .form-grid.cols-4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+/* Indicateurs (tableau de bord) */
+.kpi {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  box-shadow: var(--shadow);
+}
+.kpi .label { font-size: 12px; text-transform: uppercase; letter-spacing: .5px; color: var(--text-muted); }
+.kpi .value { font-size: 21px; font-weight: 600; margin-top: 4px; }
+.kpi .hint { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+.kpi.positive .value { color: var(--green); }
+.kpi.negative .value { color: var(--red); }
+
+/* Alertes */
+.alert {
+  padding: 10px 14px;
+  border-radius: var(--radius);
+  margin-bottom: 14px;
+  border: 1px solid;
+  font-size: 13.5px;
+}
+.alert-success { background: var(--green-bg); border-color: #b6dcc6; color: #14532d; }
+.alert-error { background: var(--red-bg); border-color: #efc4c1; color: #7f1d1d; }
+.alert-info { background: var(--blue-bg); border-color: #bcd7ea; color: #0b3c5d; }
+.alert-warning { background: var(--orange-bg); border-color: #f0d3a4; color: #7a4400; }
+
+/* Badges d'etat */
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 11.5px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.badge-grey { background: var(--grey-bg); color: #4a5b69; }
+.badge-blue { background: var(--blue-bg); color: var(--primary-dark); }
+.badge-green { background: var(--green-bg); color: var(--green); }
+.badge-orange { background: var(--orange-bg); color: var(--orange); }
+.badge-red { background: var(--red-bg); color: var(--red); }
+
+/* Boutons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 13px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border-strong);
+  background: #fff;
+  color: var(--text);
+  font-size: 13.5px;
+  cursor: pointer;
+  font-family: inherit;
+}
+.btn:hover { background: #f6f8fa; text-decoration: none; }
+.btn-primary { background: var(--primary); border-color: var(--primary); color: #fff; }
+.btn-primary:hover { background: var(--primary-dark); }
+.btn-success { background: var(--green); border-color: var(--green); color: #fff; }
+.btn-danger { background: #fff; border-color: #d9a5a2; color: var(--red); }
+.btn-small { padding: 4px 9px; font-size: 12.5px; }
+.btn[disabled] { opacity: .55; cursor: not-allowed; }
+
+/* -------------------------------------------------------------- Tableaux */
+table.data {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13.5px;
+}
+table.data thead th {
+  background: #f7f9fb;
+  text-align: left;
+  padding: 8px 10px;
+  border-bottom: 2px solid var(--border-strong);
+  font-size: 12.5px;
+  text-transform: uppercase;
+  letter-spacing: .4px;
+  color: #47596b;
+  white-space: nowrap;
+}
+table.data tbody td {
+  padding: 7px 10px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+}
+table.data tbody tr:nth-child(even) { background: #fcfdfe; }
+table.data tbody tr:hover { background: var(--primary-light); }
+table.data tfoot td {
+  padding: 8px 10px;
+  border-top: 2px solid var(--border-strong);
+  font-weight: 600;
+  background: #fafbfc;
+}
+table.data .num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+table.data .center { text-align: center; }
+table.data .code { font-family: "Consolas", "Courier New", monospace; font-size: 12.5px; }
+table.data .secondary { color: var(--text-muted); font-size: 12.5px; }
+.empty { padding: 26px; text-align: center; color: var(--text-muted); }
+.table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+/* Barre de filtres */
+.filters {
+  display: flex;
+  gap: 10px;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  padding: 12px 14px;
+  background: #fafbfc;
+  border-bottom: 1px solid var(--border);
+}
+.filters .field { display: flex; flex-direction: column; gap: 4px; }
+.filters input, .filters select { min-width: 140px; }
+
+/* ------------------------------------------------------------- Formulaires */
+label { font-size: 12.5px; font-weight: 600; color: #47596b; display: block; margin-bottom: 4px; }
+input[type="text"], input[type="email"], input[type="password"], input[type="number"],
+input[type="date"], select, textarea, input[type="search"] {
+  width: 100%;
+  padding: 7px 9px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius);
+  font-size: 13.5px;
+  font-family: inherit;
+  background: #fff;
+  color: var(--text);
+}
+input:focus, select:focus, textarea:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px rgba(11, 92, 143, .15);
+}
+.form-grid { display: grid; gap: 12px; }
+.form-grid.cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.form-grid.cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.form-grid.cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.form-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding: 14px;
+  border-top: 1px solid var(--border);
+  background: #fafbfc;
+}
+.field-help { font-size: 12px; color: var(--text-muted); margin-top: 3px; }
+.required::after { content: " *"; color: var(--red); }
+
+/* Bandeau recapitulatif (totaux facture) */
+.totaux { margin-left: auto; width: 320px; }
+.totaux .line { display: flex; justify-content: space-between; padding: 4px 0; font-size: 13.5px; }
+.totaux .line.total {
+  border-top: 2px solid var(--border-strong);
+  margin-top: 4px;
+  padding-top: 7px;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+/* ------------------------------------------------------- Facture a imprimer */
+.invoice-print { background: #fff; padding: 34px; max-width: 900px; overflow-x: auto; }
+.invoice-print .entete { display: flex; justify-content: space-between; gap: 30px; }
+.invoice-print h2 { margin: 0 0 6px; font-size: 18px; }
+.invoice-print .mentions { font-size: 12.5px; color: #33475b; line-height: 1.7; }
+.invoice-print .bloc-client { border: 1px solid var(--border); padding: 12px; min-width: 280px; font-size: 13px; }
+.invoice-print .titre-doc {
+  text-align: center;
+  font-size: 20px;
+  font-weight: 700;
+  margin: 26px 0 6px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+.invoice-print .sous-titre { text-align: center; font-size: 13px; color: var(--text-muted); margin-bottom: 20px; }
+.invoice-print .pied { margin-top: 26px; border-top: 1px solid var(--border); padding-top: 10px; font-size: 12px; color: var(--text-muted); }
+
+@media print {
+  .topbar, .sidebar, .no-print { display: none !important; }
+  .content { padding: 0; }
+  .table-wrap, .card > .body, .invoice-print { overflow: visible !important; }
+  .invoice-print { padding: 0; max-width: none; }
+  body { background: #fff; }
+}
+
+/* ---------------------------------------------------------------- Connexion */
+.login-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--navy) 0%, #24506f 100%);
+  padding: 20px;
+}
+.login-card {
+  background: #fff;
+  width: 100%;
+  max-width: 400px;
+  border-radius: 6px;
+  box-shadow: 0 12px 34px rgba(0, 0, 0, .3);
+  overflow: hidden;
+}
+.login-card header { background: var(--primary); color: #fff; padding: 18px 22px; }
+.login-card header h1 { margin: 0; font-size: 18px; }
+.login-card header p { margin: 4px 0 0; font-size: 12.5px; opacity: .85; }
+.login-card .body { padding: 22px; }
+.login-card .body .field { margin-bottom: 14px; }
+.login-card .btn { width: 100%; justify-content: center; padding: 9px; }
+.login-card footer { padding: 12px 22px; background: #f7f9fb; font-size: 12px; color: var(--text-muted); }
+
+/* ==========================================================================
+   P1B - Responsive UX - bandes de reference : 1440 (base) / 1024 / 768 / 390
+   Presentation uniquement : aucun comportement metier, aucun libelle change.
+   ========================================================================== */
+
+/* Tableaux : le defilement horizontal se fait dans le conteneur (`.table-wrap`
+   ou le corps de carte), jamais dans la page. */
+.card > .body {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Groupe de menu contenant la page courante : toujours identifiable */
+.sidebar button.group-title.has-active {
+  color: #fff;
+  background: rgba(127, 196, 240, .10);
+  border-left: 3px solid #7fc4f0;
+  padding-left: 13px;
+}
+.sidebar button.group-title.has-active .caret { color: #7fc4f0; }
+
+/* Navigation mobile : hamburger, tiroir et fond d'ecran (masques sur desktop) */
+.nav-toggle { display: none; }
+.nav-close { display: none; }
+.nav-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  padding: 0;
+  border: 0;
+  cursor: pointer;
+  background: rgba(9, 24, 38, .55);
+  z-index: 35;
+}
+
+/* ------------------------------------------------ 1024 px : petit desktop -- */
+/* Les grilles KPI/etats passent en 2 colonnes au niveau de leur definition
+   (bloc `.grid`, ci-dessus) ; ici, uniquement les espacements. */
+@media (max-width: 1024px) {
+  .content { padding: 16px 16px 48px; }
+  .topbar { gap: 14px; }
+}
+
+/* --------------------------------------------- 768 px : tablette - tiroir -- */
+@media (max-width: 768px) {
+  /* Bandeau : pas de debordement, le dossier passe sur une deuxieme ligne */
+  .topbar {
+    height: auto;
+    min-height: 52px;
+    flex-wrap: wrap;
+    row-gap: 6px;
+    gap: 10px 12px;
+    padding: 8px 12px;
+  }
+  .topbar .brand { font-size: 15px; }
+  .topbar .user { flex-wrap: wrap; gap: 6px 10px; min-width: 0; }
+  .topbar .dossier {
+    order: 5;
+    flex: 1 0 100%;
+    border-left: 0;
+    border-top: 1px solid rgba(255, 255, 255, .18);
+    padding: 6px 0 0;
+    font-size: 12.5px;
+  }
+
+  /* Menu : bouton hamburger + tiroir off-canvas + fond d'ecran */
+  .nav-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 42px;
+    min-height: 40px;
+    padding: 6px 10px;
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, .3);
+    border-radius: var(--radius);
+    color: #fff;
+    font-size: 17px;
+    line-height: 1;
+    cursor: pointer;
+  }
+  .nav-toggle:focus-visible { outline: 2px solid #7fc4f0; outline-offset: 2px; }
+  .sidebar {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: min(300px, 86vw);
+    z-index: 40;
+    padding-top: 0;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    visibility: hidden;
+    transform: translateX(-100%);
+    transition: transform .18s ease-out, visibility .18s;
+    box-shadow: 2px 0 16px rgba(16, 40, 59, .35);
+  }
+  body.nav-open .sidebar {
+    visibility: visible;
+    transform: translateX(0);
+  }
+  body.nav-open .nav-backdrop { display: block; }
+  body.nav-open { overflow: hidden; }
+  .nav-close {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    box-sizing: border-box;
+    width: 100%;
+    min-height: 44px;
+    padding: 10px 16px;
+    background: var(--navy);
+    border: 0;
+    border-bottom: 1px solid rgba(255, 255, 255, .12);
+    color: #dbe7f0;
+    font-family: inherit;
+    font-size: 13px;
+    text-align: left;
+    cursor: pointer;
+  }
+  .sidebar a { min-height: 42px; }
+  .sidebar button.group-title { min-height: 40px; }
+
+  /* Contenu */
+  .content { padding: 14px 14px 56px; }
+  .card > header { flex-wrap: wrap; gap: 4px 10px; }
+
+  /* Formulaires et filtres adaptatifs, cibles tactiles */
+  .form-grid.cols-3, .form-grid.cols-4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .filters .field { flex: 1 1 180px; }
+  .filters input, .filters select { min-width: 0; width: 100%; }
+  .btn { min-height: 40px; }
+  .btn-small { min-height: 34px; }
+  input[type="text"], input[type="email"], input[type="password"], input[type="number"],
+  input[type="date"], input[type="search"], select, textarea { min-height: 40px; }
+
+  /* Encart des totaux */
+  .totaux { width: 100%; margin-left: 0; }
+
+  /* Document de facturation */
+  .invoice-print { padding: 18px; }
+  .invoice-print .entete { flex-direction: column; gap: 14px; }
+  .invoice-print .bloc-client { min-width: 0; width: 100%; }
+}
+
+/* ------------------------------------------------------- 390 px : mobile -- */
+@media (max-width: 390px) {
+  .content { padding: 12px 12px 56px; }
+  .topbar .brand { font-size: 14px; }
+  .page-head h1 { font-size: 18px; }
+  .grid.cols-2, .grid.cols-3, .grid.cols-4,
+  .form-grid.cols-2, .form-grid.cols-3, .form-grid.cols-4 {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .kpi .value { font-size: 19px; }
+  .actions { width: 100%; }
+  .actions .btn { flex: 1 1 auto; justify-content: center; }
+  .sidebar { width: min(300px, 88vw); }
+}

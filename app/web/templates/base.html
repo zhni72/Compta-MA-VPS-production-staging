@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block page_title %}{{ title }}{% endblock %} — {{ app_name }}</title>
+  <link rel="stylesheet" href="/static/css/app.css">
+</head>
+<body>
+<header class="topbar">
+  <button type="button" class="nav-toggle" aria-expanded="false" aria-controls="main-nav" aria-label="Ouvrir le menu de navigation">☰</button>
+  <div class="brand"><span class="logo">CM</span>{{ app_name }}</div>
+  <div class="dossier">
+    Dossier : <strong>{{ company.name if company else "aucun" }}</strong>
+    {% if company and company.ice %}· ICE {{ company.ice }}{% endif %}
+    {% if company %}· <span class="badge badge-blue">TVA {{ company.vat_regime }}</span>{% endif %}
+  </div>
+  <div class="spacer"></div>
+  <div class="user">
+    {% if user %}
+      <span>{{ user.full_name }}</span>
+      {% set codes = user.role_codes | list %}
+      {% if codes %}<span class="badge badge-blue">{{ ROLE_LABELS_WEB.get(codes[0], codes[0]) }}</span>{% endif %}
+      <a href="/deconnexion" title="Fermer la session">Déconnexion</a>
+    {% endif %}
+  </div>
+</header>
+
+<div class="layout">
+  <nav class="sidebar" id="main-nav" aria-label="Navigation principale">
+    <button type="button" class="nav-close" aria-controls="main-nav">Fermer le menu<span aria-hidden="true"> ✕</span></button>
+    <a href="/" class="{{ 'active' if active == 'tableau-de-bord' }}"><span class="ico">▦</span>Tableau de bord</a>
+
+    <button type="button" class="group-title group-toggle" aria-expanded="true" aria-controls="nav-commerce">Commerce<span class="caret" aria-hidden="true">▾</span></button>
+    <div class="group-items" id="nav-commerce">
+      <a href="/tiers" class="{{ 'active' if active == 'tiers' }}"><span class="ico">👥</span>Clients &amp; fournisseurs</a>
+      <a href="/factures?type=vente" class="{{ 'active' if active == 'ventes' }}"><span class="ico">📄</span>Factures de vente</a>
+      <a href="/factures?type=achat" class="{{ 'active' if active == 'achats' }}"><span class="ico">📥</span>Factures d'achat</a>
+      <a href="/reglements" class="{{ 'active' if active == 'reglements' }}"><span class="ico">💰</span>Règlements</a>
+    </div>
+
+    <button type="button" class="group-title group-toggle" aria-expanded="true" aria-controls="nav-comptabilite">Comptabilité<span class="caret" aria-hidden="true">▾</span></button>
+    <div class="group-items" id="nav-comptabilite">
+      <a href="/ecritures" class="{{ 'active' if active == 'ecritures' }}"><span class="ico">✎</span>Saisie des écritures</a>
+      <a href="/etats/journal" class="{{ 'active' if active == 'journal' }}"><span class="ico">📓</span>Journal comptable</a>
+      <a href="/etats/grand-livre" class="{{ 'active' if active == 'grand-livre' }}"><span class="ico">📖</span>Grand livre</a>
+      <a href="/etats/balance" class="{{ 'active' if active == 'balance' }}"><span class="ico">⚖</span>Balance générale</a>
+      <a href="/comptes" class="{{ 'active' if active == 'comptes' }}"><span class="ico">📚</span>Plan comptable</a>
+      <a href="/rapprochement" class="{{ 'active' if active == 'rapprochement' }}"><span class="ico">🏦</span>Rapprochement bancaire</a>
+    </div>
+
+    <button type="button" class="group-title group-toggle" aria-expanded="true" aria-controls="nav-etats">États de synthèse<span class="caret" aria-hidden="true">▾</span></button>
+    <div class="group-items" id="nav-etats">
+      <a href="/etats/bilan" class="{{ 'active' if active == 'bilan' }}"><span class="ico">🏦</span>Bilan</a>
+      <a href="/etats/cpc" class="{{ 'active' if active == 'cpc' }}"><span class="ico">📈</span>CPC</a>
+      <a href="/etats/esg" class="{{ 'active' if active == 'esg' }}"><span class="ico">📊</span>ESG</a>
+      <a href="/etats/etic" class="{{ 'active' if active == 'etic' }}"><span class="ico">🗒</span>ETIC</a>
+    </div>
+
+    <button type="button" class="group-title group-toggle" aria-expanded="true" aria-controls="nav-immobilisations">Immobilisations<span class="caret" aria-hidden="true">▾</span></button>
+    <div class="group-items subnav" id="nav-immobilisations">
+      <a href="/immobilisations" class="{{ 'active' if active == 'immobilisations' }}"><span class="ico">🏭</span>Fiches</a>
+      <a href="/immobilisations/etats" class="{{ 'active' if active == 'immobilisations-etats' }}"><span class="ico">📉</span>Amortissements &amp; cessions</a>
+    </div>
+
+    <button type="button" class="group-title group-toggle" aria-expanded="true" aria-controls="nav-stocks">Stocks &amp; provisions<span class="caret" aria-hidden="true">▾</span></button>
+    <div class="group-items subnav" id="nav-stocks">
+      <a href="/stocks" class="{{ 'active' if active == 'stocks' }}"><span class="ico">📦</span>Articles</a>
+      <a href="/stocks/mouvements" class="{{ 'active' if active == 'stocks-mouvements' }}"><span class="ico">🔁</span>Mouvements</a>
+      <a href="/stocks/inventaire" class="{{ 'active' if active == 'stocks-inventaire' }}"><span class="ico">🔢</span>Inventaire</a>
+      <a href="/stocks/provisions" class="{{ 'active' if active == 'stocks-provisions' }}"><span class="ico">🛡</span>Provisions / dépréciations</a>
+    </div>
+
+    <button type="button" class="group-title group-toggle" aria-expanded="true" aria-controls="nav-paie">Paie<span class="caret" aria-hidden="true">▾</span></button>
+    <div class="group-items subnav" id="nav-paie">
+      <a href="/paie" class="{{ 'active' if active == 'paie' }}"><span class="ico">💼</span>Paie</a>
+      <a href="/etats/journal?journal_code=OD" class="{{ 'active' if active == 'paie-ecritures' }}"><span class="ico">✎</span>Écritures de paie</a>
+      <a href="/paie/dts.pdf" class="telechargement" title="Télécharger le document PDF"><span class="ico">📄</span>DTS / État 9421 (PDF)</a>
+    </div>
+
+    <button type="button" class="group-title group-toggle" aria-expanded="true" aria-controls="nav-fiscalite">Fiscalité<span class="caret" aria-hidden="true">▾</span></button>
+    <div class="group-items" id="nav-fiscalite">
+      <a href="/tva" class="{{ 'active' if active == 'tva' }}"><span class="ico">%</span>TVA</a>
+      <a href="/tva/edi" class="{{ 'active' if active == 'tva-edi' }}"><span class="ico">📤</span>Relevé des déductions / EDI</a>
+      <a href="/liasse" class="{{ 'active' if active == 'liasse' }}"><span class="ico">🧾</span>IS &amp; Liasse fiscale</a>
+    </div>
+
+    <button type="button" class="group-title group-toggle" aria-expanded="true" aria-controls="nav-greffe">Juridique / Greffe<span class="caret" aria-hidden="true">▾</span></button>
+    <div class="group-items" id="nav-greffe">
+      <a href="/greffe" class="{{ 'active' if active == 'greffe' }}"><span class="ico">🏛</span>Dossier Greffe</a>
+    </div>
+
+    <button type="button" class="group-title group-toggle" aria-expanded="true" aria-controls="nav-cloture">Clôture &amp; cessation<span class="caret" aria-hidden="true">▾</span></button>
+    <div class="group-items" id="nav-cloture">
+      <a href="/parametres/exercices" class="{{ 'active' if active == 'exercices' }}"><span class="ico">🗓</span>Exercices</a>
+      <a href="/parametres/a-nouveaux" class="{{ 'active' if active == 'a-nouveaux' }}"><span class="ico">↪</span>À-nouveaux</a>
+      <a href="/activite?contexte=cessation" class="{{ 'active' if active == 'cessation' }}"><span class="ico">⏹</span>Cessation</a>
+    </div>
+
+    <button type="button" class="group-title group-toggle" aria-expanded="true" aria-controls="nav-efacturation">E-facturation<span class="caret" aria-hidden="true">▾</span></button>
+    <div class="group-items" id="nav-efacturation">
+      <a href="/e-facturation" class="{{ 'active' if active == 'e-facturation' }}"><span class="ico">📡</span>Transmission</a>
+    </div>
+
+    <button type="button" class="group-title group-toggle" aria-expanded="true" aria-controls="nav-audit">Audit &amp; traçabilité<span class="caret" aria-hidden="true">▾</span></button>
+    <div class="group-items" id="nav-audit">
+      <a href="/audit" class="{{ 'active' if active == 'audit' }}"><span class="ico">🕵</span>Journal d'audit</a>
+      <a href="/activite" class="{{ 'active' if active == 'activite' }}"><span class="ico">📋</span>Événements système</a>
+      <a href="/audit/integrite" class="{{ 'active' if active == 'integrite' }}"><span class="ico">✅</span>Contrôles d'intégrité</a>
+    </div>
+
+    <button type="button" class="group-title group-toggle" aria-expanded="true" aria-controls="nav-parametres">Paramètres<span class="caret" aria-hidden="true">▾</span></button>
+    <div class="group-items" id="nav-parametres">
+      <a href="/parametres/societe" class="{{ 'active' if active == 'societe' }}"><span class="ico">⚙</span>Société</a>
+      <a href="/parametres/journaux" class="{{ 'active' if active == 'journaux' }}"><span class="ico">📓</span>Journaux</a>
+      <a href="/parametres/utilisateurs" class="{{ 'active' if active == 'utilisateurs' }}"><span class="ico">🔑</span>Utilisateurs &amp; rôles</a>
+      <a href="/parametres/referentiels" class="{{ 'active' if active == 'referentiels' }}"><span class="ico">📐</span>Référentiels fiscaux</a>
+      <a href="/docs" target="_blank"><span class="ico">🔗</span>API technique (avancé)</a>
+    </div>
+  </nav>
+  <button type="button" class="nav-backdrop" aria-label="Fermer le menu de navigation"></button>
+
+  <main class="content">
+    {% if msg %}<div class="alert alert-{{ level }}">{{ msg }}</div>{% endif %}
+    {% block content %}{% endblock %}
+  </main>
+</div>
+<script>
+  (function () {
+    var menu = document.querySelector('.sidebar');
+    if (!menu) { return; }
+    var etats = {};
+    try { etats = JSON.parse(window.localStorage.getItem('compta_ma_menu') || '{}') || {}; } catch (e) { etats = {}; }
+    function appliquer(bouton, ouvert) {
+      bouton.setAttribute('aria-expanded', ouvert ? 'true' : 'false');
+      var bloc = document.getElementById(bouton.getAttribute('aria-controls'));
+      if (bloc) { bloc.hidden = !ouvert; }
+    }
+    Array.prototype.forEach.call(menu.querySelectorAll('.group-toggle'), function (bouton) {
+      var id = bouton.getAttribute('aria-controls');
+      var bloc = document.getElementById(id);
+      var actif = !!(bloc && bloc.querySelector('a.active'));
+      if (actif) { bouton.classList.add('has-active'); }
+      appliquer(bouton, actif || etats[id] !== false);
+      bouton.addEventListener('click', function () {
+        var ouvert = bouton.getAttribute('aria-expanded') !== 'true';
+        appliquer(bouton, ouvert);
+        etats[id] = ouvert;
+        try { window.localStorage.setItem('compta_ma_menu', JSON.stringify(etats)); } catch (err) {}
+      });
+    });
+  })();
+  (function () {
+    /* P1B - tiroir de navigation (tablette / mobile) : ouverture par le bouton
+       hamburger, fermeture par le fond d'ecran, la croix, Echap ou un lien. */
+    var bascule = document.querySelector('.nav-toggle');
+    var menu = document.querySelector('.sidebar');
+    var fond = document.querySelector('.nav-backdrop');
+    var fermer = document.querySelector('.nav-close');
+    if (!bascule || !menu) { return; }
+    function afficher(ouvert) {
+      document.body.classList.toggle('nav-open', ouvert);
+      bascule.setAttribute('aria-expanded', ouvert ? 'true' : 'false');
+      bascule.setAttribute('aria-label', ouvert ? 'Fermer le menu de navigation' : 'Ouvrir le menu de navigation');
+      if (ouvert) {
+        var lien = menu.querySelector('a.active');
+        if (lien) { menu.scrollTop = Math.max(0, lien.offsetTop - Math.round(menu.clientHeight / 2)); }
+      }
+    }
+    bascule.addEventListener('click', function () {
+      afficher(!document.body.classList.contains('nav-open'));
+    });
+    if (fond) { fond.addEventListener('click', function () { afficher(false); }); }
+    if (fermer) { fermer.addEventListener('click', function () { afficher(false); bascule.focus(); }); }
+    menu.addEventListener('click', function (evenement) {
+      var cible = evenement.target;
+      if (cible && cible.closest && cible.closest('a')) { afficher(false); }
+    });
+    document.addEventListener('keydown', function (evenement) {
+      if ((evenement.key === 'Escape' || evenement.keyCode === 27) && document.body.classList.contains('nav-open')) {
+        afficher(false);
+      }
+    });
+    window.addEventListener('resize', function () {
+      if (window.innerWidth > 768 && document.body.classList.contains('nav-open')) { afficher(false); }
+    });
+  })();
+</script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

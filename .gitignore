@@ -1,0 +1,44 @@
+# --- Python ---
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# --- Secrets / config locale ---
+.env
+.env.*
+!.env.example
+
+# --- Bases de donnees locales (Phase 1) ---
+*.db
+*.sqlite
+*.sqlite3
+*.bak*
+
+# --- Fichiers temporaires / artefacts locaux ---
+*.tmp
+*.log
+
+# --- Pieces justificatives et exports (donnees clients) ---
+media/
+exports/
+backups/
+
+# --- IDE ---
+.vscode/
+.idea/
+*.swp
+Thumbs.db
+# --- Environnements Python historiques ---
+.venv-*/
+
+# --- Rapports de tests / reconciliation generes ---
+/pg5*.xml
+/PG4_RECONCILIATION_POST_*.txt
+
+# --- Etats d'execution generes ---
+/P1B_STAGE3_STATE.json

@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1>Nouvelle immobilisation</h1>
+    <div class="breadcrumb">
+      <a href="/">Accueil</a> &middot; <a href="/immobilisations">Immobilisations</a> &middot;
+      Fiche d'acquisition
+    </div>
+  </div>
+  <div class="actions">
+    <a class="btn" href="/immobilisations">Retour</a>
+  </div>
+</div>
+
+<div class="card">
+  <header><span>Acquisition (CGNC — actif immobilisé)</span></header>
+  <div class="body">
+    <form method="post" action="/immobilisations/nouvelle">
+      <div class="grid cols-2">
+        <div class="field">
+          <label for="label">Libellé <span class="required">*</span></label>
+          <input type="text" id="label" name="label" required maxlength="180"
+                 placeholder="Camion frigorifique, ordinateur portable…">
+        </div>
+        <div class="field">
+          <label for="account_number">Compte d'immobilisation (PCGE, classe 2) <span class="required">*</span></label>
+          <select id="account_number" name="account_number" required>
+            {% for numero, libelle in comptes %}
+            <option value="{{ numero }}">{{ numero }} — {{ libelle }}</option>
+            {% endfor %}
+          </select>
+          <div class="field-help">
+            La TVA d'immobilisation sera portée au {{ tva_immo }} (jamais au 34552).
+          </div>
+        </div>
+      </div>
+
+      <div class="grid cols-3">
+        <div class="field">
+          <label for="acquisition_date">Date d'acquisition <span class="required">*</span></label>
+          <input type="date" id="acquisition_date" name="acquisition_date" required>
+        </div>
+        <div class="field">
+          <label for="service_date">Mise en service</label>
+          <input type="date" id="service_date" name="service_date">
+          <div class="field-help">Début de l'amortissement (CGI art. 10).</div>
+        </div>
+        <div class="field">
+          <label for="valeur_origine">Valeur d'origine HT (DH) <span class="required">*</span></label>
+          <input type="number" id="valeur_origine" name="valeur_origine" step="0.01" min="0.01" required>
+        </div>
+      </div>
+
+      <div class="grid cols-3">
+        <div class="field">
+          <label for="valeur_residuelle">Valeur résiduelle (DH)</label>
+          <input type="number" id="valeur_residuelle" name="valeur_residuelle" step="0.01" min="0" value="0">
+          <div class="field-help">Doit rester inférieure à la valeur d'origine.</div>
+        </div>
+        <div class="field">
+          <label for="duree_annees">Durée d'utilité (années)</label>
+          <input type="number" id="duree_annees" name="duree_annees" min="0" max="99" value="5">
+          <div class="field-help">Obligatoire pour un bien amortissable.</div>
+        </div>
+        <div class="field">
+          <label for="mode">Mode d'amortissement</label>
+          <select id="mode" name="mode">
+            <option value="lineaire">Linéaire (par défaut)</option>
+            <option value="degressif">Dégressif (coefficient paramétrable)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="grid cols-3">
+        <div class="field">
+          <label for="coefficient">Coefficient du dégressif</label>
+          <input type="number" id="coefficient" name="coefficient" step="0.1" min="1" max="3" placeholder="auto">
+          <div class="field-help">
+            Paramètres : {{ coefficients.court }} (3-4 ans), {{ coefficients.moyen }} (5-6 ans),
+            {{ coefficients.long }} (&gt; 6 ans) — à confirmer (CGI art. 10).
+          </div>
+        </div>
+        <div class="field">
+          <label for="tva_montant">TVA récupérable (DH)</label>
+          <input type="number" id="tva_montant" name="tva_montant" step="0.01" min="0" value="0">
+        </div>
+        <div class="field">
+          <label for="prorata_temporis">Prorata temporis (1re annuité)</label>
+          <select id="prorata_temporis" name="prorata_temporis">
+            <option value="1" {{ 'selected' if prorata_defaut }}>Oui — règle fiscale (mois entiers)</option>
+            <option value="0" {{ 'selected' if not prorata_defaut }}>Non — annuité pleine (comptable)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="grid cols-2">
+        <div class="field">
+          <label for="third_party_id">Fournisseur (identifiant tiers, optionnel)</label>
+          <input type="number" id="third_party_id" name="third_party_id" min="1">
+          <div class="field-help">La facture d'achat comptabilise déjà l'immobilisation.</div>
+        </div>
+        <div class="field">
+          <label for="notes">Notes internes</label>
+          <input type="text" id="notes" name="notes" maxlength="255">
+        </div>
+      </div>
+
+      <div class="field">
+        <label>
+          <input type="checkbox" name="comptabiliser" value="1">
+          Générer l'écriture d'acquisition (compte 2xxx + TVA au {{ tva_immo }})
+        </label>
+        <div class="field-help">
+          À cocher lorsque l'immobilisation n'a pas été comptabilisée par une facture
+          d'achat (apport, production, acquisition à l'étranger).
+        </div>
+      </div>
+      <div class="field">
+        <label for="compte_contrepartie">Compte de contrepartie (si écriture générée)</label>
+        <input type="text" id="compte_contrepartie" name="compte_contrepartie"
+               placeholder="4411 (fournisseur) ou 5141 (banque)">
+      </div>
+
+      <div style="margin-top:14px">
+        <button type="submit" class="btn btn-primary">Enregistrer la fiche</button>
+        <a class="btn" href="/immobilisations">Annuler</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

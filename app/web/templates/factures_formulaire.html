@@ -1,0 +1,191 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1>{{ title }}</h1>
+    <div class="breadcrumb">
+      <a href="/">Accueil</a> &middot;
+      <a href="/factures?type={{ type_facture }}">{{ title }}</a> &middot; Saisie
+    </div>
+  </div>
+  <div class="actions">
+    <a class="btn" href="/factures?type={{ type_facture }}">Retour à la liste</a>
+  </div>
+</div>
+
+<form method="post" action="/factures/nouvelle" id="form-facture">
+  <input type="hidden" name="invoice_type" value="{{ type_facture }}">
+
+  <div class="card">
+    <header><span>Entête du document</span></header>
+    <div class="body">
+      <div class="form-grid cols-4">
+        <div style="grid-column: span 2">
+          <label for="partner_code" class="required">
+            {{ 'Fournisseur' if type_facture == 'achat' else 'Client' }}
+          </label>
+          <select id="partner_code" name="partner_code" required>
+            <option value="">— Sélectionner —</option>
+            {% for t in tiers %}
+            <option value="{{ t.code }}">{{ t.code }} — {{ t.name }}{% if t.ice %} (ICE {{ t.ice }}){% endif %}</option>
+            {% endfor %}
+          </select>
+          {% if not tiers %}
+          <div class="field-help">
+            Aucun {{ 'fournisseur' if type_facture == 'achat' else 'client' }} enregistré :
+            <a href="/tiers/nouveau?kind={{ 'fournisseur' if type_facture == 'achat' else 'client' }}">créer une fiche</a>.
+          </div>
+          {% endif %}
+        </div>
+        <div>
+          <label for="invoice_date" class="required">Date de facture</label>
+          <input type="date" id="invoice_date" name="invoice_date" value="{{ today }}" required>
+        </div>
+        <div>
+          <label for="due_date">Date d'échéance</label>
+          <input type="date" id="due_date" name="due_date">
+          <div class="field-help">Vide = délai de règlement du tiers.</div>
+        </div>
+        <div>
+          <label for="payment_mode">Mode de règlement</label>
+          <select id="payment_mode" name="payment_mode">
+            <option value="virement">Virement bancaire</option>
+            <option value="prelevement">Prélèvement</option>
+            <option value="cheque">Chèque</option>
+            <option value="espece">Espèces</option>
+            <option value="effet">Effet (traite)</option>
+            <option value="compensation">Compensation</option>
+          </select>
+        </div>
+        <div style="grid-column: span 2">
+          <label for="reference">Référence / bon de commande</label>
+          <input type="text" id="reference" name="reference" maxlength="60">
+        </div>
+        <div>
+          <label for="notes">Commentaire</label>
+          <input type="text" id="notes" name="notes" maxlength="255">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <header>
+      <span>Lignes de facturation</span>
+      <button type="button" class="btn btn-small" onclick="ajouterLigne()">+ Ajouter une ligne</button>
+    </header>
+    <div class="body tight table-wrap">
+      <table class="data" id="table-lignes">
+        <thead>
+          <tr>
+            <th style="width:38%">Désignation</th>
+            <th style="width:10%">Quantité</th>
+            <th style="width:15%">Prix unitaire HT</th>
+            <th style="width:10%">TVA</th>
+            <th class="num" style="width:13%">Total HT</th>
+            <th class="num" style="width:14%">Total TTC</th>
+            <th style="width:40px"></th>
+          </tr>
+        </thead>
+        <tbody id="corps-lignes"></tbody>
+      </table>
+    </div>
+    <div class="form-actions" style="justify-content: flex-end">
+      <div class="totaux">
+        <div class="line"><span>Total HT</span><span id="total-ht">0,00 DH</span></div>
+        <div class="line"><span>Total TVA</span><span id="total-tva">0,00 DH</span></div>
+        <div class="line total"><span>Total TTC</span><span id="total-ttc">0,00 DH</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="body">
+      <label>
+        <input type="checkbox" name="is_credit_note" value="1" style="width:auto; margin-right:6px">
+        Document d'avoir (annulation totale ou partielle, TVA en sens inverse)
+      </label>
+      <label style="margin-top:8px">
+        <input type="checkbox" name="auto_validate" value="1" style="width:auto; margin-right:6px" checked>
+        Valider immédiatement (numéro attribué + écriture comptable générée)
+      </label>
+      <div class="field-help">
+        Un brouillon reste modifiable ; dès la validation, la facture est numérotée,
+        comptabilisée et devient immuable (correction par avoir ou contre-écriture).
+      </div>
+    </div>
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary">Enregistrer la facture</button>
+      <a class="btn" href="/factures?type={{ type_facture }}">Annuler</a>
+    </div>
+  </div>
+</form>
+
+<template id="modele-ligne">
+  <tr>
+    <td><input type="text" name="designation" placeholder="Désignation de la prestation ou du produit"></td>
+    <td><input type="text" name="quantity" value="1" class="ligne-qte"></td>
+    <td><input type="text" name="unit_price" value="0.00" class="ligne-pu"></td>
+    <td>
+      <select name="vat_rate" class="ligne-tva">
+        <option value="20" selected>20 %</option>
+        <option value="10">10 %</option>
+        <option value="0">Exonéré</option>
+      </select>
+    </td>
+    <td class="num ligne-ht">0,00</td>
+    <td class="num ligne-ttc">0,00</td>
+    <td class="center">
+      <button type="button" class="btn btn-small btn-danger" onclick="supprimerLigne(this)">✕</button>
+    </td>
+  </tr>
+</template>
+
+<script>
+  const corps = document.getElementById('corps-lignes');
+  const modele = document.getElementById('modele-ligne');
+
+  function nombre(valeur) {
+    return parseFloat(String(valeur).replace(/\s/g, '').replace(',', '.')) || 0;
+  }
+
+  function formater(montant, devise) {
+    const texte = montant.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    return devise ? texte + ' DH' : texte;
+  }
+
+  function ajouterLigne() {
+    corps.appendChild(modele.content.cloneNode(true));
+    recalculer();
+  }
+
+  function supprimerLigne(bouton) {
+    bouton.closest('tr').remove();
+    if (!corps.children.length) ajouterLigne();
+    recalculer();
+  }
+
+  function recalculer() {
+    let totalHT = 0;
+    let totalTVA = 0;
+    corps.querySelectorAll('tr').forEach(function (ligne) {
+      const ht = nombre(ligne.querySelector('.ligne-qte').value)
+               * nombre(ligne.querySelector('.ligne-pu').value);
+      const taux = nombre(ligne.querySelector('.ligne-tva').value);
+      const tva = ht * taux / 100;
+      ligne.querySelector('.ligne-ht').textContent = formater(ht);
+      ligne.querySelector('.ligne-ttc').textContent = formater(ht + tva);
+      totalHT += ht;
+      totalTVA += tva;
+    });
+    document.getElementById('total-ht').textContent = formater(totalHT, true);
+    document.getElementById('total-tva').textContent = formater(totalTVA, true);
+    document.getElementById('total-ttc').textContent = formater(totalHT + totalTVA, true);
+  }
+
+  corps.addEventListener('input', recalculer);
+  corps.addEventListener('change', recalculer);
+  for (let i = 0; i < 3; i++) ajouterLigne();
+</script>
+{% endblock %}

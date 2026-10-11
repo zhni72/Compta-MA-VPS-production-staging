@@ -1,0 +1,40 @@
+# Compta MA - deploiement phase 3 : application + PostgreSQL
+# Usage : cp .env.example .env ; docker compose up -d --build
+#         docker compose exec app python -m alembic upgrade head
+
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-compta_ma}
+      POSTGRES_USER: ${POSTGRES_USER:-compta}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-compta}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-compta} -d ${POSTGRES_DB:-compta_ma}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build: .
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      # En phase 3 la base est PostgreSQL : meme code que la phase 1 (SQLite).
+      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-compta}:${POSTGRES_PASSWORD:-compta}@db:5432/${POSTGRES_DB:-compta_ma}
+      SECRET_KEY: ${SECRET_KEY:-compta-ma-secret-a-remplacer-en-production-32}
+      DEBUG: ${DEBUG:-false}
+      DEFAULT_VAT_RATE: ${DEFAULT_VAT_RATE:-20.00}
+    ports:
+      - "8000:8000"
+    volumes:
+      - media:/app/media
+
+volumes:
+  postgres_data:
+  media:

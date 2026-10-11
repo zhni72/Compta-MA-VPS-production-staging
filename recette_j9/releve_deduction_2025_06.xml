@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!-- Declarant : SOCIETE RECETTE MAROC SARL AU -->
+<DeclarationReleveDeduction>
+  <identifiantFiscal>1234567</identifiantFiscal>
+  <annee>2025</annee>
+  <periode>6</periode>
+  <regime>1</regime>
+  <releveDeductions>
+    <rd>
+      <ord>1</ord>
+      <num>FA25-05</num>
+      <des>6111 — Achat marchandises 05/2025</des>
+      <mht>8000.00</mht>
+      <tva>800.00</tva>
+      <ttc>8800.00</ttc>
+      <refF>
+        <if>1000202</if>
+        <nom>FOURNISSEUR-DIVERS</nom>
+        <ice>000000000000202</ice>
+      </refF>
+      <tx>20</tx>
+      <mp>
+        <id>1</id>
+      </mp>
+      <dpai>2025-06-18</dpai>
+      <dfac>2025-05-08</dfac>
+    </rd>
+    <rd>
+      <ord>2</ord>
+      <num>FA25-06</num>
+      <des>6111 — Achat marchandises 06/2025</des>
+      <mht>8000.00</mht>
+      <tva>640.00</tva>
+      <ttc>8640.00</ttc>
+      <refF>
+        <if>1000202</if>
+        <nom>FOURNISSEUR-DIVERS</nom>
+        <ice>000000000000202</ice>
+      </refF>
+      <tx>20</tx>
+      <mp>
+        <id>1</id>
+      </mp>
+      <dpai>2025-06-18</dpai>
+      <dfac>2025-06-08</dfac>
+    </rd>
+    <rd>
+      <ord>3</ord>
+      <num>LOY25-06</num>
+      <des>6131 — Loyer 06/2025</des>
+      <mht>2000.00</mht>
+      <tva>400.00</tva>
+      <ttc>2400.00</ttc>
+      <refF>
+        <if>1000202</if>
+        <nom>FOURNISSEUR-DIVERS</nom>
+        <ice>000000000000202</ice>
+      </refF>
+      <tx>20</tx>
+      <mp>
+        <id>1</id>
+      </mp>
+      <dpai>2025-06-18</dpai>
+      <dfac>2025-06-03</dfac>
+    </rd>
+  </releveDeductions>
+</DeclarationReleveDeduction>

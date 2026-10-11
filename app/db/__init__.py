@@ -1,0 +1,1 @@
+"""Couche d'acces aux donnees (SQLite en phase 1, PostgreSQL en phase 2/3)."""

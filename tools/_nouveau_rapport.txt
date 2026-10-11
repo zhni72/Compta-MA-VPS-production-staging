@@ -1,0 +1,173 @@
+def _rapport(contexte: dict) -> str:
+    """Livrable `P1B_SIMULATION_2025_V3_CORRIGEE.md` (lecture seule).
+
+    Demarche fiscale demandee : resultat comptable -> reintegrations -> deductions
+    -> resultat fiscal -> IS au taux de l'exercice -> cotisation minimale
+    (exigibilite selon les dates reelles) -> impot du -> resultat net corrige ->
+    impact sur les a-nouveaux 2026.
+    """
+    chiffres = contexte["chiffres"]
+    fiscal = contexte["fiscal"]
+    ir = contexte["ir"]
+    exo = fiscal["exoneration"]
+    manquants = contexte["manquants"]
+    lignes = [
+        "# P1B v3 CORRIGEE — IS 2025 par la demarche fiscale (lecture seule)",
+        "",
+        f"**Societe** : {contexte['company'].name}  ·  **Exercice** : {EXERCICE}  ·  "
+        f"**Ecritures** : {contexte['nb_ecritures']}",
+        f"**Base inchangee pendant l'execution** : {contexte['base_identique']} "
+        f"(SHA-256 {contexte['empreinte_avant'][:16]}…) — aucune ecriture modifiee.",
+        "",
+        "## 1. Resultat comptable -> resultat fiscal -> IS 2025",
+        "",
+        "| Etape | Montant |",
+        "|---|---|",
+        f"| Resultat net **comptabilise** (apres IS) | "
+        f"{_montant(fiscal['resultat_comptable'])} DH |",
+        f"| + Reintegration de l'IS comptabilise (**non deductible**, CGI art. 11) | "
+        f"{_montant(fiscal['impots_comptabilises'])} DH |",
+        f"| = **Resultat comptable avant IS** | "
+        f"**{_montant(fiscal['resultat_avant_impot'])} DH** |",
+    ]
+    if fiscal["total_reintegrations"]:
+        for ligne in fiscal["reintegrations"]:
+            lignes.append(
+                f"| + Reintegration : {ligne['libelle']} ({ligne['reference']}) | "
+                f"{_montant(ligne['montant'])} DH |"
+            )
+    else:
+        lignes.append("| + Autres reintegrations (catalogue CGI art. 11) | 0,00 DH |")
+    if fiscal["total_deductions"]:
+        for ligne in fiscal["deductions"]:
+            lignes.append(
+                f"| - Deduction : {ligne['libelle']} ({ligne['reference']}) | "
+                f"{_montant(ligne['montant'])} DH |"
+            )
+    else:
+        lignes.append("| - Deductions fiscales | 0,00 DH (aucune identifiee) |")
+    lignes += [
+        f"| **Resultat fiscal (BNF) 2025** | **{_montant(fiscal['resultat_fiscal'])} DH** |",
+        f"| Taux IS applicable (exercice 2025) | **{fiscal['taux']}** "
+        f"(BNF <= 300 000 DH : grille transitoire 2025) |",
+        f"| **IS 2025 calcule** | **{_montant(fiscal['is'])} DH** |",
+        f"| IS comptabilise (compte 6701) | {_montant(chiffres['is_comptabilise'])} DH |",
+        f"| **Ecart (IS comptabilise - IS calcule)** | "
+        f"**{_montant(fiscal['ecart_is'])} DH** |",
+        "",
+        "## 2. Cotisation minimale 2025 et exoneration",
+        "",
+        "| Element | Valeur |",
+        "|---|---|",
+        f"| Taux theorique | {fiscal['cm_parametres']['rate']} du CA TTC |",
+        f"| Plancher theorique | {_montant(fiscal['cm_parametres']['minimum'])} DH |",
+        f"| Base (CA TTC : CA HT + TVA collectee) | {_montant(fiscal['cm_base'])} DH |",
+        f"| **CM theorique** (avant exoneration) | {_montant(fiscal['cm_theorique'])} DH |",
+        f"| Debut d'exploitation retenu | {exo['date_debut_activite']} (fiche societe) |",
+        f"| Duree d'exoneration legale | {exo['duree_exoneration_mois']} mois |",
+        f"| Fin d'exoneration | {exo['fin_exoneration']} |",
+        f"| Mois d'activite de l'exercice | {exo['mois_activite']} |",
+        f"| **Cotisation minimale exigible 2025** | "
+        + (
+            "**NON (0,00 DH)**"
+            if exo["exoneree"]
+            else f"**{_montant(fiscal['cm_exigible'])} DH**"
+        )
+        + " |",
+        f"| Justification | "
+        + (
+            f"societe en activite depuis le {exo['date_debut_activite']} : les 36 premiers "
+            f"mois couvrent l'exercice {EXERCICE} (jusqu'au {exo['fin_exoneration']}) — "
+            "cotisation minimale **non exigible** ; les 3 000 DH de plancher ne constituent "
+            "**pas** une dette fiscale."
+            if exo["exoneree"]
+            else "exoneration terminee : cotisation minimale exigible."
+        )
+        + " |",
+        "",
+        "## 3. Impot finalement du et resultat net corrige",
+        "",
+        "| Element | Montant |",
+        "|---|---|",
+        f"| IS calcule | {_montant(fiscal['is'])} DH |",
+        f"| Cotisation minimale exigible | {_montant(fiscal['cm_exigible'])} DH |",
+        f"| **Impot finalement du 2025** | **{_montant(fiscal['impot_du'])} DH** |",
+        f"| Acomptes verses (3453) | {_montant(fiscal['acomptes'])} DH |",
+        f"| Credits d'impot | {_montant(fiscal['credits'])} DH |",
+        f"| Solde a payer | {_montant(fiscal['solde'])} DH |",
+        f"| **Resultat net corrige 2025** (resultat avant IS - IS du) | "
+        f"**{_montant(fiscal['resultat_net_corrige'])} DH** |",
+        f"| Resultat net comptabilise | {_montant(fiscal['resultat_net_comptabilise'])} DH |",
+        "",
+        "## 4. Impact projete sur les a-nouveaux 2026 (simulation)",
+        "",
+        "| Poste | Situation actuelle | Apres correction | Ecart |",
+        "|---|---|---|---|",
+        f"| Report a nouveau (resultat 2025) | "
+        f"{_montant(fiscal['resultat_net_comptabilise'])} DH | "
+        f"{_montant(fiscal['resultat_net_corrige'])} DH | "
+        f"+{_montant(fiscal['ecart_is'])} DH |",
+        f"| Dette d'IS (6701 / 4453) | {_montant(chiffres['is_comptabilise'])} DH | "
+        f"{_montant(fiscal['impot_du'])} DH | -{_montant(fiscal['ecart_is'])} DH |",
+        f"| Total du bilan net 2025 | {_montant(contexte['total_bilan'])} DH | "
+        f"{_montant(contexte['total_bilan'])} DH | 0,00 DH (equilibre conserve) |",
+        "",
+        f"> Correction **strictement interne** : baisse de la charge d'IS "
+        f"({_montant(fiscal['ecart_is'])} DH) et de la dette d'impot du meme montant ; le "
+        "total du bilan reste inchange. **Aucune ecriture n'a ete passee** (simulation).",
+        "",
+        "## 5. Paie / IR 2025 — blocage maintenu",
+        "",
+    ]
+    if manquants:
+        for manquant in manquants:
+            lignes.append(f"- {manquant}")
+        lignes.append("")
+        lignes.append(
+            "> Les parametres sociaux et de frais professionnels 2025 n'etant pas "
+            "documentes, **aucune paie 2025 n'est calculee** (le moteur refuse : "
+            "`BaremeIndisponible`) et l'IR 2025 reste **non chiffre** — aucun taux devine."
+        )
+    else:
+        lignes.append("- aucun")
+    if ir["calcule"]:
+        lignes.append(
+            f"- IR 2025 recalcule : {_montant(ir['ir_recalcule'])} DH "
+            f"(comptabilise {_montant(ir['ir_comptabilise'])}, ecart {_montant(ir['ecart'])})"
+        )
+    else:
+        lignes.append(f"- IR 2025 : {ir['motif']}")
+    lignes += [
+        "",
+        "## 6. References et statut",
+        "",
+        "| Element | Valeur | Source |",
+        "|---|---|---|",
+    ]
+    for entree in rates_ma.sources_referentiel(EXERCICE):
+        lignes.append(
+            f"| {entree['element']} | {entree['valeur']} | {entree['source']} "
+            f"({entree['statut']}) |"
+        )
+    lignes += [
+        "",
+        "## 7. Conclusion",
+        "",
+        f"- **IS 2025** : base fiscale {_montant(fiscal['resultat_fiscal'])} DH x "
+        f"{fiscal['taux']} = **{_montant(fiscal['is'])} DH** ; cotisation minimale "
+        + (
+            "**non exigible (exoneration des 36 premiers mois)**"
+            if exo["exoneree"]
+            else "**exigible**"
+        )
+        + f" ; impot du **{_montant(fiscal['impot_du'])} DH** ; ecart de "
+        f"**{_montant(fiscal['ecart_is'])} DH** avec l'IS comptabilise (6701).",
+        f"- **Resultat net corrige 2025** : **{_montant(fiscal['resultat_net_corrige'])} DH** "
+        "(avant toute regularisation de paie).",
+        f"- **Simulation uniquement** : exercice 2025 inchange (SHA-256 de la base identique, "
+        f"{contexte['nb_ecritures']} ecritures avant et apres).",
+        "- **P1B etape 3 non lancee** : elle suppose la validation humaine de la presente "
+        "simulation corrigee (et, pour l'IR, la documentation des parametres de paie 2025).",
+        "",
+    ]
+    return "\n".join(lignes)

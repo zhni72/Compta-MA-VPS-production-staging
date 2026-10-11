@@ -1,0 +1,6 @@
+date;libelle;reference;debit;credit
+2025-02-03;Loyer 02/2025;LOY25-02;;2400.00
+2025-02-12;Encaissement clients 02/2025;ENC25-02;32400.00;
+2025-02-18;Règlement fournisseurs 02/2025;REG25-02;;8640.00
+2025-02-25;Autres charges 02/2025;OD25-02;;1000.00
+2025-02-28;Paie et charges 02/2025;PAIE25-02;;12000.00

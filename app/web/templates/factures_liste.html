@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1>{{ title }}</h1>
+    <div class="breadcrumb">
+      <a href="/">Accueil</a> &middot; {{ title }} &middot; {{ documents | length }} document(s)
+    </div>
+  </div>
+  <div class="actions">
+    <a class="btn btn-primary" href="/factures/nouvelle?type={{ type_facture }}">
+      + Nouvelle facture {{ "d'achat" if type_facture == 'achat' else 'de vente' }}
+    </a>
+    <a class="btn" href="/reglements?type={{ type_facture }}">Règlements</a>
+  </div>
+</div>
+
+<div class="grid cols-3">
+  <div class="kpi">
+    <div class="label">Total TTC affiché</div>
+    <div class="value">{{ totaux.ttc | money }}</div>
+    <div class="hint">Documents non annulés</div>
+  </div>
+  <div class="kpi {% if totaux.reste > 0 %}negative{% else %}positive{% endif %}">
+    <div class="label">Reste à encaisser / payer</div>
+    <div class="value">{{ totaux.reste | money }}</div>
+    <div class="hint">Total TTC - règlements enregistrés</div>
+  </div>
+  <div class="kpi">
+    <div class="label">Nombre de documents</div>
+    <div class="value">{{ documents | length }}</div>
+    <div class="hint">Filtres actifs : {{ statut or 'tous états' }}</div>
+  </div>
+</div>
+
+<div class="card">
+  <form class="filters" method="get" action="/factures">
+    <input type="hidden" name="type" value="{{ type_facture }}">
+    <div class="field">
+      <label for="statut">État</label>
+      <select id="statut" name="statut">
+        <option value="" {{ 'selected' if not statut }}>Tous</option>
+        <option value="draft" {{ 'selected' if statut == 'draft' }}>Brouillon</option>
+        <option value="validated" {{ 'selected' if statut == 'validated' }}>Validée</option>
+        <option value="partially_paid" {{ 'selected' if statut == 'partially_paid' }}>Partiellement réglée</option>
+        <option value="paid" {{ 'selected' if statut == 'paid' }}>Réglée</option>
+        <option value="cancelled" {{ 'selected' if statut == 'cancelled' }}>Annulée</option>
+      </select>
+    </div>
+    <div class="field">
+      <label for="search">Numéro de facture</label>
+      <input type="search" id="search" name="search" value="{{ search }}" placeholder="FV202600001">
+    </div>
+    <div class="field">
+      <label for="avoir">Type</label>
+      <select id="avoir" name="avoir">
+        <option value="" {{ 'selected' if not avoir }}>Factures + avoirs</option>
+        <option value="0" {{ 'selected' if avoir == '0' }}>Factures seules</option>
+        <option value="1" {{ 'selected' if avoir == '1' }}>Avoirs seuls</option>
+      </select>
+    </div>
+    <button type="submit" class="btn">Filtrer</button>
+    <a class="btn" href="/factures?type={{ type_facture }}">Réinitialiser</a>
+  </form>
+
+  <div class="body tight table-wrap">
+    <table class="data">
+      <thead>
+        <tr>
+          <th>Numéro</th><th>Date</th><th>Tiers</th><th class="num">Total HT</th>
+          <th class="num">TVA</th><th class="num">Total TTC</th><th class="num">Réglé</th>
+          <th class="num">Reste</th><th>Échéance</th><th>État</th><th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for f in documents %}
+        <tr>
+          <td>
+            <a href="/factures/{{ f.id }}">{{ f.number or ('Brouillon #' ~ f.id) }}</a>
+            {% if f.is_credit_note %}<span class="badge badge-grey">Avoir</span>{% endif %}
+          </td>
+          <td>{{ f.invoice_date | date_fr }}</td>
+          <td>{{ tiers_map.get(f.partner_id, '—') }}</td>
+          <td class="num">{{ f.total_ht | amount }}</td>
+          <td class="num">{{ f.total_vat | amount }}</td>
+          <td class="num"><strong>{{ f.total_ttc | amount }}</strong></td>
+          <td class="num">{{ f.paid_amount | amount }}</td>
+          <td class="num">{{ f.remaining_amount | amount }}</td>
+          <td>{{ f.due_date | date_fr }}</td>
+          <td><span class="badge {{ STATUS_BADGES.get(f.status) }}">{{ STATUS_LABELS.get(f.status) }}</span></td>
+          <td class="center">
+            {% if f.status != 'cancelled' %}
+            <a class="btn btn-small" href="/factures/{{ f.id }}/impression" target="_blank">Imprimer</a>
+            {% endif %}
+          </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="11" class="empty">Aucun document ne correspond aux filtres sélectionnés.</td></tr>
+        {% endfor %}
+      </tbody>
+      <tfoot>
+        <tr>
+          <td colspan="5">Totaux (documents non annulés)</td>
+          <td class="num">{{ totaux.ttc | amount }}</td>
+          <td colspan="2" class="num">{{ totaux.reste | amount }}</td>
+          <td colspan="3"></td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+</div>
+{% endblock %}

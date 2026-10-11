@@ -1,0 +1,178 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1>Déclaration de TVA</h1>
+    <div class="breadcrumb">
+      <a href="/">Accueil</a> &middot; Fiscalité &middot; {{ libelle }}
+      &middot; échéance de dépôt : {{ declaration.echeance | date_fr }}
+    </div>
+  </div>
+  <div class="actions">
+    <button class="btn" type="button" onclick="window.print()">Imprimer</button>
+    {% if company %}<a class="btn" href="/parametres/societe">Régime : {{ company.vat_regime }}</a>{% endif %}
+  </div>
+</div>
+
+<div class="grid cols-4">
+  <div class="kpi">
+    <div class="label">TVA collectée (4455)</div>
+    <div class="value">{{ declaration.tva_collectee | money }}</div>
+    <div class="hint">Sur les ventes de la période</div>
+  </div>
+  <div class="kpi">
+    <div class="label">TVA déductible (3455)</div>
+    <div class="value">{{ declaration.tva_deductible | money }}</div>
+    <div class="hint">Sur les achats et charges</div>
+  </div>
+  <div class="kpi {{ 'negative' if declaration.tva_a_payer > 0 else 'positive' }}">
+    <div class="label">{{ "TVA à payer" if declaration.tva_a_payer > 0 else "Crédit de TVA" }}</div>
+    <div class="value">
+      {{ (declaration.tva_a_payer if declaration.tva_a_payer > 0 else declaration.credit_tva_a_reporter) | money }}
+    </div>
+    <div class="hint">Net = collectée − déductible</div>
+  </div>
+  <div class="kpi">
+    <div class="label">Chiffre d'affaires {{ exercice }}</div>
+    <div class="value">{{ ca_annuel | money }}</div>
+    <div class="hint">Régime conseillé : {{ regime_conseille }}</div>
+  </div>
+</div>
+
+<div class="grid cols-2">
+  <div class="card">
+    <header><span>Période déclarative</span></header>
+    <form class="filters" method="get" action="/tva">
+      <div class="field">
+        <label for="year">Exercice</label>
+        <input type="number" id="year" name="year" value="{{ exercice }}" min="2000" max="2100" style="min-width:110px">
+      </div>
+      <div class="field">
+        <label for="month">Mois (régime mensuel)</label>
+        <select id="month" name="month">
+          <option value="">—</option>
+          {% for m in range(1, 13) %}
+          <option value="{{ m }}" {{ 'selected' if month == m | string }}>{{ '%02d' % m }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="field">
+        <label for="quarter">Trimestre (régime trimestriel)</label>
+        <select id="quarter" name="quarter">
+          <option value="">—</option>
+          {% for t in range(1, 5) %}
+          <option value="{{ t }}" {{ 'selected' if quarter == t | string }}>T{{ t }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <button type="submit" class="btn btn-primary">Calculer</button>
+    </form>
+    <div class="body">
+      <p class="field-help" style="margin:0">
+        Dépôt et paiement sur <strong>SIMPL-TVA</strong> (portail DGI) au plus tard le
+        <strong>20</strong> du mois suivant la période. Régime mensuel si le chiffre
+        d'affaires annuel atteint 1 000 000 DH, trimestriel en dessous.
+      </p>
+    </div>
+  </div>
+
+  <div class="card">
+    <header>
+      <span>Ventilation de la TVA par taux — ventes (collectée) et achats (déductible)</span>
+      <a class="btn btn-small btn-primary" href="/tva/edi?year={{ exercice }}&quarter={{ quarter }}&month={{ month }}">Relevé des déductions (XML DGI)</a>
+    </header>
+    <div class="body tight table-wrap">
+      <table class="data">
+        <thead>
+          <tr>
+            <th class="num">Taux</th>
+            <th class="num">Ventes : base HT</th><th class="num">Ventes : TVA</th>
+            <th class="num">Achats : base HT</th><th class="num">Achats : TVA</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% set taux_liste = (ventilation_ventes | map(attribute='vat_rate') | list) +
+                              (ventilation_achats | map(attribute='vat_rate') | list) %}
+          {% set uniques = taux_liste | unique | sort(reverse=true) %}
+          {% for taux in uniques %}
+          {% set vente = (ventilation_ventes | selectattr('vat_rate', 'equalto', taux) | list | first) %}
+          {% set achat = (ventilation_achats | selectattr('vat_rate', 'equalto', taux) | list | first) %}
+          <tr>
+            <td class="num">{{ taux | amount }} %</td>
+            <td class="num">{{ vente.base_ht | amount if vente else '—' }}</td>
+            <td class="num">{{ vente.tva | amount if vente else '—' }}</td>
+            <td class="num">{{ achat.base_ht | amount if achat else '—' }}</td>
+            <td class="num">{{ achat.tva | amount if achat else '—' }}</td>
+          </tr>
+          {% else %}
+          <tr><td colspan="5" class="empty">Aucune facture validée sur la période.</td></tr>
+          {% endfor %}
+        </tbody>
+        <tfoot>
+          <tr>
+            <td class="num">Totaux</td>
+            <td class="num">{{ ventilation_ventes | sum(attribute='base_ht') | amount }}</td>
+            <td class="num">{{ declaration.tva_collectee | amount }}</td>
+            <td class="num">{{ ventilation_achats | sum(attribute='base_ht') | amount }}</td>
+            <td class="num">{{ declaration.tva_deductible | amount }}</td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div class="grid cols-2">
+  <div class="card">
+    <header><span>Comptes de TVA mouvementés</span></header>
+    <div class="body tight table-wrap">
+      <table class="data">
+        <thead><tr><th>Compte</th><th>Intitulé</th><th class="num">Débit</th><th class="num">Crédit</th><th class="num">Solde</th></tr></thead>
+        <tbody>
+          {% for d in declaration.detail %}
+          <tr>
+            <td class="code">{{ d.account_number }}</td>
+            <td>{{ d.label }}</td>
+            <td class="num">{{ d.debit | amount }}</td>
+            <td class="num">{{ d.credit | amount }}</td>
+            <td class="num">{{ d.solde | amount }}</td>
+          </tr>
+          {% else %}
+          <tr><td colspan="5" class="empty">Aucun mouvement de TVA sur la période.</td></tr>
+          {% endfor %}
+        </tbody>
+        <tfoot>
+          <tr><td colspan="4">TVA nette</td><td class="num">{{ declaration.tva_nette | amount }}</td></tr>
+        </tfoot>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <header><span>Taux de TVA en vigueur (barème 2026)</span></header>
+    <div class="body tight table-wrap">
+      <table class="data">
+        <thead><tr><th>Code</th><th class="num">Taux</th><th>Libellé</th><th class="center">Déductible</th></tr></thead>
+        <tbody>
+          {% for t in taux %}
+          <tr>
+            <td class="code">{{ t.code }}</td>
+            <td class="num">{{ t.rate | amount }} %</td>
+            <td>{{ t.label }}</td>
+            <td class="center">{{ 'Oui' if t.is_deductible else 'Non' }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      <div class="body">
+        <p class="field-help" style="margin:0">
+          Depuis le 01/01/2026, seuls subsistent <strong>20 %</strong> (normal) et
+          <strong>10 %</strong> (réduit) : les taux de 14 % et 7 % sont supprimés.
+          Les taux sont historisés en base, jamais codés en dur.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

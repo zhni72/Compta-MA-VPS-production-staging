@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1>Plan comptable (CGNC)</h1>
+    <div class="breadcrumb">
+      <a href="/">Accueil</a> &middot; Comptabilité &middot; {{ total_comptes }} comptes au plan
+    </div>
+  </div>
+  <div class="actions">
+    <a class="btn" href="/comptes?account_class=6">Charges</a>
+    <a class="btn" href="/comptes?account_class=7">Produits</a>
+    <a class="btn" href="/comptes?prefix=34">Tiers clients</a>
+    <a class="btn" href="/comptes?prefix=44">Fournisseurs &amp; État</a>
+  </div>
+</div>
+
+<div class="card">
+  <form class="filters" method="get" action="/comptes">
+    <div class="field">
+      <label for="prefix">Code (préfixe)</label>
+      <input type="search" id="prefix" name="prefix" value="{{ prefix }}" placeholder="ex. 3421">
+    </div>
+    <div class="field">
+      <label for="account_class">Classe</label>
+      <select id="account_class" name="account_class">
+        <option value="">Toutes les classes</option>
+        {% for classe, libelle in [(1, 'Financement permanent'), (2, 'Actif immobilisé'),
+          (3, 'Actif circulant'), (4, 'Passif circulant'), (5, 'Trésorerie'),
+          (6, 'Charges'), (7, 'Produits'), (8, 'Résultats')] %}
+        <option value="{{ classe }}" {{ 'selected' if account_class == classe | string }}>
+          {{ classe }} — {{ libelle }}
+        </option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="field">
+      <label for="search">Libellé</label>
+      <input type="search" id="search" name="search" value="{{ search }}" placeholder="ex. TVA">
+    </div>
+    <button type="submit" class="btn">Rechercher</button>
+    <a class="btn" href="/comptes">Réinitialiser</a>
+  </form>
+
+  <div class="body tight table-wrap">
+    <table class="data">
+      <thead>
+        <tr>
+          <th>Compte</th><th>Intitulé</th><th class="center">Classe</th>
+          <th class="center">Type</th><th class="center">Collectif</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for c in comptes %}
+        <tr>
+          <td class="code"><a href="/etats/grand-livre?account_number={{ c.number }}">{{ c.number }}</a></td>
+          <td>{{ c.label }}</td>
+          <td class="center">{{ c.account_class }}</td>
+          <td class="center">
+            {% if c.statement == 'bilan' %}
+            <span class="badge badge-blue">Bilan</span>
+            {% else %}
+            <span class="badge badge-grey">CPC</span>
+            {% endif %}
+          </td>
+          <td class="center">{{ 'Oui' if c.is_collectif else '—' }}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="5" class="empty">Aucun compte ne correspond à la recherche.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="card">
+  <header><span>Créer un compte (divisionnaire ou sous-compte)</span></header>
+  <form method="post" action="/comptes/nouveau">
+    <div class="body">
+      <div class="form-grid cols-3">
+        <div>
+          <label for="number" class="required">Numéro de compte</label>
+          <input type="text" id="number" name="number" required minlength="4" maxlength="12"
+                 placeholder="ex. 61425">
+          <div class="field-help">Codification décimale du CGNC : 4 chiffres minimum.</div>
+        </div>
+        <div style="grid-column: span 2">
+          <label for="label" class="required">Intitulé du compte</label>
+          <input type="text" id="label" name="label" required maxlength="180"
+                 placeholder="ex. Transports sur achats">
+        </div>
+      </div>
+      <label style="margin-top:10px">
+        <input type="checkbox" name="is_collectif" value="1" style="width:auto; margin-right:6px">
+        Compte collectif (les écritures sont saisies sur ses divisionnaires)
+      </label>
+    </div>
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary">Créer le compte</button>
+    </div>
+  </form>
+</div>
+{% endblock %}

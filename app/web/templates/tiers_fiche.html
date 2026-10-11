@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1>{{ tiers.code }} — {{ tiers.name }}</h1>
+    <div class="breadcrumb">
+      <a href="/">Accueil</a> &middot; <a href="/tiers">Tiers</a> &middot; Fiche
+    </div>
+  </div>
+  <div class="actions">
+    <a class="btn btn-primary"
+       href="/factures/nouvelle?type={{ 'achat' if tiers.kind == 'fournisseur' else 'vente' }}">
+      + Nouvelle facture
+    </a>
+    <a class="btn" href="/tiers?kind={{ tiers.kind }}">Retour</a>
+  </div>
+</div>
+
+<div class="grid cols-2">
+  <div class="card">
+    <header><span>Identité</span></header>
+    <div class="body tight">
+      <table class="data">
+        <tbody>
+          <tr><td>Code</td><td><strong>{{ tiers.code }}</strong></td></tr>
+          <tr><td>Type</td><td>{{ {'client': 'Client', 'fournisseur': 'Fournisseur', 'salarie': 'Salarié'}.get(tiers.kind, tiers.kind) }}</td></tr>
+          <tr><td>ICE</td><td class="code">{{ tiers.ice or ('dispensé (particulier)' if tiers.is_individual else 'non renseigné') }}</td></tr>
+          <tr><td>Identifiant fiscal (IF)</td><td class="code">{{ tiers.fiscal_id or '—' }}</td></tr>
+          <tr><td>Registre de commerce</td><td class="code">{{ tiers.rc or '—' }}</td></tr>
+          <tr><td>Compte PCGE</td><td class="code">{{ tiers.account_number }}</td></tr>
+          <tr><td>Délai de règlement</td><td>{{ tiers.payment_terms_days }} jour(s)</td></tr>
+          <tr><td>Coordonnées</td><td>{{ tiers.phone or '—' }} · {{ tiers.email or '—' }}</td></tr>
+          <tr><td>Adresse</td><td>{{ tiers.address or '—' }}{% if tiers.city %} — {{ tiers.city }}{% endif %}</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <header><span>Extrait du grand livre {{ livre.date_from | date_fr }} — {{ livre.date_to | date_fr }} (compte {{ tiers.account_number }})</span></header>
+    <div class="body tight table-wrap">
+      <table class="data">
+        <thead><tr><th>Date</th><th>Pièce</th><th class="num">Débit</th><th class="num">Crédit</th><th class="num">Solde</th></tr></thead>
+        <tbody>
+          {% for l in livre.lines[:15] %}
+          <tr>
+            <td>{{ l.entry_date | date_fr }}</td>
+            <td>{{ l.entry_number }} — {{ l.entry_label }}</td>
+            <td class="num">{{ l.debit | amount }}</td>
+            <td class="num">{{ l.credit | amount }}</td>
+            <td class="num">{{ l.solde_cumule | amount }}</td>
+          </tr>
+          {% else %}
+          <tr><td colspan="5" class="empty">Aucun mouvement sur ce compte.</td></tr>
+          {% endfor %}
+        </tbody>
+        <tfoot>
+          <tr>
+            <td colspan="2">Solde du compte</td>
+            <td class="num">{{ livre.total_debit | amount }}</td>
+            <td class="num">{{ livre.total_credit | amount }}</td>
+            <td class="num">{{ livre.solde | amount }}</td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <header><span>Documents du tiers</span></header>
+  <div class="body tight table-wrap">
+    <table class="data">
+      <thead>
+        <tr>
+          <th>Numéro</th><th>Date</th><th>Type</th><th class="num">Total HT</th>
+          <th class="num">TVA</th><th class="num">Total TTC</th><th class="num">Reste à payer</th><th>État</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for f in documents %}
+        <tr>
+          <td><a href="/factures/{{ f.id }}">{{ f.number or ('Brouillon #' ~ f.id) }}</a></td>
+          <td>{{ f.invoice_date | date_fr }}</td>
+          <td>{{ 'Vente' if f.invoice_type == 'vente' else 'Achat' }}{% if f.is_credit_note %} (avoir){% endif %}</td>
+          <td class="num">{{ f.total_ht | amount }}</td>
+          <td class="num">{{ f.total_vat | amount }}</td>
+          <td class="num">{{ f.total_ttc | amount }}</td>
+          <td class="num">{{ f.remaining_amount | amount }}</td>
+          <td><span class="badge {{ STATUS_BADGES.get(f.status) }}">{{ STATUS_LABELS.get(f.status) }}</span></td>
+        </tr>
+        {% else %}
+        <tr><td colspan="8" class="empty">Aucun document pour ce tiers.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

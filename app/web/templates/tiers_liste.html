@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1>Clients &amp; fournisseurs</h1>
+    <div class="breadcrumb"><a href="/">Accueil</a> &middot; Tiers &middot; {{ tiers | length }} fiche(s)</div>
+  </div>
+  <div class="actions">
+    <a class="btn btn-primary" href="/tiers/nouveau?kind=client">+ Client</a>
+    <a class="btn" href="/tiers/nouveau?kind=fournisseur">+ Fournisseur</a>
+  </div>
+</div>
+
+<div class="card">
+  <form class="filters" method="get" action="/tiers">
+    <div class="field">
+      <label for="kind">Type de tiers</label>
+      <select id="kind" name="kind">
+        <option value="" {{ 'selected' if not kind }}>Tous</option>
+        <option value="client" {{ 'selected' if kind == 'client' }}>Clients</option>
+        <option value="fournisseur" {{ 'selected' if kind == 'fournisseur' }}>Fournisseurs</option>
+        <option value="salarie" {{ 'selected' if kind == 'salarie' }}>Salariés</option>
+      </select>
+    </div>
+    <div class="field">
+      <label for="search">Recherche par nom</label>
+      <input type="search" id="search" name="search" value="{{ search }}" placeholder="Raison sociale…">
+    </div>
+    <button type="submit" class="btn">Rechercher</button>
+    <a class="btn" href="/tiers">Réinitialiser</a>
+  </form>
+
+  <div class="body tight table-wrap">
+    <table class="data">
+      <thead>
+        <tr>
+          <th>Code</th><th>Raison sociale</th><th>Type</th><th>ICE</th><th>IF</th>
+          <th>Compte PCGE</th><th class="center">Délai</th><th class="center">État</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for t in tiers %}
+        <tr>
+          <td><a href="/tiers/{{ t.code }}">{{ t.code }}</a></td>
+          <td>{{ t.name }}{% if t.is_individual %} <span class="badge badge-grey">Particulier</span>{% endif %}</td>
+          <td>{{ {'client': 'Client', 'fournisseur': 'Fournisseur', 'salarie': 'Salarié'}.get(t.kind, t.kind) }}</td>
+          <td class="code">
+            {% if t.ice %}{{ t.ice }}
+            {% elif t.requires_ice %}<span class="badge badge-orange">à compléter</span>
+            {% else %}<span class="secondary">dispensé</span>{% endif %}
+          </td>
+          <td class="code">{{ t.fiscal_id or '—' }}</td>
+          <td class="code">{{ t.account_number }}</td>
+          <td class="center">{{ t.payment_terms_days }} j</td>
+          <td class="center">
+            {% if t.is_active %}<span class="badge badge-green">Actif</span>
+            {% else %}<span class="badge badge-grey">Inactif</span>{% endif %}
+          </td>
+        </tr>
+        {% else %}
+        <tr>
+          <td colspan="8" class="empty">
+            Aucun tiers enregistré. Créez un <a href="/tiers/nouveau?kind=client">client</a>
+            ou un <a href="/tiers/nouveau?kind=fournisseur">fournisseur</a>.
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

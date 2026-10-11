@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1>Règlements</h1>
+    <div class="breadcrumb"><a href="/">Accueil</a> &middot; Règlements &middot; {{ reglements | length }} mouvement(s)</div>
+  </div>
+  <div class="actions">
+    <a class="btn" href="/factures?type=vente">Factures de vente</a>
+    <a class="btn" href="/factures?type=achat">Factures d'achat</a>
+  </div>
+</div>
+
+<div class="grid cols-3">
+  <div class="kpi positive">
+    <div class="label">Total des règlements affichés</div>
+    <div class="value">{{ total | money }}</div>
+    <div class="hint">{{ reglements | length }} règlement(s)</div>
+  </div>
+  <div class="kpi">
+    <div class="label">Filtre appliqué</div>
+    <div class="value" style="font-size:17px">
+      {{ {'vente': 'Encaissements clients', 'achat': 'Décaissements fournisseurs'}.get(type, 'Tous les règlements') }}
+    </div>
+    <div class="hint"><a href="/reglements">Voir tous les règlements</a></div>
+  </div>
+  <div class="kpi">
+    <div class="label">Comptes de trésorerie</div>
+    <div class="value" style="font-size:17px">5141 Banque · 5161 Caisse</div>
+    <div class="hint">Écritures générées automatiquement</div>
+  </div>
+</div>
+
+<div class="card">
+  <form class="filters" method="get" action="/reglements">
+    <div class="field">
+      <label for="type">Type</label>
+      <select id="type" name="type">
+        <option value="" {{ 'selected' if not type }}>Tous</option>
+        <option value="vente" {{ 'selected' if type == 'vente' }}>Encaissements clients</option>
+        <option value="achat" {{ 'selected' if type == 'achat' }}>Décaissements fournisseurs</option>
+      </select>
+    </div>
+    <button type="submit" class="btn">Filtrer</button>
+    <a class="btn" href="/reglements">Réinitialiser</a>
+  </form>
+
+  <div class="body tight table-wrap">
+    <table class="data">
+      <thead>
+        <tr>
+          <th>Date</th><th>Pièce</th><th>Tiers</th><th>Mode</th><th>Référence</th>
+          <th>Compte trésorerie</th><th class="num">Montant</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in reglements %}
+        <tr>
+          <td>{{ r.payment_date | date_fr }}</td>
+          <td>
+            {% if r.invoice_id %}
+            <a href="/factures/{{ r.invoice_id }}">{{ factures.get(r.invoice_id, '#' ~ r.invoice_id) }}</a>
+            {% else %}—{% endif %}
+          </td>
+          <td>{{ tiers_map.get(r.partner_id, '—') }}</td>
+          <td>{{ r.method }}</td>
+          <td>{{ r.reference or '—' }}</td>
+          <td class="code">{{ r.treasury_account }}</td>
+          <td class="num"><strong>{{ r.amount | amount }}</strong></td>
+        </tr>
+        {% else %}
+        <tr><td colspan="7" class="empty">Aucun règlement enregistré pour le moment.</td></tr>
+        {% endfor %}
+      </tbody>
+      <tfoot>
+        <tr>
+          <td colspan="6">Total</td>
+          <td class="num">{{ total | amount }}</td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+</div>
+{% endblock %}
