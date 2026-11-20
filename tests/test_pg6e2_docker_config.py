@@ -45,7 +45,7 @@ VARIABLES_REQUISES = (
 )
 
 # Ancien secret d'exemple du depot : interdit dans le compose de production.
-SECRET_EXEMPLE = "compta-ma-secret-a-remplacer-en-production-32"
+SECRET_EXEMPLE = "__REQUIRED_SECRET_KEY__"
 
 
 def _lire(chemin: Path) -> str:

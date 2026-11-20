@@ -23,7 +23,7 @@ BASE_DIR = Path(__file__).resolve().parents[2]
 # Valeur d'exemple de `SECRET_KEY` (documentation / developpement). Elle est
 # explicitement INTERDITE en production (cf. PG6E1) : un secret reel doit etre
 # genere hors du depot.
-PLACEHOLDER_SECRET_KEY = "compta-ma-secret-a-remplacer-en-production-32"
+PLACEHOLDER_SECRET_KEY = "__REQUIRED_SECRET_KEY__"
 # Longueur minimale exigee pour `SECRET_KEY` en production (signature HS256).
 MIN_SECRET_KEY_LENGTH = 32
 
